@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카페 온도 — 따뜻한 한 잔의 쉼표</title>
+<meta name="description" content="동네의 작은 로스터리 카페, 카페 온도입니다. 직접 볶은 원두와 수제 디저트를 만나보세요.">
+<style>
+  :root {
+    --brown-dark: #3e2c23;
+    --brown: #6f4e37;
+    --cream: #f7f1e8;
+    --cream-dark: #efe5d5;
+    --accent: #c98a4b;
+    --text: #4a3b30;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", sans-serif;
+    color: var(--text);
+    background: var(--cream);
+    line-height: 1.7;
+  }
+  header {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 6vw;
+    background: rgba(247, 241, 232, 0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--cream-dark);
+  }
+  .logo { font-size: 1.3rem; font-weight: 700; color: var(--brown-dark); }
+  .logo span { color: var(--accent); }
+  nav a {
+    margin-left: 1.5rem; text-decoration: none; color: var(--text);
+    font-size: 0.95rem; transition: color 0.2s;
+  }
+  nav a:hover { color: var(--accent); }
+  .hero {
+    text-align: center;
+    padding: 7rem 6vw 6rem;
+    background: linear-gradient(180deg, var(--cream) 0%, var(--cream-dark) 100%);
+  }
+  .hero .badge {
+    display: inline-block; padding: 0.3rem 1rem; border-radius: 999px;
+    background: var(--brown-dark); color: var(--cream);
+    font-size: 0.85rem; letter-spacing: 0.1em; margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: var(--brown-dark); margin-bottom: 1rem; line-height: 1.3;
+  }
+  .hero p { font-size: 1.1rem; color: var(--brown); margin-bottom: 2.5rem; }
+  .btn {
+    display: inline-block; padding: 0.9rem 2.2rem; border-radius: 999px;
+    background: var(--brown-dark); color: var(--cream);
+    text-decoration: none; font-weight: 600; transition: background 0.2s, transform 0.2s;
+  }
+  .btn:hover { background: var(--accent); transform: translateY(-2px); }
+  section { padding: 5rem 6vw; max-width: 1100px; margin: 0 auto; }
+  h2 {
+    font-size: 1.8rem; color: var(--brown-dark);
+    text-align: center; margin-bottom: 0.6rem;
+  }
+  .sub { text-align: center; color: var(--brown); margin-bottom: 3rem; }
+  .menu-grid {
+    display: grid; gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  }
+  .card {
+    background: #fff; border-radius: 16px; padding: 2rem 1.6rem;
+    box-shadow: 0 4px 16px rgba(62, 44, 35, 0.08);
+    text-align: center; transition: transform 0.2s;
+  }
+  .card:hover { transform: translateY(-4px); }
+  .card .emoji { font-size: 2.5rem; margin-bottom: 0.8rem; }
+  .card h3 { color: var(--brown-dark); margin-bottom: 0.4rem; }
+  .card .price { color: var(--accent); font-weight: 700; margin-top: 0.6rem; }
+  .about { background: var(--brown-dark); color: var(--cream); max-width: none; }
+  .about-inner { max-width: 800px; margin: 0 auto; text-align: center; }
+  .about h2 { color: var(--cream); }
+  .about .sub { color: #d9c7b2; }
+  .about p.body { color: #e9ddcd; }
+  .info-grid {
+    display: grid; gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    text-align: center;
+  }
+  .info-grid h3 { color: var(--brown-dark); margin-bottom: 0.5rem; }
+  footer {
+    text-align: center; padding: 2rem;
+    background: var(--cream-dark); color: var(--brown);
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">카페 <span>온도</span></div>
+  <nav>
+    <a href="#menu">메뉴</a>
+    <a href="#about">소개</a>
+    <a href="#visit">오시는 길</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="badge">SINCE 2026 · 동네 로스터리</div>
+  <h1>따뜻한 한 잔의 쉼표,<br>카페 온도</h1>
+  <p>매일 아침 직접 볶은 원두와 손으로 만든 디저트.<br>당신의 하루에 알맞은 온도를 더합니다.</p>
+  <a class="btn" href="#menu">메뉴 보러가기</a>
+</section>
+
+<section id="menu">
+  <h2>시그니처 메뉴</h2>
+  <p class="sub">가장 사랑받는 네 가지를 소개해요</p>
+  <div class="menu-grid">
+    <div class="card">
+      <div class="emoji">☕</div>
+      <h3>온도 블렌드</h3>
+      <p>고소함과 단맛의 균형이 좋은 하우스 블렌드</p>
+      <p class="price">4,500원</p>
+    </div>
+    <div class="card">
+      <div class="emoji">🥛</div>
+      <h3>수제 바닐라 라떼</h3>
+      <p>직접 만든 바닐라빈 시럽으로 은은하게</p>
+      <p class="price">5,500원</p>
+    </div>
+    <div class="card">
+      <div class="emoji">🍰</div>
+      <h3>바스크 치즈케이크</h3>
+      <p>겉은 진하게, 속은 부드럽게 구운 매일 한정 케이크</p>
+      <p class="price">6,000원</p>
+    </div>
+    <div class="card">
+      <div class="emoji">🍪</div>
+      <h3>브라운버터 쿠키</h3>
+      <p>버터를 태워 풍미를 끌어올린 겉바속촉 쿠키</p>
+      <p class="price">3,500원</p>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="about-inner">
+    <h2>커피에도 알맞은 온도가 있듯이</h2>
+    <p class="sub">사람에게도 저마다의 온도가 있다고 믿어요</p>
+    <p class="body">
+      카페 온도는 동네의 작은 로스터리 카페입니다.
+      매일 아침 그날 쓸 만큼만 원두를 볶고, 디저트는 손으로 직접 만듭니다.
+      바쁜 하루 속, 잠시 쉬어가는 쉼표 같은 공간이 되고 싶습니다.
+    </p>
+  </div>
+</section>
+
+<section id="visit">
+  <h2>오시는 길</h2>
+  <p class="sub">언제든 편하게 들러주세요</p>
+  <div class="info-grid">
+    <div class="card">
+      <div class="emoji">📍</div>
+      <h3>위치</h3>
+      <p>서울시 어딘가구 온도로 12<br>1층 카페 온도</p>
+    </div>
+    <div class="card">
+      <div class="emoji">🕘</div>
+      <h3>영업시간</h3>
+      <p>매일 09:00 – 21:00<br>(매주 월요일 휴무)</p>
+    </div>
+    <div class="card">
+      <div class="emoji">📞</div>
+      <h3>문의</h3>
+      <p>0507-1234-5678<br>@cafe_ondo</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 카페 온도 · 따뜻한 한 잔의 쉼표
+</footer>
+
+</body>
+</html>
