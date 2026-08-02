@@ -1,0 +1,581 @@
+<title>주식리포트 3.0 — 아침 관제탑 (재설계안)</title>
+<style>
+  :root{
+    color-scheme: light;
+    /* 고정 상태색 — 절대 테마 안 탐 */
+    --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+
+    /* 지면 — 새벽 창문 밖 색에서 뽑은 청회색 계열 */
+    --paper:#E9EDF1;
+    --panel:#F7F9FB;
+    --panel-2:#DFE5EB;
+    --line:#C3CDD7;
+    --ink:#111A22;
+    --ink-soft:#5A6774;
+    --ink-faint:#8B98A5;
+    /* 강조 — 개장 직전 여명의 호박색 */
+    --accent:#9A6207;
+    --accent-bg:#F4E6CC;
+    /* 밤 구간 마커 */
+    --night:#2C3A4B;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0E1319;
+      --panel:#161D25;
+      --panel-2:#1E262F;
+      --line:#2C3641;
+      --ink:#EAEEF2;
+      --ink-soft:#98A5B2;
+      --ink-faint:#6B7A88;
+      --accent:#E2A748;
+      --accent-bg:#2E2314;
+      --night:#8FA3BA;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0E1319;
+    --panel:#161D25;
+    --panel-2:#1E262F;
+    --line:#2C3641;
+    --ink:#EAEEF2;
+    --ink-soft:#98A5B2;
+    --ink-faint:#6B7A88;
+    --accent:#E2A748;
+    --accent-bg:#2E2314;
+    --night:#8FA3BA;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Apple SD Gothic Neo","Malgun Gothic",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+  }
+  .num{font-variant-numeric:tabular-nums}
+  .wrap{max-width:800px;margin:0 auto;padding:0 18px 72px}
+
+  .banner{
+    background:var(--panel-2); border-bottom:1px solid var(--line);
+    padding:9px 18px; font-size:12.5px; color:var(--ink-soft); text-align:center;
+  }
+
+  /* ---------- 머리 ---------- */
+  .head{ padding:26px 0 18px; border-bottom:2px solid var(--ink); margin-bottom:0 }
+  .head-row{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap }
+  .head-title{ font-size:19px; font-weight:800; letter-spacing:-0.01em }
+  .head-date{ font-size:13px; color:var(--ink-soft); margin-left:auto }
+
+  /* ---------- 시간축 레일 ---------- */
+  .rail{ position:relative; padding-left:74px }
+  .rail::before{
+    content:""; position:absolute; left:26px; top:8px; bottom:24px; width:2px;
+    background:linear-gradient(to bottom, var(--night) 0%, var(--night) 30%, var(--accent) 62%, var(--accent) 100%);
+    opacity:.35;
+  }
+  .stage{ position:relative; padding:24px 0 4px }
+  .stage-mark{
+    position:absolute; left:-74px; top:26px; width:56px; text-align:right;
+  }
+  .stage-time{ font-size:12px; font-weight:800; letter-spacing:.02em; color:var(--ink-soft); display:block }
+  .stage-dot{
+    position:absolute; left:-52px; top:30px; width:11px; height:11px; border-radius:50%;
+    background:var(--paper); border:2.5px solid var(--night);
+  }
+  .stage.dawn .stage-dot{ border-color:var(--accent) }
+  .stage-label{
+    font-size:12px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-faint); margin-bottom:10px;
+  }
+
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:9px;
+    padding:18px 20px;
+  }
+  .card + .card{ margin-top:10px }
+
+  /* ---------- 밤사이 ---------- */
+  .overnight-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden;
+  }
+  .ov{ background:var(--panel); padding:11px 13px }
+  .ov-name{ font-size:11.5px; color:var(--ink-soft) }
+  .ov-val{ font-size:19px; font-weight:800; margin-top:1px; letter-spacing:-0.01em }
+  .ov-note{ font-size:11px; color:var(--ink-faint); margin-top:2px }
+  .up{color:var(--good)} .down{color:var(--critical)}
+
+  /* ---------- 아침 예측 (핵심) ---------- */
+  .fc{ display:flex; flex-direction:column; gap:14px }
+  .fc-row{ display:flex; gap:14px; align-items:flex-start }
+  .fc-flag{ font-size:26px; line-height:1.2; flex:none; width:32px }
+  .fc-main{ flex:1; min-width:0 }
+  .fc-head{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap }
+  .fc-market{ font-size:15px; font-weight:800 }
+  .fc-call{ font-size:20px; font-weight:800; letter-spacing:-0.01em }
+  .fc-conf{
+    font-size:11.5px; font-weight:800; padding:2px 8px; border-radius:999px;
+    background:var(--panel-2); color:var(--ink-soft); margin-left:auto;
+  }
+  .fc-why{ font-size:13.5px; color:var(--ink-soft); margin-top:5px; line-height:1.6 }
+  .fc-why b{ color:var(--ink); font-weight:700 }
+
+  .verdict{
+    margin-top:14px; padding-top:12px; border-top:1px dashed var(--line);
+    font-size:12.5px; color:var(--ink-soft); display:flex; gap:10px; align-items:flex-start;
+  }
+  .verdict-badge{
+    flex:none; font-size:11px; font-weight:800; padding:2px 7px; border-radius:5px;
+    background:var(--accent-bg); color:var(--accent);
+  }
+
+  /* ---------- 위험 숫자 ---------- */
+  .risk-top{ display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom:12px }
+  .risk-fig{ font-size:52px; font-weight:800; line-height:.95; letter-spacing:-0.02em }
+  .risk-fig small{ font-size:17px; font-weight:600; color:var(--ink-soft) }
+  .risk-break{ font-size:12.5px; color:var(--ink-soft); margin-top:5px }
+  .spark{ margin-left:auto; text-align:right }
+  .spark-cap{ font-size:11px; color:var(--ink-faint); margin-bottom:3px }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:800;
+    padding:3px 10px 3px 8px; border-radius:999px; white-space:nowrap;
+  }
+  .pill .dot{ width:7px; height:7px; border-radius:50%; flex:none }
+  .p-good{ background:color-mix(in srgb,var(--good) 15%,transparent); color:var(--good) }
+  .p-good .dot{ background:var(--good) }
+  .p-warn{ background:color-mix(in srgb,var(--warning) 22%,transparent); color:#8a6100 }
+  .p-warn .dot{ background:var(--warning) }
+  .p-ser{ background:color-mix(in srgb,var(--serious) 20%,transparent); color:#98401f }
+  .p-ser .dot{ background:var(--serious) }
+  .p-crit{ background:color-mix(in srgb,var(--critical) 15%,transparent); color:var(--critical) }
+  .p-crit .dot{ background:var(--critical) }
+  :root[data-theme="dark"] .p-warn{color:#ffd88a} :root[data-theme="dark"] .p-ser{color:#ffb38f}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .p-warn{color:#ffd88a}
+    :root:not([data-theme="light"]) .p-ser{color:#ffb38f} }
+
+  .meaning{
+    font-size:14.5px; line-height:1.8; padding-top:13px; border-top:1px dashed var(--line);
+  }
+  .meaning b{ color:var(--accent) }
+
+  .cty{ display:flex; flex-direction:column; gap:0; margin-top:14px }
+  .cty-r{ display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-top:1px solid var(--line) }
+  .cty-flag{ font-size:18px; flex:none; width:24px }
+  .cty-b{ flex:1; min-width:0 }
+  .cty-h{ display:flex; align-items:baseline; gap:9px }
+  .cty-n{ font-weight:800; font-size:14.5px }
+  .cty-s{ margin-left:auto; font-size:16px; font-weight:800 }
+  .cty-sub{ font-size:11.5px; color:var(--ink-faint); margin-top:1px }
+  .cty-w{ font-size:13px; color:var(--ink-soft); margin-top:5px; line-height:1.6 }
+  .cty-a{ font-size:12.5px; font-weight:800; color:var(--accent); margin-top:5px }
+
+  /* ---------- 행동 ---------- */
+  .act{ padding:13px 0; border-top:1px solid var(--line) }
+  .act:first-of-type{ border-top:0; padding-top:2px }
+  .act-h{ display:flex; align-items:baseline; gap:9px; flex-wrap:wrap }
+  .act-n{ font-weight:800; font-size:14.5px }
+  .act-t{ font-size:11.5px; color:var(--ink-faint) }
+  .act-do{ margin-left:auto; font-size:14px; font-weight:800 }
+  .act-w{ font-size:12.5px; color:var(--ink-soft); margin-top:4px; line-height:1.55 }
+  .band{ flex:none; font-size:12px; font-weight:800; width:13px; text-align:center }
+  .legend{
+    display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--ink-faint);
+    padding-bottom:11px; margin-bottom:3px; border-bottom:1px solid var(--line);
+  }
+  .legend b{ font-weight:800 }
+
+  /* ---------- 행동2 · BNF ---------- */
+  .bnf-hd{ display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:11px }
+  .bnf-rule{ font-size:12px; color:var(--ink-faint) }
+  .bnf-budget{ margin-left:auto; font-size:12px; color:var(--ink-soft) }
+  .bar{ height:5px; border-radius:3px; background:var(--panel-2); overflow:hidden; margin-top:9px }
+  .bar span{ display:block; height:100%; background:var(--accent); border-radius:3px }
+  .bnf-empty{
+    padding:13px 15px; border-radius:8px; background:var(--panel-2);
+    font-size:13.5px; line-height:1.65;
+  }
+  .near{ margin-top:12px }
+  .near-cap{ font-size:11.5px; font-weight:800; color:var(--ink-faint); letter-spacing:.04em; margin-bottom:6px }
+  .near-r{
+    display:flex; gap:10px; align-items:baseline; padding:7px 0;
+    border-top:1px solid var(--line); font-size:13px;
+  }
+  .near-n{ font-weight:700; flex:none; min-width:112px }
+  .near-g{ margin-left:auto; font-size:12px; color:var(--ink-soft) }
+  .ok{ color:var(--good); font-weight:800 }
+  .no{ color:var(--ink-faint) }
+
+  /* ---------- 뉴스 ---------- */
+  .news-t{ font-size:15.5px; font-weight:800; margin-bottom:4px; line-height:1.4 }
+  .news-b{ font-size:13px; color:var(--ink-soft); line-height:1.6 }
+  .news-m{ font-size:11.5px; color:var(--ink-faint); margin-top:6px }
+  .news-tag{
+    display:inline-block; font-size:11px; font-weight:800; padding:2px 7px; border-radius:5px;
+    background:var(--accent-bg); color:var(--accent); margin-bottom:7px;
+  }
+  .empty{ font-size:13px; color:var(--ink-faint); font-style:normal }
+
+  /* ---------- 성적 ---------- */
+  .sc{ display:flex; gap:26px; flex-wrap:wrap; align-items:flex-end }
+  .sc-i{ }
+  .sc-v{ font-size:27px; font-weight:800; letter-spacing:-0.01em }
+  .sc-l{ font-size:11.5px; color:var(--ink-soft); margin-top:1px }
+  .sc-note{ font-size:12px; color:var(--ink-faint); margin-top:12px; line-height:1.6; padding-top:10px; border-top:1px dashed var(--line) }
+
+  .foot{ font-size:11.5px; color:var(--ink-faint); margin-top:26px; padding-top:14px; border-top:1px solid var(--line); line-height:1.7 }
+
+  @media (max-width:560px){
+    .rail{ padding-left:0 }
+    .rail::before{ display:none }
+    .stage-mark{ position:static; text-align:left; width:auto; margin-bottom:2px }
+    .stage-dot{ display:none }
+    .risk-fig{ font-size:44px }
+  }
+</style>
+
+<div class="banner">🧭 재설계안 — 실제 리포트 아님 · 2026-08-02 저장소 실측값으로 구성</div>
+
+<div class="wrap">
+
+  <div class="head">
+    <div class="head-row">
+      <span class="head-title">아침 관제탑</span>
+      <span class="head-date num">2026. 8. 2. (일) 08:42 생성 · 자료 07-31 마감</span>
+    </div>
+  </div>
+
+  <div class="rail">
+
+    <!-- ══════ 1. 밤사이 ══════ -->
+    <section class="stage">
+      <div class="stage-mark"><span class="stage-time">밤사이</span></div>
+      <span class="stage-dot"></span>
+      <div class="stage-label">내가 자는 동안 무슨 일이</div>
+
+      <div class="card">
+        <div class="overnight-grid">
+          <div class="ov">
+            <div class="ov-name">🇺🇸 S&amp;P500 마감</div>
+            <div class="ov-val num">7,489.7 <span class="up">+0.70%</span></div>
+            <div class="ov-note">7-31 종가</div>
+          </div>
+          <div class="ov">
+            <div class="ov-name">나스닥 선물</div>
+            <div class="ov-val num up">+0.59%</div>
+            <div class="ov-note">미국 분위기 양호</div>
+          </div>
+          <div class="ov">
+            <div class="ov-name">닛케이 선물</div>
+            <div class="ov-val num down">−0.68%</div>
+            <div class="ov-note">일본 개장 선행</div>
+          </div>
+          <div class="ov">
+            <div class="ov-name">엔화 (3일 누적)</div>
+            <div class="ov-val num down">−3.61%</div>
+            <div class="ov-note">엔 급등 = 일본주 부담</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ 2. 오늘 아침 예측 — 핵심 ══════ -->
+    <section class="stage dawn">
+      <div class="stage-mark"><span class="stage-time">오늘 아침</span></div>
+      <span class="stage-dot"></span>
+      <div class="stage-label">그래서 오늘 개장은</div>
+
+      <div class="card">
+        <div class="fc">
+
+          <div class="fc-row">
+            <span class="fc-flag">🇰🇷</span>
+            <div class="fc-main">
+              <div class="fc-head">
+                <span class="fc-market">한국 09:00 개장</span>
+                <span class="fc-call down">약세 출발 예상</span>
+                <span class="fc-conf">근거 2종 · 채점 대기</span>
+              </div>
+              <div class="fc-why">
+                미국 상장 한국 ETF(EWY)가 <b>−20.5% 갭</b>으로 마감 — 한국 개장 방향의 가장 빠른 선행 신호예요.
+                공포지수 VKOSPI도 <b>84</b>로 역대 상위 1% 극단치입니다.
+                다만 어제 코스피가 <b>+17.9%</b> 급반등한 직후라 되돌림 성격이 섞여 있어요.
+              </div>
+            </div>
+          </div>
+
+          <div class="fc-row">
+            <span class="fc-flag">🇯🇵</span>
+            <div class="fc-main">
+              <div class="fc-head">
+                <span class="fc-market">일본 09:00 개장</span>
+                <span class="fc-call down">약세 출발 예상</span>
+                <span class="fc-conf">근거 2종 · 채점 대기</span>
+              </div>
+              <div class="fc-why">
+                닛케이 선물 <b>−0.68%</b>, 엔화 3일 <b>−3.61%</b> 급등 — 엔이 오르면 수출주에 부담이에요.
+                닛케이 변동성은 <b>36%</b>(역대 상위 8%)로 높은 상태입니다.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="verdict">
+          <span class="verdict-badge">어제 예측</span>
+          <span>
+            어제 아침 이 자리에서 <b>한국 강세 · 일본 약세</b>로 봤고, 실제로는
+            코스피 <b class="up">+17.9%</b> · 닛케이 <b class="up">+4.0%</b>였습니다 —
+            <b>한국 적중 / 일본 빗나감.</b>
+            <span style="color:var(--ink-faint)">(이 채점은 매일 자동으로 쌓입니다 — 아래 성적표에 누적)</span>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ 3. 오늘 위험 숫자 → 그래서 무슨 뜻 ══════ -->
+    <section class="stage dawn">
+      <div class="stage-mark"><span class="stage-time">위험도</span></div>
+      <span class="stage-dot"></span>
+      <div class="stage-label">숫자와 그 뜻</div>
+
+      <div class="card">
+        <div class="risk-top">
+          <div>
+            <div class="risk-fig num">59.8<small>/100</small></div>
+            <div class="risk-break">기본 50.8 + 추세경보 3.0 + 개장갭 6.0</div>
+          </div>
+          <div style="align-self:center">
+            <span class="pill p-ser"><span class="dot"></span>주의 — 현금 챙기고 방어 준비</span>
+          </div>
+          <div class="spark">
+            <div class="spark-cap">최근 12일</div>
+            <svg width="132" height="36" viewBox="0 0 132 36" aria-label="최근 12일 위험 추이: 40.9에서 59.6까지 올랐다가 53.8">
+              <polyline fill="none" stroke="var(--ink-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                points="0,26 11,29 22,23 33,23 44,22 55,22 66,16 77,4 88,2 99,1 110,10 121,9"/>
+              <circle cx="121" cy="9" r="4" fill="var(--accent)"/>
+            </svg>
+          </div>
+        </div>
+
+        <p class="meaning">
+          위험이 오른 주범은 <b>일본</b>입니다. 한국은 이미 오래 높은 상태라 새 소식이 아니고,
+          미국은 조용해서 오늘 숫자를 끌어올린 건 일본 쪽 변동성이에요.
+        </p>
+
+        <div class="cty">
+          <div class="cty-r">
+            <span class="cty-flag">🇰🇷</span>
+            <div class="cty-b">
+              <div class="cty-h"><span class="cty-n">한국</span><span class="cty-s num">100</span></div>
+              <div class="cty-sub num">상한 도달(원시 107) · 자기 역사 상위 93.7%</div>
+              <div class="cty-w">VKOSPI 84로 역대 상위 1% 극단. <b>위기 체제 124일째</b> — 오늘 새로 나빠진 게 아니라 계속 높은 상태예요.</div>
+              <div class="cty-a">→ 신규 매수 보류</div>
+            </div>
+          </div>
+          <div class="cty-r">
+            <span class="cty-flag">🇯🇵</span>
+            <div class="cty-b">
+              <div class="cty-h"><span class="cty-n">일본</span><span class="cty-s num">78.5</span></div>
+              <div class="cty-sub num">자기 역사 상위 97.8% · 어제보다 상승</div>
+              <div class="cty-w">닛케이 변동성 36%(역대 상위 8%)에 <b>엔 급등 경보</b>까지 겹쳤어요. 오늘 종합 위험을 올린 게 여기입니다.</div>
+              <div class="cty-a">→ 신규 매수 보류</div>
+            </div>
+          </div>
+          <div class="cty-r">
+            <span class="cty-flag">🇺🇸</span>
+            <div class="cty-b">
+              <div class="cty-h"><span class="cty-n">미국</span><span class="cty-s num">29.5</span></div>
+              <div class="cty-sub num">자기 역사 상위 29.9%</div>
+              <div class="cty-w">전 축 평온 — 특이 신호 없음.</div>
+              <div class="cty-a">→ 평소 모드</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ 4-1. 행동1 — 보유 종목 ══════ -->
+    <section class="stage dawn">
+      <div class="stage-mark"><span class="stage-time">행동 1</span></div>
+      <span class="stage-dot"></span>
+      <div class="stage-label">보유 종목 — 어제와 달라진 것만</div>
+
+      <div class="card">
+        <div class="legend">
+          <span><b>▼</b> 줄이기 — 파는 행동</span>
+          <span><b>■</b> 지키기 — 안 팜</span>
+          <span><b>▲</b> 사기 — 추가매수 허용</span>
+        </div>
+
+        <div class="act">
+          <div class="act-h">
+            <span class="band" style="color:var(--warning)">■</span>
+            <span class="act-n">테슬라</span><span class="act-t">🇺🇸 16주</span>
+            <span class="act-do" style="color:#8a6100">사지 마세요 · 보유는 그대로</span>
+          </div>
+          <div class="act-w">🗞 미 NHTSA 서스펜션 결함 조사 착수(7-31) — 아래 핵심 사건 참고. 개별 악재라 추가매수만 막혔고, 파는 게 아닙니다.</div>
+        </div>
+        <div class="act">
+          <div class="act-h">
+            <span class="band" style="color:var(--serious)">■</span>
+            <span class="act-n">야스카와전기</span><span class="act-t">🇯🇵 100주</span>
+            <span class="act-do" style="color:#98401f">방어를 준비하세요 · 팔지는 마세요</span>
+          </div>
+          <div class="act-w">가격건강 나쁨 + 헤지신호 구역. 엔 급등이 수출주에 부담이라 오늘 특히 조심.</div>
+        </div>
+        <div class="act">
+          <div class="act-h">
+            <span class="band" style="color:var(--good)">▲</span>
+            <span class="act-n">미네베아미쓰미</span><span class="act-t">🇯🇵 300주</span>
+            <span class="act-do" style="color:var(--good)">눌림목에서만 사세요</span>
+          </div>
+          <div class="act-w">시장 국면 경계로 추가매수 등급이 한 단계 내려갔어요 — 아무 때나 말고 밀렸을 때만.</div>
+        </div>
+        <div class="act">
+          <div class="act-h">
+            <span class="band" style="color:var(--good)">■</span>
+            <span class="act-n">나머지 21종목</span><span class="act-t">특이사항 없음</span>
+            <span class="act-do" style="color:var(--good)">그대로 두세요</span>
+          </div>
+          <div class="act-w">오늘 행동이 바뀐 종목만 위에 올렸어요. 나머지는 어제와 같습니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ 4-2. 행동2 — 일본주 BNF 매매 지시 ══════ -->
+    <section class="stage dawn">
+      <div class="stage-mark"><span class="stage-time">행동 2</span></div>
+      <span class="stage-dot"></span>
+      <div class="stage-label">일본주 BNF 매매 지시</div>
+
+      <div class="card">
+        <div class="bnf-hd">
+          <span class="pill p-good"><span class="dot"></span>5관문 통과 · 이 저장소 유일</span>
+          <span class="bnf-rule num">TOPIX500 490종목 전수 · 커버리지 100%</span>
+        </div>
+
+        <div class="bnf-empty">
+          <b>오늘 매수 지시 없음</b> — 490종목 전부 훑었는데 3조건을 모두 채운 종목이 없습니다.
+          <span style="color:var(--ink-faint)">보유 중인 BNF 포지션도 없어 오늘 청산 지시도 없어요.</span>
+        </div>
+
+        <div class="near">
+          <div class="near-cap">아깝게 못 미친 종목 — 내일 다시 볼 것</div>
+          <div class="near-r">
+            <span class="near-n">소시오넥스트 <span class="no num">6526</span></span>
+            <span class="num">이격도 <span class="ok">−23.1</span> · 5일 <span class="ok">−20.1</span> · RSI <span class="num">30.9</span></span>
+            <span class="near-g">RSI가 <b>0.9</b>만 더 내려오면 신호</span>
+          </div>
+          <div class="near-r">
+            <span class="near-n">SCREEN홀딩스 <span class="no num">7735</span></span>
+            <span class="num">이격도 <span class="ok">−24.6</span> · 5일 <span class="ok">−20.5</span> · RSI <span class="num">35.5</span></span>
+            <span class="near-g">RSI <b>5.5</b> 남음</span>
+          </div>
+          <div class="near-r">
+            <span class="near-n">다이요유덴 <span class="no num">6976</span></span>
+            <span class="num">이격도 <span class="ok">−28.2</span> · 5일 <span class="ok">−10.4</span> · RSI <span class="num">39.2</span></span>
+            <span class="near-g">RSI <b>9.2</b> 남음</span>
+          </div>
+        </div>
+
+        <div style="margin-top:14px; padding-top:12px; border-top:1px dashed var(--line)">
+          <div class="bnf-hd" style="margin-bottom:6px">
+            <span style="font-size:12.5px; font-weight:800">예산</span>
+            <span class="bnf-budget num">0 / 500만엔 사용 · 여유 500만엔</span>
+          </div>
+          <div class="bar"><span style="width:0%"></span></div>
+          <div style="font-size:11.5px; color:var(--ink-faint); margin-top:7px; line-height:1.6">
+            규칙: 신호 뜨면 <b>다음 거래일 시가</b>에 종목당 100만엔(100주 단위) 매수 → <b>20거래일 뒤 청산</b>.
+            같은 종목 재신호는 1회까지 추가(누적 200만엔). 예산을 넘는 신호는 규칙 밖 — 사장님 재량입니다.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ 5. 핵심 사건 ══════ -->
+    <section class="stage dawn">
+      <div class="stage-mark"><span class="stage-time">사건</span></div>
+      <span class="stage-dot"></span>
+      <div class="stage-label">오늘 진짜 중요한 것만</div>
+
+      <div class="card">
+        <span class="news-tag">보유 종목 직접 영향</span>
+        <div class="news-t">테슬라 — 美 NHTSA, 서스펜션 결함 의혹 조사 착수</div>
+        <div class="news-b">보유 16주에 직접 영향을 주는 규제 리스크예요. 위 「오늘 할 행동」에 이미 반영돼 있습니다.</div>
+        <div class="news-m">2026-07-31 · finance.sina.com.cn</div>
+
+        <div style="margin-top:15px; padding-top:13px; border-top:1px dashed var(--line)">
+          <div class="empty">그 외 어제·오늘 수집된 뉴스 중 보유·관심 종목에 영향 있는 건 없었어요. 수집은 정상 작동했습니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ 6. 성적표 ══════ -->
+    <section class="stage dawn">
+      <div class="stage-mark"><span class="stage-time">성적</span></div>
+      <span class="stage-dot"></span>
+      <div class="stage-label">이 리포트를 믿어도 되나</div>
+
+      <div class="card">
+        <div class="sc">
+          <div class="sc-i">
+            <div class="sc-v num">62%</div>
+            <div class="sc-l">시장 판단 적중률 (주간 자가채점)</div>
+          </div>
+          <div class="sc-i">
+            <div class="sc-v num" style="color:var(--ink-faint)">1일</div>
+            <div class="sc-l">개장 방향 예측 누적 (오늘 시작)</div>
+          </div>
+          <div class="sc-i">
+            <div class="sc-v num" style="color:var(--ink-faint)">0건</div>
+            <div class="sc-l">실전 검증 완료 지표</div>
+          </div>
+        </div>
+        <p class="sc-note">
+          ★ 개장 방향 예측은 <b>오늘부터 채점을 시작</b>합니다. 20거래일쯤 쌓이면 “이 예측이 몇 % 맞는지”가 실제 숫자로 나와요.
+          그 전까지는 예측을 참고만 하시고, 실제 매매는 「오늘 할 행동」을 따르시는 게 안전합니다.
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <details style="margin-top:26px; border:1px solid var(--line); border-radius:9px; background:var(--panel); padding:14px 18px">
+    <summary style="font-size:13px; font-weight:800; cursor:pointer">참고 — 행동 문구 13단계 전체 (시안 검토용)</summary>
+    <div style="margin-top:13px; font-size:13px; line-height:1.5">
+
+      <div style="font-size:11.5px; font-weight:800; letter-spacing:.06em; color:var(--ink-faint); margin:0 0 7px">▼ 줄이기 — 파는 행동이 들어감</div>
+      <div class="near-r" style="border-top:0"><span class="band" style="color:var(--critical)">▼</span><span><b>매도를</b> 검토하세요</span><span class="near-g num">SELL_REVIEW</span></div>
+      <div class="near-r"><span class="band" style="color:var(--critical)">▼</span><span><b>줄이는 걸</b> 검토하세요</span><span class="near-g num">REDUCE_REVIEW</span></div>
+      <div class="near-r"><span class="band" style="color:var(--serious)">▼</span><span><b>일부 정리</b>를 검토하세요</span><span class="near-g num">PROFIT_LOCK_REVIEW</span></div>
+
+      <div style="font-size:11.5px; font-weight:800; letter-spacing:.06em; color:var(--ink-faint); margin:15px 0 7px">■ 지키기 — 안 팜 · 추가매수 여부만 다름</div>
+      <div class="near-r" style="border-top:0"><span class="band" style="color:var(--serious)">■</span><span><b>방어를 준비</b>하세요 · 팔지는 마세요</span><span class="near-g num">HEDGE_PREPARE</span></div>
+      <div class="near-r"><span class="band" style="color:var(--serious)">■</span><span><b>버티세요</b> · 재매수는 아직</span><span class="near-g num">DEFENSE_HOLD</span></div>
+      <div class="near-r"><span class="band" style="color:var(--warning)">■</span><span><b>관찰 중</b> · 사지 마세요</span><span class="near-g num">WATCH_CHART</span></div>
+      <div class="near-r"><span class="band" style="color:var(--warning)">■</span><span><b>사지 마세요</b> · 보유는 그대로</span><span class="near-g num">DO_NOT_ADD</span></div>
+      <div class="near-r"><span class="band" style="color:var(--ink-faint)">■</span><span style="color:var(--ink-faint)"><b>판단 보류</b> · 자료 부족</span><span class="near-g num">DATA_INSUFFICIENT</span></div>
+      <div class="near-r"><span class="band" style="color:var(--good)">■</span><span><b>그대로 두세요</b></span><span class="near-g num">HOLD</span></div>
+
+      <div style="font-size:11.5px; font-weight:800; letter-spacing:.06em; color:var(--ink-faint); margin:15px 0 7px">▲ 사기 — 추가매수 허용</div>
+      <div class="near-r" style="border-top:0"><span class="band" style="color:var(--good)">▲</span><span><b>나눠서 재매수</b> 시작</span><span class="near-g num">STAGED_REENTRY</span></div>
+      <div class="near-r"><span class="band" style="color:var(--good)">▲</span><span><b>눌림목에서만</b> 사세요</span><span class="near-g num">BUY_THE_DIP_ONLY</span></div>
+      <div class="near-r"><span class="band" style="color:var(--good)">▲</span><span><b>조금씩 나눠</b> 사세요</span><span class="near-g num">PARTIAL_ADD_ALLOWED</span></div>
+      <div class="near-r"><span class="band" style="color:var(--good)">▲</span><span><b>더 사도</b> 좋습니다</span><span class="near-g num">ADD_ALLOWED</span></div>
+
+      <p style="font-size:12px; color:var(--ink-faint); margin:15px 0 0; line-height:1.65; padding-top:11px; border-top:1px dashed var(--line)">
+        어떤 두 문구도 <b>첫 단어가 같지 않습니다.</b> 특히 <b>“사지 마세요”</b>와 <b>“더 사도 좋습니다”</b>는
+        뜻이 정반대라 앞 글자가 겹치지 않게 갈라놨어요.
+        <b>HOLD</b>와 <b>ADD_ALLOWED</b>는 색이 같으므로 <b>띠 기호(■/▲)가 유일한 구분자</b>입니다 — 띠를 빼면 안 됩니다.
+      </p>
+    </div>
+  </details>
+
+  <p class="foot">
+    이 화면은 <b>판단을 보여주기만</b> 합니다 — 자동으로 사고팔지 않아요. 모든 숫자는 하나의 원천에서 나오고, 화면이 다시 계산하지 않습니다.<br>
+    자료 기준일 2026-07-31 · 국가위험 08:38 산출 · 밤사이 스냅샷 08:42 봉인
+  </p>
+
+</div>
