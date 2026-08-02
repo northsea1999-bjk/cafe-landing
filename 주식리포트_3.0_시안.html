@@ -543,7 +543,7 @@
   </div>
 
   <details style="margin-top:26px; border:1px solid var(--line); border-radius:9px; background:var(--panel); padding:14px 18px">
-    <summary style="font-size:13px; font-weight:800; cursor:pointer">참고 — 행동 문구 13단계 전체 (시안 검토용)</summary>
+    <summary style="font-size:13px; font-weight:800; cursor:pointer">참고 — 행동 문구 15개 전체 (config.FINAL_ACTION_KO 전수)</summary>
     <div style="margin-top:13px; font-size:13px; line-height:1.5">
 
       <div style="font-size:11.5px; font-weight:800; letter-spacing:.06em; color:var(--ink-faint); margin:0 0 7px">▼ 줄이기 — 파는 행동이 들어감</div>
@@ -565,10 +565,15 @@
       <div class="near-r"><span class="band" style="color:var(--good)">▲</span><span><b>조금씩 나눠</b> 사세요</span><span class="near-g num">PARTIAL_ADD_ALLOWED</span></div>
       <div class="near-r"><span class="band" style="color:var(--good)">▲</span><span><b>더 사도</b> 좋습니다</span><span class="near-g num">ADD_ALLOWED</span></div>
 
+      <div style="font-size:11.5px; font-weight:800; letter-spacing:.06em; color:var(--ink-faint); margin:15px 0 7px">◇ 미보유 관심종목 전용 — 보유 줄에는 안 나옴</div>
+      <div class="near-r" style="border-top:0"><span class="band" style="color:var(--warning)">◇</span><span><b>관심에서 빼세요</b> (미보유)</span><span class="near-g num">NONHOLDER_AVOID</span></div>
+      <div class="near-r"><span class="band" style="color:var(--ink-soft)">◇</span><span><b>지켜보는 중</b> (미보유)</span><span class="near-g num">NONHOLDER_WATCH</span></div>
+
       <p style="font-size:12px; color:var(--ink-faint); margin:15px 0 0; line-height:1.65; padding-top:11px; border-top:1px dashed var(--line)">
         어떤 두 문구도 <b>첫 단어가 같지 않습니다.</b> 특히 <b>“사지 마세요”</b>와 <b>“더 사도 좋습니다”</b>는
-        뜻이 정반대라 앞 글자가 겹치지 않게 갈라놨어요.
-        <b>HOLD</b>와 <b>ADD_ALLOWED</b>는 색이 같으므로 <b>띠 기호(■/▲)가 유일한 구분자</b>입니다 — 띠를 빼면 안 됩니다.
+        뜻이 정반대라 앞 글자가 겹치지 않게 갈라놨어요.<br>
+        <b>HOLD</b>와 <b>ADD_ALLOWED</b>는 색이 같으므로 <b>띠 기호(■/▲)가 유일한 구분자</b>입니다 — 띠를 빼면 안 됩니다.<br>
+        <b>위험 주의(RISK_ALERT)</b>는 이 표에 없습니다 — 그건 <b>행동이 아니라 보유등급</b>이라 축이 다릅니다.
       </p>
     </div>
   </details>
