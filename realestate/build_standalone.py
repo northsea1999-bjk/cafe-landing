@@ -18,10 +18,10 @@ OUT = WEB / "standalone.html"
 
 #: 신규 매물 카드에 실제로 쓰이는 필드만 남긴다 (전체를 심으면 파일이 몇 배가 된다)
 LISTING_FIELDS = (
-    "title", "city", "stage", "price_man", "price_yen", "layout", "area_m2",
+    "title", "city", "sub_area", "stage", "price_man", "price_yen", "layout", "area_m2",
     "unit_price_man_per_tsubo", "total_units", "built_year", "station_labels",
 )
-MAX_LISTINGS = 60
+MAX_LISTINGS = 140
 
 
 def _read_json(path: Path):

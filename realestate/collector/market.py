@@ -64,7 +64,9 @@ class MarketUnavailable(RuntimeError):
 
 
 def build_listing_trends(
-    observations: Iterable[dict[str, Any]], config: dict[str, Any]
+    observations: Iterable[dict[str, Any]],
+    config: dict[str, Any],
+    min_units: int | None = None,
 ) -> dict[str, Any] | None:
     """관측 로그(observations.jsonl)에서 구별·단계별 坪単価 중앙값 추이를 만든다.
 
@@ -73,7 +75,8 @@ def build_listing_trends(
     한 번 본 가격을 지우지 않는다.
     """
     cfg = config.get("trends", {})
-    min_units = int(cfg.get("min_total_units", 200))
+    if min_units is None:
+        min_units = int(cfg.get("min_total_units", 500))
     min_samples = int(cfg.get("min_samples", 3))
     granularity = str(cfg.get("granularity", "quarter"))
     synthetic = bool(cfg.get("synthetic", False))
@@ -313,6 +316,8 @@ def _period_of(value: str, granularity: str) -> str | None:
         return None
     if granularity == "month":
         return f"{moment.year}-{moment.month:02d}"
+    if granularity == "half":
+        return f"{moment.year}H{1 if moment.month <= 6 else 2}"
     if granularity == "year":
         return str(moment.year)
     return f"{moment.year}Q{(moment.month - 1) // 3 + 1}"
@@ -356,3 +361,235 @@ def _to_float(value: Any) -> float | None:
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+
+# ======================================================================
+# 역세권 단위 세분화 — 지도용
+#
+# 일본 맨션은 사실상 '가장 가까운 역'을 기준으로 값이 매겨진다. 같은 구
+# 안에서도 新宿駅 주변과 四ツ谷駅 주변은 완전히 다른 시장이다. 그래서
+# 구를 다시 역세권으로 쪼갠다.
+#
+# 좌표는 역 위치의 **개략값**이다 (수백 m 오차 가능). 지도에 점을 찍는
+# 용도로는 충분하지만 측량값이 아니다. 정밀한 값이 필요하면
+# 国土数値情報「鉄道」 데이터로 교체할 것.
+
+#: 역 → (구 코드, 위도, 경도, 한국어 표기)
+STATION_AREAS: dict[str, tuple[str, float, float, str]] = {
+    # 千代田区
+    "東京":       ("13101", 35.6812, 139.7671, "도쿄역"),
+    "大手町":     ("13101", 35.6866, 139.7663, "오테마치역"),
+    "秋葉原":     ("13101", 35.6984, 139.7731, "아키하바라역"),
+    "九段下":     ("13101", 35.6960, 139.7514, "구단시타역"),
+    "麹町":       ("13101", 35.6840, 139.7390, "고지마치역"),
+    "市ヶ谷":     ("13101", 35.6917, 139.7355, "이치가야역"),
+    # 中央区
+    "銀座":       ("13102", 35.6717, 139.7650, "긴자역"),
+    "日本橋":     ("13102", 35.6822, 139.7745, "니혼바시역"),
+    "月島":       ("13102", 35.6644, 139.7840, "쓰키시마역"),
+    "勝どき":     ("13102", 35.6588, 139.7770, "가치도키역"),
+    "八丁堀":     ("13102", 35.6752, 139.7776, "핫초보리역"),
+    "人形町":     ("13102", 35.6862, 139.7827, "닌교초역"),
+    # 港区
+    "六本木":     ("13103", 35.6628, 139.7315, "롯폰기역"),
+    "麻布十番":   ("13103", 35.6556, 139.7360, "아자부주반역"),
+    "白金高輪":   ("13103", 35.6431, 139.7343, "시로카네타카나와역"),
+    "品川":       ("13103", 35.6285, 139.7387, "시나가와역"),
+    "田町":       ("13103", 35.6457, 139.7476, "다마치역"),
+    "表参道":     ("13103", 35.6652, 139.7124, "오모테산도역"),
+    "赤坂":       ("13103", 35.6725, 139.7365, "아카사카역"),
+    # 新宿区
+    "新宿":       ("13104", 35.6896, 139.7006, "신주쿠역"),
+    "四ツ谷":     ("13104", 35.6862, 139.7301, "요쓰야역"),
+    "高田馬場":   ("13104", 35.7126, 139.7038, "다카다노바바역"),
+    "神楽坂":     ("13104", 35.7040, 139.7405, "가구라자카역"),
+    "西早稲田":   ("13104", 35.7085, 139.7156, "니시와세다역"),
+    "曙橋":       ("13104", 35.6930, 139.7245, "아케보노바시역"),
+    # 文京区
+    "後楽園":     ("13105", 35.7075, 139.7517, "고라쿠엔역"),
+    "本郷三丁目": ("13105", 35.7073, 139.7590, "혼고산초메역"),
+    "茗荷谷":     ("13105", 35.7170, 139.7382, "묘가다니역"),
+    "千駄木":     ("13105", 35.7263, 139.7616, "센다기역"),
+    "護国寺":     ("13105", 35.7180, 139.7263, "고코쿠지역"),
+    # 江東区
+    "豊洲":       ("13108", 35.6547, 139.7967, "도요스역"),
+    "東雲":       ("13108", 35.6417, 139.8003, "시노노메역"),
+    "門前仲町":   ("13108", 35.6717, 139.7960, "몬젠나카초역"),
+    "清澄白河":   ("13108", 35.6817, 139.8003, "기요스미시라카와역"),
+    "亀戸":       ("13108", 35.6975, 139.8266, "가메이도역"),
+    "木場":       ("13108", 35.6697, 139.8073, "기바역"),
+    "有明":       ("13108", 35.6350, 139.7930, "아리아케역"),
+    # 渋谷区
+    "渋谷":       ("13113", 35.6580, 139.7016, "시부야역"),
+    "恵比寿":     ("13113", 35.6467, 139.7100, "에비스역"),
+    "代々木":     ("13113", 35.6830, 139.7020, "요요기역"),
+    "原宿":       ("13113", 35.6702, 139.7027, "하라주쿠역"),
+    "代官山":     ("13113", 35.6484, 139.7031, "다이칸야마역"),
+    "初台":       ("13113", 35.6800, 139.6870, "하쓰다이역"),
+    "広尾":       ("13113", 35.6520, 139.7220, "히로오역"),
+}
+
+STATIONS_BY_WARD: dict[str, list[str]] = defaultdict(list)
+for _station, (_ward_code, _lat, _lon, _ko) in STATION_AREAS.items():
+    STATIONS_BY_WARD[_ward_code].append(_station)
+
+
+def build_area_map(
+    observations: Iterable[dict[str, Any]],
+    config: dict[str, Any],
+    min_units: int | None = None,
+) -> dict[str, Any] | None:
+    """역세권 단위 坪単価 — 지도에 점으로 찍기 위한 집계.
+
+    분기별 추이와 달리 여기서는 **최근 N분기를 하나로 합쳐** 지역 수준을 낸다.
+    역 × 분기까지 쪼개면 표본이 남지 않는다.
+    """
+    cfg = config.get("area_map", {})
+    if cfg.get("enabled") is False:
+        return None
+
+    trend_cfg = config.get("trends", {})
+    if min_units is None:
+        min_units = int(trend_cfg.get("min_total_units", 500))
+    min_samples = int(cfg.get("min_samples", 3))
+    recent_quarters = int(cfg.get("recent_quarters", 8))
+    wards = [str(w) for w in trend_cfg.get("wards", [c for c, _ in TARGET_WARDS])]
+    ward_names = {WARD_NAME_BY_CODE.get(c, c) for c in wards}
+
+    rows = [r for r in observations if isinstance(r, dict)]
+    all_periods = sorted({
+        p for p in (
+            _period_of(str(r.get("listed_on") or r.get("date") or ""), "quarter") for r in rows
+        ) if p
+    })
+    if not all_periods:
+        return None
+    keep = set(all_periods[-recent_quarters:])
+
+    buckets: dict[tuple[str, str], list[float]] = defaultdict(list)
+    for row in rows:
+        if str(row.get("ward", "")) not in ward_names:
+            continue
+        station = str(row.get("sub_area") or "")
+        if station not in STATION_AREAS:
+            continue
+        units = row.get("total_units")
+        if units is None or int(units) < min_units:
+            continue
+        period = _period_of(str(row.get("listed_on") or row.get("date") or ""), "quarter")
+        if period not in keep:
+            continue
+        unit_price = row.get("unit")
+        if unit_price is None:
+            continue
+        buckets[(station, str(row.get("stage") or STAGE_USED))].append(float(unit_price))
+
+    points: list[dict[str, Any]] = []
+    for (station, stage), values in buckets.items():
+        if len(values) < min_samples:
+            continue
+        ward_code, lat, lon, ko = STATION_AREAS[station]
+        points.append({
+            "id": f"{station}|{stage}",
+            "station": station,
+            "label_ja": f"{station}駅",
+            "label_ko": ko,
+            "ward_code": ward_code,
+            "ward": WARD_NAME_BY_CODE.get(ward_code, ward_code),
+            "stage": stage,
+            "lat": lat,
+            "lon": lon,
+            "median": round(statistics.median(values), 1),
+            "samples": len(values),
+        })
+
+    if not points:
+        return None
+
+    points.sort(key=lambda p: -p["median"])
+    return {
+        "generated_at": _now_iso(),
+        "measure_label": "坪単価 中央値（万円/坪）",
+        "min_total_units": min_units,
+        "periods": sorted(keep),
+        "coord_note": "駅の座標は概略値（測量値ではない）",
+        "points": points,
+    }
+
+
+def build_station_trends(
+    observations: Iterable[dict[str, Any]],
+    config: dict[str, Any],
+    min_units: int | None = None,
+) -> dict[str, Any] | None:
+    """역세권 × 단계별 坪単価 추이.
+
+    구 단위보다 표본이 훨씬 적으므로 기본 구간을 반기(half)로 잡는다.
+    분기로 쪼개면 대부분의 칸이 결측이 되어 선이 점선처럼 끊긴다.
+    """
+    cfg = config.get("station_trends", {})
+    trend_cfg = config.get("trends", {})
+    if min_units is None:
+        min_units = int(trend_cfg.get("min_total_units", 500))
+    min_samples = int(cfg.get("min_samples", 2))
+    granularity = str(cfg.get("granularity", "half"))
+    wards = [str(w) for w in trend_cfg.get("wards", [c for c, _ in TARGET_WARDS])]
+    ward_names = {WARD_NAME_BY_CODE.get(c, c) for c in wards}
+
+    buckets: dict[tuple[str, str, str], list[float]] = defaultdict(list)
+    for row in observations:
+        if str(row.get("ward", "")) not in ward_names:
+            continue
+        station = str(row.get("sub_area") or "")
+        if station not in STATION_AREAS:
+            continue
+        units = row.get("total_units")
+        if units is None or int(units) < min_units:
+            continue
+        period = _period_of(str(row.get("listed_on") or row.get("date") or ""), granularity)
+        unit_price = row.get("unit")
+        if period is None or unit_price is None:
+            continue
+        buckets[(station, str(row.get("stage") or STAGE_USED), period)].append(float(unit_price))
+
+    if not buckets:
+        return None
+    periods = sorted({p for _, _, p in buckets})
+    if len(periods) < 2:
+        return None
+
+    series: list[dict[str, Any]] = []
+    for station, (ward_code, lat, lon, ko) in STATION_AREAS.items():
+        if ward_code not in wards:
+            continue
+        for stage in (STAGE_USED, STAGE_NEW):
+            points = _points(
+                {p: buckets.get((station, stage, p), []) for p in periods}, periods, min_samples
+            )
+            built = _summarize(points)
+            if built is None:
+                continue
+            series.append({
+                "id": f"{station}|{stage}",
+                "station": station,
+                "label_ja": f"{station}駅",
+                "label_ko": ko,
+                "ward_code": ward_code,
+                "ward": WARD_NAME_BY_CODE.get(ward_code, ward_code),
+                "stage": stage,
+                "stage_label": STAGE_LABELS_JA[stage],
+                "lat": lat,
+                "lon": lon,
+                "points": points,
+                **built,
+            })
+
+    if not series:
+        return None
+    return {
+        "generated_at": _now_iso(),
+        "measure_label": "坪単価 中央値（万円/坪）",
+        "min_total_units": min_units,
+        "granularity": granularity,
+        "periods": periods,
+        "series": series,
+    }

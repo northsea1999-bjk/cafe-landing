@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-09T21:24:23+00:00",
+  "generated_at": "2026-08-09T21:34:47+00:00",
   "status": [
     {
       "key": "suumo",
@@ -35,7 +35,7 @@
       "key": "sample",
       "name": "サンプル（架空データ）",
       "state": "ok",
-      "count": 498
+      "count": 491
     }
   ],
   "portals": [

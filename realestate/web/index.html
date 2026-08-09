@@ -12,49 +12,60 @@
 <div class="wrap">
 
   <header class="masthead">
-    <h1>도쿄 7구 대규모 맨션 가격추이</h1>
-    <p>총 <strong>200세대 이상</strong> 맨션의 <strong>중고 호가</strong>와 <strong>신축 분양가</strong>를 구별·분기별 <strong>坪単価 중앙값</strong>으로 추적합니다.</p>
+    <div class="masthead-top">
+      <h1 data-i18n="title">도쿄 7구 대규모 맨션 가격추이</h1>
+      <div class="seg lang" id="lang-seg" role="group" aria-label="Language / 言語 / 언어">
+        <button type="button" data-lang="ko" aria-pressed="true" lang="ko">한국어</button>
+        <button type="button" data-lang="ja" aria-pressed="false" lang="ja">日本語</button>
+      </div>
+    </div>
+    <p data-i18n-html="lede"></p>
     <div class="scope" id="scope-chips"></div>
   </header>
 
   <div class="banner" id="synthetic-banner" hidden>
     <span class="icon" aria-hidden="true">⚠</span>
     <div>
-      <strong>지금 보이는 숫자는 전부 가상 데이터입니다</strong>
-      <p id="synthetic-detail">실제 도쿄 시세가 아닙니다. 파이프라인 검증용 샘플이며, 실제 데이터 소스를 연결하면 자동으로 교체됩니다.</p>
+      <strong data-i18n="syntheticTitle"></strong>
+      <p id="synthetic-detail"></p>
     </div>
   </div>
 
   <!-- 필터는 한 줄로 모아 아래 모든 차트에 동일하게 적용된다 -->
   <div class="filters" role="group" aria-label="표시 조건">
     <div class="field">
-      <span class="field-label" id="lbl-wards">지역</span>
+      <span class="field-label" id="lbl-wards" data-i18n="fArea">지역</span>
       <div class="chips" id="ward-chips" role="group" aria-labelledby="lbl-wards"></div>
     </div>
 
     <div class="field">
-      <span class="field-label" id="lbl-stage">구분</span>
+      <span class="field-label" id="lbl-units" data-i18n="fUnits">세대수</span>
+      <div class="seg" id="units-seg" role="group" aria-labelledby="lbl-units"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label" id="lbl-stage" data-i18n="fStage">구분</span>
       <div class="seg" id="stage-seg" role="group" aria-labelledby="lbl-stage">
-        <button type="button" data-stage="used" aria-pressed="true">중고</button>
-        <button type="button" data-stage="new" aria-pressed="false">신축 분양</button>
-        <button type="button" data-stage="both" aria-pressed="false">둘 다 비교</button>
+        <button type="button" data-stage="used" aria-pressed="true" data-i18n="stageUsed">중고</button>
+        <button type="button" data-stage="new" aria-pressed="false" data-i18n="stageNew">신축 분양</button>
+        <button type="button" data-stage="both" aria-pressed="false" data-i18n="stageBoth">둘 다 비교</button>
       </div>
     </div>
 
     <div class="field">
-      <span class="field-label" id="lbl-range">기간</span>
+      <span class="field-label" id="lbl-range" data-i18n="fPeriod">기간</span>
       <div class="seg" id="range-seg" role="group" aria-labelledby="lbl-range">
-        <button type="button" data-range="12" aria-pressed="false">3년</button>
-        <button type="button" data-range="20" aria-pressed="false">5년</button>
-        <button type="button" data-range="all" aria-pressed="true">전체</button>
+        <button type="button" data-range="12" aria-pressed="false" data-i18n="r3y">3년</button>
+        <button type="button" data-range="20" aria-pressed="false" data-i18n="r5y">5년</button>
+        <button type="button" data-range="all" aria-pressed="true" data-i18n="rAll">전체</button>
       </div>
     </div>
 
     <div class="field">
-      <span class="field-label" id="lbl-scale">표시</span>
+      <span class="field-label" id="lbl-scale" data-i18n="fScale">표시</span>
       <div class="seg" id="scale-seg" role="group" aria-labelledby="lbl-scale">
-        <button type="button" data-scale="abs" aria-pressed="true">실額 万円/坪</button>
-        <button type="button" data-scale="idx" aria-pressed="false">지수 =100</button>
+        <button type="button" data-scale="abs" aria-pressed="true" data-i18n="scaleAbs"></button>
+        <button type="button" data-scale="idx" aria-pressed="false" data-i18n="scaleIdx"></button>
       </div>
     </div>
   </div>
@@ -64,10 +75,10 @@
   <section class="card">
     <div class="card-head">
       <div>
-        <h2 id="main-title">구별 坪単価 추이</h2>
+        <h2 id="main-title"></h2>
         <p class="sub" id="main-sub"></p>
       </div>
-      <button type="button" class="linkish" id="toggle-table" aria-expanded="false">표로 보기</button>
+      <button type="button" class="linkish" id="toggle-table" aria-expanded="false"></button>
     </div>
     <div class="chart-host" id="main-chart"></div>
     <div class="legend" id="main-legend"></div>
@@ -77,17 +88,40 @@
   <section class="card" id="facet-card">
     <div class="card-head">
       <div>
-        <h2>구별 상세 — 중고 vs 신축 분양</h2>
-        <p class="sub">각 구를 따로 떼어 보면 두 계열의 간격(신축 프리미엄)이 드러납니다. 실선 중고 · 파선 신축 분양.</p>
+        <h2 data-i18n="facetTitle"></h2>
+        <p class="sub" data-i18n="facetSub"></p>
       </div>
     </div>
     <div class="facets" id="facets"></div>
   </section>
 
+  <section class="card" id="map-card">
+    <div class="card-head">
+      <div>
+        <h2 data-i18n="mapTitle"></h2>
+        <p class="sub" id="map-sub"></p>
+      </div>
+      <button type="button" class="linkish" id="toggle-map-table" aria-expanded="false"></button>
+    </div>
+    <div class="chart-host" id="map-chart"></div>
+    <div class="legend" id="map-legend"></div>
+    <div class="table-wrap" id="map-table" hidden></div>
+  </section>
+
+  <section class="card" id="station-card">
+    <div class="card-head">
+      <div>
+        <h2 data-i18n="stationTitle"></h2>
+        <p class="sub" id="station-sub"></p>
+      </div>
+    </div>
+    <div class="facets" id="station-facets"></div>
+  </section>
+
   <section class="card" id="change-card">
     <div class="card-head">
       <div>
-        <h2>기간 변동률</h2>
+        <h2 data-i18n="changeTitle"></h2>
         <p class="sub" id="change-sub"></p>
       </div>
     </div>
@@ -97,8 +131,8 @@
   <section class="card" id="official-card" hidden>
     <div class="card-head">
       <div>
-        <h2>참고 — 국토교통성 성약가</h2>
-        <p class="sub">실제로 거래가 성사된 가격입니다. 이 데이터에는 총세대수가 없어 <strong>200세대 필터가 적용되지 않은 구 전체 수치</strong>입니다. 호가보다 낮게 나오는 것이 정상입니다.</p>
+        <h2 data-i18n="officialTitle"></h2>
+        <p class="sub" data-i18n-html="officialSub"></p>
       </div>
     </div>
     <div class="chart-host" id="official-chart"></div>
@@ -108,8 +142,8 @@
   <section class="card">
     <div class="card-head">
       <div>
-        <h2>신규 매물</h2>
-        <p class="sub" id="new-sub">최근 수집분 중 조건에 맞는 신규 등록 물건입니다.</p>
+        <h2 data-i18n="newTitle"></h2>
+        <p class="sub" id="new-sub"></p>
       </div>
     </div>
     <div id="new-listings"></div>
@@ -118,8 +152,8 @@
   <section class="card">
     <div class="card-head">
       <div>
-        <h2>데이터 출처</h2>
-        <p class="sub">각 포털에서 데이터를 받으려면 정당한 접근 경로가 필요합니다. 아래는 현재 연결 상태입니다.</p>
+        <h2 data-i18n="srcTitle"></h2>
+        <p class="sub" data-i18n="srcSub"></p>
       </div>
     </div>
     <div class="sources" id="sources"></div>
@@ -127,7 +161,7 @@
 
   <footer>
     <p id="generated"></p>
-    <p>坪単価 = 가격 ÷ (전용면적 ÷ 3.30578). 각 분기 값은 <strong>중앙값</strong>이며, 표본이 기준 미만인 분기는 선을 잇지 않고 비워 둡니다.</p>
+    <p data-i18n-html="footNote"></p>
   </footer>
 
 </div>

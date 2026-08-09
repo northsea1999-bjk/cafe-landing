@@ -102,16 +102,35 @@ def main(argv: list[str] | None = None) -> int:
 
     # --- 5. 추이 --------------------------------------------------------
     observations = store.load_observations()
-    trends = market.build_listing_trends(observations, config)
-    if trends is not None:
-        sources_used = set(trends.get("sources", []))
-        # 샘플에서만 나온 추이는 무조건 '가상' 표시를 단다.
-        trends["synthetic"] = sources_used.issubset({"sample"})
+    thresholds = [int(x) for x in config.get("trends", {}).get("unit_thresholds", [500])]
+    default_threshold = int(config.get("trends", {}).get("min_total_units", thresholds[-1]))
+    if default_threshold not in thresholds:
+        thresholds.append(default_threshold)
+    thresholds.sort()
+
+    trends_by_units: dict[str, Any] = {}
+    areas_by_units: dict[str, Any] = {}
+    stations_by_units: dict[str, Any] = {}
+    for units in thresholds:
+        built = market.build_listing_trends(observations, config, min_units=units)
+        if built is not None:
+            # 샘플에서만 나온 추이는 무조건 '가상' 표시를 단다.
+            built["synthetic"] = set(built.get("sources", [])).issubset({"sample"})
+            trends_by_units[str(units)] = built
+        area = market.build_area_map(observations, config, min_units=units)
+        if area is not None:
+            areas_by_units[str(units)] = area
+        stations = market.build_station_trends(observations, config, min_units=units)
+        if stations is not None:
+            stations_by_units[str(units)] = stations
         print(
-            f"  추이 계열 {len(trends['series'])}개 / 기간 {len(trends['periods'])}구간"
-            + ("  ⚠ 架空データ" if trends["synthetic"] else "")
+            f"  {units:>4}세대 이상 → 구별 계열 {len(built['series']) if built else 0}"
+            f" / 역세권 계열 {len(stations['series']) if stations else 0}"
+            f" / 지도 지점 {len(area['points']) if area else 0}"
         )
-    else:
+
+    trends = trends_by_units.get(str(default_threshold))
+    if trends is None:
         print("  추이: 표본 부족 (수집이 쌓이면 생성됩니다)")
 
     official: dict[str, Any] | None
@@ -126,7 +145,11 @@ def main(argv: list[str] | None = None) -> int:
         Path(store.root) / "market.json",
         {
             "generated_at": _now_iso(),
-            "listing_trends": trends,
+            "thresholds": [t for t in thresholds if str(t) in trends_by_units],
+            "default_threshold": default_threshold,
+            "listing_trends": trends_by_units,
+            "area_map": areas_by_units,
+            "station_trends": stations_by_units,
             "official_trends": official,
         },
     )

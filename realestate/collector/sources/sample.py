@@ -15,6 +15,7 @@ import random
 from datetime import date, timedelta
 from typing import Any
 
+from ..market import STATION_AREAS, STATIONS_BY_WARD, WARD_CODE_BY_NAME
 from ..schema import KIND_MANSION, STAGE_NEW, STAGE_USED, Listing, Station
 from .base import Source
 
@@ -116,16 +117,24 @@ class SampleSource(Source):
         city, pref, base_tsubo, _weight = rng.choices(
             _WARDS, weights=[w[3] for w in _WARDS]
         )[0]
-        line, stations = rng.choice(_LINES)
-        station = rng.choice(stations)
         posted = _EPOCH + timedelta(days=day)
+
+        # 지도용 역세권. 대상 7개 구는 실제 역 목록에서, 그 밖은 기존 노선표에서.
+        ward_code = WARD_CODE_BY_NAME.get(city)
+        sub_area = rng.choice(STATIONS_BY_WARD[ward_code]) if ward_code else ""
+        if sub_area:
+            line = rng.choice(_LINES)[0]
+            station = sub_area
+        else:
+            line, stations = rng.choice(_LINES)
+            station = rng.choice(stations)
 
         is_new = stage == STAGE_NEW
 
-        # 총 세대수 — 大規模(200세대 이상) 비중은 新築 쪽이 높다
-        large_ratio = 0.55 if is_new else 0.34
+        # 총 세대수 — 大規模 비중은 新築 쪽이 높다
+        large_ratio = 0.62 if is_new else 0.42
         if rng.random() < large_ratio:
-            total_units = rng.randrange(200, 900, 10)
+            total_units = rng.randrange(200, 1200, 10)
         else:
             total_units = rng.randrange(14, 200, 2)
 
@@ -163,6 +172,7 @@ class SampleSource(Source):
             price_yen=int(price_man * 10_000),
             prefecture=pref,
             city=city,
+            sub_area=sub_area,
             address=f"{pref}{city}{rng.choice('一二三四五六七')}丁目{rng.randint(1, 30)}-{rng.randint(1, 20)}",
             stations=[Station(line=line, name=station, walk_minutes=rng.randint(1, 15))],
             area_m2=area,

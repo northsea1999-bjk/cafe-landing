@@ -291,6 +291,7 @@ def _observation(listing: Listing, observed_on: str, event: str) -> dict[str, An
         "key": listing.key,
         "source": listing.source,
         "ward": listing.city,
+        "sub_area": listing.sub_area,
         "stage": listing.stage,
         "kind": listing.kind,
         "total_units": listing.total_units,

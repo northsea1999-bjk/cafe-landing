@@ -34,6 +34,13 @@
   --series-6: #008300;
   --series-7: #4a3aa7;
 
+  /* 시퀀셜 램프 — 지도에서 '가격 크기'를 나타낸다 (한 색상, 밝음→어두움) */
+  --seq-1: #86b6ef;
+  --seq-2: #5598e7;
+  --seq-3: #2a78d6;
+  --seq-4: #1c5cab;
+  --seq-5: #104281;
+
   --radius: 10px;
   --font: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN",
     "Noto Sans JP", "Apple SD Gothic Neo", sans-serif;
@@ -64,6 +71,12 @@
     --series-5: #d55181;
     --series-6: #008300;
     --series-7: #9085e9;
+
+    --seq-1: #9ec5f4;
+    --seq-2: #6da7ec;
+    --seq-3: #3987e5;
+    --seq-4: #256abf;
+    --seq-5: #184f95;
   }
 }
 
@@ -91,6 +104,12 @@
   --series-5: #d55181;
   --series-6: #008300;
   --series-7: #9085e9;
+
+  --seq-1: #9ec5f4;
+  --seq-2: #6da7ec;
+  --seq-3: #3987e5;
+  --seq-4: #256abf;
+  --seq-5: #184f95;
 }
 
 * { box-sizing: border-box; }
@@ -114,6 +133,17 @@ body {
 /* ---------------------------------------------------------- 헤더 */
 
 .masthead { margin-bottom: 20px; }
+
+.masthead-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.seg.lang { flex: none; }
+.seg.lang button { font-size: 12.5px; padding: 3px 12px; min-height: 30px; }
 
 .masthead h1 {
   margin: 0 0 6px;
@@ -526,3 +556,13 @@ footer a { color: inherit; }
   .source-row { grid-template-columns: 1fr; gap: 4px; }
   .tile.hero .value { font-size: 38px; }
 }
+
+/* ------------------------------------------------------- 지도 */
+
+.map-note { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+
+.scale-legend { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); }
+.scale-legend .swatches { display: flex; gap: 2px; }
+.scale-legend .sw { width: 26px; height: 10px; border-radius: 2px; }
+.scale-legend .size-key { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; }
+.scale-legend .size-key .bub { border-radius: 50%; background: var(--text-muted); opacity: .45; }

@@ -170,6 +170,7 @@ class PortalSource(Source):
             price_yen=price,
             prefecture=get("prefecture"),
             city=get("city"),
+            sub_area=get("sub_area"),
             address=address,
             stations=(
                 [Station(line=get("line"), name=station, walk_minutes=parse_walk_minutes(get("walk") or station))]

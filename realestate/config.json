@@ -1,21 +1,39 @@
 {
   "data_dir": "web/data",
-
   "trends": {
-    "min_total_units": 200,
+    "min_total_units": 500,
     "min_samples": 5,
     "granularity": "quarter",
-    "wards": ["13101", "13102", "13103", "13104", "13105", "13108", "13113"]
+    "wards": [
+      "13101",
+      "13102",
+      "13103",
+      "13104",
+      "13105",
+      "13108",
+      "13113"
+    ],
+    "unit_thresholds": [
+      200,
+      300,
+      500
+    ]
   },
-
   "official_market": {
     "enabled": true,
     "quarters": 20,
     "min_samples": 5,
-    "wards": ["13101", "13102", "13103", "13104", "13105", "13108", "13113"],
+    "wards": [
+      "13101",
+      "13102",
+      "13103",
+      "13104",
+      "13105",
+      "13108",
+      "13113"
+    ],
     "_note": "국토교통성 不動産情報ライブラリ. 환경변수 REINFOLIB_API_KEY 필요. 성약가에는 총세대수가 없어 200세대 필터가 적용되지 않는다."
   },
-
   "sources": {
     "suumo": {
       "enabled": false,
@@ -38,7 +56,6 @@
       "access_mode": "off",
       "basis": ""
     },
-
     "feed": {
       "enabled": false,
       "basis": "",
@@ -68,12 +85,16 @@
         "listed_on": "情報公開日"
       }
     },
-
     "sample": {
       "enabled": true,
       "seed_history": true,
       "seed_history_days": 1825,
       "_note": "架空データ. 실제 소스가 붙으면 enabled 를 false 로."
     }
+  },
+  "area_map": {
+    "enabled": true,
+    "min_samples": 3,
+    "recent_quarters": 8
   }
 }

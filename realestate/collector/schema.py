@@ -74,6 +74,7 @@ class Listing:
     # --- 위치 ---
     prefecture: str = ""
     city: str = ""
+    sub_area: str = ""   # 地区名 (六本木·豊洲 등). 구보다 한 단계 아래
     address: str = ""
     stations: list[Station] = field(default_factory=list)
 

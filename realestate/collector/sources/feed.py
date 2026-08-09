@@ -162,6 +162,7 @@ class FeedSource(Source):
             price_yen=price,
             prefecture=prefecture,
             city=city,
+            sub_area=get("sub_area"),
             address=address,
             stations=(
                 [

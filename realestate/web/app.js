@@ -6,18 +6,183 @@
  * 직접 라벨 + 표 보기로도 읽을 수 있게 한다(색만으로 정보를 주지 않는다).
  */
 
-const SLOTS = 7;
-const NS = 'http://www.w3.org/2000/svg';
-const STAGE_LABEL = { used: '중고', new: '신축 분양' };
-
 const state = {
   wards: new Set(),
   stage: 'used',
   range: 'all',
   scale: 'abs',
+  lang: 'ko',
+  units: '500',
+  station: null,       // 지도에서 역을 고르면 아래 매물이 그 역으로 좁혀진다
+  showMapTable: false,
   hidden: new Set(),
   showTable: false,
 };
+
+const SLOTS = 7;
+const NS = 'http://www.w3.org/2000/svg';
+
+/* ------------------------------------------------------------------ 다국어
+ * UI 문구·구 이름·단위만 번역한다. 물건명·역명·노선명은 원본 데이터의
+ * 고유명사이므로 일본어 그대로 둔다 (한국어 이용자도 실제 검색에 그 표기를 쓴다).
+ */
+
+const WARD_KO = {
+  '13101': '지요다구', '13102': '주오구', '13103': '미나토구', '13104': '신주쿠구',
+  '13105': '분쿄구', '13108': '고토구', '13113': '시부야구',
+};
+
+const I18N = {
+  ko: {
+    htmlLang: 'ko',
+    title: '도쿄 7구 대규모 맨션 가격추이',
+    lede: '총 <strong>{units}세대 이상</strong> 맨션의 <strong>중고 호가</strong>와 <strong>신축 분양가</strong>를 구별·분기별 <strong>평당가 중앙값</strong>으로 추적합니다.',
+    syntheticTitle: '지금 보이는 숫자는 전부 가상 데이터입니다',
+    syntheticDetail: '실제 도쿄 시세가 아닙니다. 판단 근거로 쓰면 안 됩니다. 실제 데이터 소스를 연결하면 자동으로 교체됩니다. 출처: {source}',
+    fArea: '지역', fStage: '구분', fPeriod: '기간', fScale: '표시',
+    fUnits: '세대수',
+    unitsOption: '{n}세대+',
+    mapTitle: '역세권 지도 — 어디가 비싼가',
+    mapSub: '{units}세대 이상 · {stage} · {n}개 역세권 · {from}–{to} 합산',
+    mapEmpty: '{units}세대 이상 조건에서는 지도에 찍을 역세권이 부족합니다. 세대수 기준을 낮춰 보세요.',
+    mapNote: '점 위치는 역 좌표(개략값)입니다. 행정 경계 지도가 아닙니다. 점을 누르면 아래 매물이 그 역세권으로 좁혀집니다.',
+    mapMedian: '평당가 중앙값', mapSamples: '표본 수',
+    mapLow: '저', mapHigh: '고', mapSizeKey: ' 점 크기 = 표본 수 (최대 {n})',
+    mapColArea: '역세권',
+    stationTitle: '역세권별 추이',
+    stationSub: '{units}세대 이상 · {stage} · 최근 값이 높은 {n}곳 (반기 단위)',
+    stationFilter: '{station} 만 보기 해제',
+    stageUsed: '중고', stageNew: '신축 분양', stageBoth: '둘 다 비교',
+    r3y: '3년', r5y: '5년', rAll: '전체',
+    scaleAbs: '실제 금액', scaleIdx: '지수 =100',
+    unitTsubo: '만엔/평', unitTsuboSuffix: ' 만엔/평', unitMan: '만엔',
+    unitCase: '건', unitPctSign: '%',
+    scopeWards: '대상 {n}개 구', scopeUnits: '총 {units}세대 이상', scopeKinds: '중고 · 신축 분양',
+    tileHero: '선택 지역 중고 평당가 중앙값 · {period}',
+    tileNew: '신축 분양 평당가 중앙값 · {period}',
+    tilePremium: '신축 프리미엄 (중고 대비)',
+    tileToday: '최근 신규 등록',
+    tileSince: '{period} 대비',
+    tileSub: '가격변경 {changed} · 게재종료 {removed}',
+    mainTitleStage: '구별 평당가 추이 · {stage}',
+    mainTitleBoth: '선택 지역 종합 — 중고 vs 신축 분양',
+    mainSubIdx: '{base} = 100 지수', mainSubAbs: '만엔/평 중앙값',
+    mainSubUnits: '총 {units}세대 이상', mainSubBoth: '구별 내역은 아래 상세 참조',
+    tableOpen: '표로 보기', tableClose: '표 닫기', tableHeadPeriod: '분기',
+    facetTitle: '구별 상세 — 중고 vs 신축 분양',
+    facetSub: '각 구를 따로 떼어 보면 두 계열의 간격(신축 프리미엄)이 드러납니다. 실선 중고 · 파선 신축 분양.',
+    facetMeta: '중고 {value} 만엔/평 · {period}',
+    changeTitle: '기간 변동률',
+    changeSub: '{from} → {to} · {stage} 평당가 중앙값 기준',
+    officialTitle: '참고 — 국토교통성 성약가',
+    officialSub: '실제로 거래가 성사된 가격입니다. 이 데이터에는 총세대수가 없어 <strong>세대수 필터가 적용되지 않은 구 전체 수치</strong>입니다. 호가보다 낮게 나오는 것이 정상입니다.',
+    newTitle: '신규 매물',
+    newSubWindow: '최근 {days}일 신규', newSubDate: '{date} 수집분',
+    newSubTail: '선택 지역 · {units}세대 이상 · {n}건',
+    newSubToday: '(오늘 {n}건)',
+    badgeNew: '신규', badgeShinchiku: '신축 분양',
+    srcTitle: '데이터 출처',
+    srcSub: '각 포털에서 데이터를 받으려면 정당한 접근 경로가 필요합니다. 아래는 현재 연결 상태입니다.',
+    srcOk: '연결됨 {n}건', srcErr: '오류', srcSkip: '미연결',
+    emptyNoData: '표시할 데이터가 없습니다. 지역이나 기간을 넓혀 보세요.',
+    emptyAllHidden: '선택한 계열이 모두 숨겨져 있습니다.',
+    emptyNoChange: '변동률을 계산할 표본이 부족합니다.',
+    emptyNoListings: '조건에 맞는 신규 등록 물건이 없습니다.',
+    noSample: '표본 부족',
+    legendNote: '실선 = 중고 · 파선 = 신축 분양',
+    seriesAll: '선택 지역 {stage}',
+    generated: '생성 {time} · 추이 출처: {source}',
+    generatedOfficial: ' · 성약가: {source}',
+    footNote: '평당가 = 가격 ÷ (전용면적 ÷ 3.30578). 각 분기 값은 <strong>중앙값</strong>이며, 표본이 기준 미만인 분기는 선을 잇지 않고 비워 둡니다.',
+    bootEmpty: '추이 데이터가 아직 없습니다. 수집기를 먼저 실행하세요',
+  },
+  ja: {
+    htmlLang: 'ja',
+    title: '東京7区 大規模マンション価格推移',
+    lede: '総戸数 <strong>{units}戸以上</strong> のマンションについて、<strong>中古の売出価格</strong>と<strong>新築分譲価格</strong>を、区別・四半期別の<strong>坪単価 中央値</strong>で追跡します。',
+    syntheticTitle: '表示中の数値はすべて架空データです',
+    syntheticDetail: '実際の東京の相場ではありません。判断材料には使えません。実データを接続すると自動的に置き換わります。出典: {source}',
+    fArea: 'エリア', fStage: '種別', fPeriod: '期間', fScale: '表示',
+    fUnits: '戸数',
+    unitsOption: '{n}戸+',
+    mapTitle: '駅エリア地図 — どこが高いか',
+    mapSub: '{units}戸以上 · {stage} · {n}駅エリア · {from}–{to} 合算',
+    mapEmpty: '{units}戸以上の条件では地図に出せる駅エリアが足りません。戸数の基準を下げてみてください。',
+    mapNote: '点の位置は駅座標（概略値）です。行政界の地図ではありません。点を押すと下の物件がその駅エリアに絞り込まれます。',
+    mapMedian: '坪単価 中央値', mapSamples: '標本数',
+    mapLow: '低', mapHigh: '高', mapSizeKey: ' 点の大きさ = 標本数 (最大 {n})',
+    mapColArea: '駅エリア',
+    stationTitle: '駅エリア別 推移',
+    stationSub: '{units}戸以上 · {stage} · 直近値の高い {n}カ所 (半期単位)',
+    stationFilter: '{station} のみ表示を解除',
+    stageUsed: '中古', stageNew: '新築分譲', stageBoth: '両方を比較',
+    r3y: '3年', r5y: '5年', rAll: '全期間',
+    scaleAbs: '実額', scaleIdx: '指数 =100',
+    unitTsubo: '万円/坪', unitTsuboSuffix: ' 万円/坪', unitMan: '万円',
+    unitCase: '件', unitPctSign: '%',
+    scopeWards: '対象 {n}区', scopeUnits: '総戸数 {units}戸以上', scopeKinds: '中古 · 新築分譲',
+    tileHero: '選択エリア 中古 坪単価 中央値 · {period}',
+    tileNew: '新築分譲 坪単価 中央値 · {period}',
+    tilePremium: '新築プレミアム (中古比)',
+    tileToday: '直近の新着',
+    tileSince: '{period} 比',
+    tileSub: '価格変更 {changed} · 掲載終了 {removed}',
+    mainTitleStage: '区別 坪単価 推移 · {stage}',
+    mainTitleBoth: '選択エリア総合 — 中古 vs 新築分譲',
+    mainSubIdx: '{base} = 100 指数', mainSubAbs: '万円/坪 中央値',
+    mainSubUnits: '総戸数 {units}戸以上', mainSubBoth: '区別の内訳は下の詳細を参照',
+    tableOpen: '表で見る', tableClose: '表を閉じる', tableHeadPeriod: '四半期',
+    facetTitle: '区別詳細 — 中古 vs 新築分譲',
+    facetSub: '区ごとに分けて見ると、två系列の差（新築プレミアム）が見えてきます。実線 中古 · 破線 新築分譲。',
+    facetMeta: '中古 {value} 万円/坪 · {period}',
+    changeTitle: '期間変動率',
+    changeSub: '{from} → {to} · {stage} 坪単価 中央値ベース',
+    officialTitle: '参考 — 国土交通省 成約価格',
+    officialSub: '実際に取引が成立した価格です。このデータには総戸数が含まれないため、<strong>戸数の絞り込みを適用していない区全体の数値</strong>です。売出価格より低く出るのが正常です。',
+    newTitle: '新着物件',
+    newSubWindow: '直近{days}日の新着', newSubDate: '{date} 収集分',
+    newSubTail: '選択エリア · {units}戸以上 · {n}件',
+    newSubToday: '(本日 {n}件)',
+    badgeNew: '新着', badgeShinchiku: '新築分譲',
+    srcTitle: 'データ出典',
+    srcSub: '各ポータルからデータを受け取るには正当なアクセス経路が必要です。以下は現在の接続状態です。',
+    srcOk: '接続済み {n}件', srcErr: 'エラー', srcSkip: '未接続',
+    emptyNoData: '表示できるデータがありません。エリアや期間を広げてください。',
+    emptyAllHidden: '選択した系列がすべて非表示です。',
+    emptyNoChange: '変動率を計算する標本が不足しています。',
+    emptyNoListings: '条件に合う新着物件がありません。',
+    noSample: '標本不足',
+    legendNote: '実線 = 中古 · 破線 = 新築分譲',
+    seriesAll: '選択エリア {stage}',
+    generated: '生成 {time} · 推移の出典: {source}',
+    generatedOfficial: ' · 成約価格: {source}',
+    footNote: '坪単価 = 価格 ÷ (専有面積 ÷ 3.30578)。各四半期の値は<strong>中央値</strong>で、標本が基準未満の四半期は線をつながず空けています。',
+    bootEmpty: '推移データがまだありません。先に収集を実行してください',
+  },
+};
+
+function t(key, vars) {
+  let text = I18N[state.lang]?.[key] ?? I18N.ko[key] ?? key;
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) text = text.split(`{${k}}`).join(String(v));
+  }
+  return text;
+}
+
+const stageLabel = (stage) => t(stage === 'new' ? 'stageNew' : 'stageUsed');
+
+/** 구 이름 — 한국어면 한글 표기, 일본어면 원 표기. */
+function wardLabel(code) {
+  if (state.lang === 'ko' && WARD_KO[code]) return WARD_KO[code];
+  return wardNames[code] ?? code;
+}
+
+/** 물건 데이터의 city 는 항상 일본어이므로 코드로 되짚어 번역한다. */
+function wardLabelByName(name) {
+  const code = Object.keys(wardNames).find((k) => wardNames[k] === name);
+  return code ? wardLabel(code) : name;
+}
+
 
 const data = { market: null, changes: null, sources: null, recent: null };
 let wardOrder = [];
@@ -48,9 +213,21 @@ function median(values) {
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 }
 
+/** 현재 세대수 기준의 데이터. 기준이 없으면 가장 가까운 것으로 대체한다. */
+function pick(bucket) {
+  if (!bucket) return null;
+  if (bucket[state.units]) return bucket[state.units];
+  const keys = Object.keys(bucket);
+  return keys.length ? bucket[keys[keys.length - 1]] : null;
+}
+
+const trendsData = () => pick(data.market?.listing_trends);
+const areaMapData = () => pick(data.market?.area_map);
+const stationData = () => pick(data.market?.station_trends);
+
 /** 보이는 기간 구간만 잘라낸다. */
 function visiblePeriods() {
-  const all = data.market?.listing_trends?.periods ?? [];
+  const all = trendsData()?.periods ?? [];
   if (state.range === 'all') return all;
   const n = Number(state.range);
   return all.slice(Math.max(0, all.length - n));
@@ -73,7 +250,7 @@ function clipPoints(points, periods) {
 
 /** 현재 필터에 맞는 메인 차트 계열. */
 function mainSeries() {
-  const trends = data.market?.listing_trends;
+  const trends = trendsData();
   if (!trends) return [];
   const periods = visiblePeriods();
   const wards = wardOrder.filter((w) => state.wards.has(w));
@@ -92,7 +269,7 @@ function mainSeries() {
       });
       return {
         id: `all|${stage}`,
-        label: `선택 지역 ${STAGE_LABEL[stage]}`,
+        label: t('seriesAll', { stage: stageLabel(stage) }),
         color: `var(--series-${i + 1})`,
         dashed: stage === 'new',
         points: scaleSeries(points),
@@ -106,7 +283,7 @@ function mainSeries() {
       if (!row) return null;
       return {
         id: row.id,
-        label: wardNames[code] ?? code,
+        label: wardLabel(code),
         color: wardColor(code),
         points: scaleSeries(clipPoints(row.points, periods)),
       };
@@ -123,7 +300,7 @@ function renderLineChart(host, opts) {
   if (!series.length || periods.length < 2) {
     const p = document.createElement('p');
     p.className = 'empty';
-    p.textContent = '표시할 데이터가 없습니다. 지역이나 기간을 넓혀 보세요.';
+    p.textContent = t('emptyNoData');
     host.appendChild(p);
     return;
   }
@@ -152,7 +329,7 @@ function renderLineChart(host, opts) {
   if (!values.length) {
     const p = document.createElement('p');
     p.className = 'empty';
-    p.textContent = '선택한 계열이 모두 숨겨져 있습니다.';
+    p.textContent = t('emptyAllHidden');
     host.appendChild(p);
     return;
   }
@@ -189,10 +366,10 @@ function renderLineChart(host, opts) {
     if (i % step && !isLast) return;
     // 마지막 눈금이 직전 눈금과 붙으면 직전 쪽을 버린다
     if (!isLast && lastIndex - i < step * 0.6) return;
-    const t = svg('text', { x: x(i), y: m.t + ih + 19, 'text-anchor': 'middle', fill: 'var(--text-muted)', 'font-size': 11 });
-    t.style.fontVariantNumeric = 'tabular-nums';
-    t.textContent = period;
-    root.appendChild(t);
+    const tickLabel = svg('text', { x: x(i), y: m.t + ih + 19, 'text-anchor': 'middle', fill: 'var(--text-muted)', 'font-size': 11 });
+    tickLabel.style.fontVariantNumeric = 'tabular-nums';
+    tickLabel.textContent = period;
+    root.appendChild(tickLabel);
   });
 
   // 선 — 결측 구간은 잇지 않고 끊는다
@@ -233,9 +410,9 @@ function renderLineChart(host, opts) {
     const text = `${end.s.label} ${fmt1(end.value)}`;
     if (cx + 10 + labelWidth(text) > width) continue;          // 들어갈 자리가 없으면 범례에 맡긴다
     placed.push(cy);
-    const t = svg('text', { x: cx + 10, y: cy + 4, fill: 'var(--text-secondary)', 'font-size': 11.5 });
-    t.textContent = text;
-    root.appendChild(t);
+    const endLabel = svg('text', { x: cx + 10, y: cy + 4, fill: 'var(--text-secondary)', 'font-size': 11.5 });
+    endLabel.textContent = text;
+    root.appendChild(endLabel);
   }
 
   host.appendChild(root);
@@ -279,7 +456,7 @@ function attachCrosshair(host, root, ctx) {
     if (!rows.length) {
       const none = document.createElement('div');
       none.className = 'tt-row';
-      none.textContent = '표본 부족';
+      none.textContent = t('noSample');
       tip.appendChild(none);
     }
 
@@ -363,7 +540,7 @@ function renderChangeChart(host, rows, suffix = '%') {
   if (!rows.length) {
     const p = document.createElement('p');
     p.className = 'empty';
-    p.textContent = '변동률을 계산할 표본이 부족합니다.';
+    p.textContent = t('emptyNoChange');
     host.appendChild(p);
     return;
   }
@@ -418,16 +595,315 @@ function renderChangeChart(host, rows, suffix = '%') {
   host.appendChild(root);
 }
 
+
+/* -------------------------------------------------------------- 지도
+ * 역 좌표에 점을 찍는다. 색은 '가격 수준'이라는 크기값이므로 한 색상의
+ * 밝음→어두움 램프(시퀀셜)를 쓴다. 구를 구분하는 색(계열색)과는 별개다.
+ * 점 크기는 표본 수 — 큰 점일수록 근거가 두텁다는 뜻.
+ */
+
+const SEQ = ['var(--seq-1)', 'var(--seq-2)', 'var(--seq-3)', 'var(--seq-4)', 'var(--seq-5)'];
+
+function seqBins(values) {
+  const sorted = [...values].sort((a, b) => a - b);
+  const at = (q) => sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))];
+  return [at(0.2), at(0.4), at(0.6), at(0.8)];
+}
+
+const seqColor = (value, cuts) => SEQ[cuts.filter((c) => value > c).length];
+
+function renderMap() {
+  const card = document.getElementById('map-card');
+  const host = document.getElementById('map-chart');
+  const area = areaMapData();
+  const stage = state.stage === 'both' ? 'used' : state.stage;
+
+  const points = (area?.points ?? []).filter(
+    (p) => p.stage === stage && state.wards.has(p.ward_code)
+  );
+
+  document.getElementById('map-sub').textContent = t('mapSub', {
+    units: state.units,
+    stage: stageLabel(stage),
+    n: points.length,
+    from: area?.periods?.[0] ?? '',
+    to: area?.periods?.[area.periods.length - 1] ?? '',
+  });
+
+  host.textContent = '';
+  if (points.length < 2) {
+    card.hidden = false;
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = t('mapEmpty', { units: state.units });
+    host.appendChild(p);
+    document.getElementById('map-legend').textContent = '';
+    return;
+  }
+  card.hidden = false;
+
+  const width = Math.max(320, Math.round(host.getBoundingClientRect().width) || 720);
+  const height = Math.min(560, Math.max(360, width * 0.62));
+  const m = { t: 18, r: 18, b: 30, l: 18 };
+
+  // 위경도 → 화면. 위도 35.7°에서 경도 1°는 위도 1°보다 짧으므로 cos 보정.
+  const midLat = points.reduce((a, p) => a + p.lat, 0) / points.length;
+  const kx = Math.cos((midLat * Math.PI) / 180);
+  const xs = points.map((p) => p.lon * kx);
+  const ys = points.map((p) => p.lat);
+  const pad = 0.006;
+  const x0 = Math.min(...xs) - pad * kx, x1 = Math.max(...xs) + pad * kx;
+  const y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+
+  // 종횡비를 유지해야 지리적 거리가 왜곡되지 않는다
+  const iw = width - m.l - m.r, ih = height - m.t - m.b;
+  const scale = Math.min(iw / (x1 - x0), ih / (y1 - y0));
+  const offX = m.l + (iw - (x1 - x0) * scale) / 2;
+  const offY = m.t + (ih - (y1 - y0) * scale) / 2;
+  const X = (lon) => offX + (lon * kx - x0) * scale;
+  const Y = (lat) => offY + (y1 - lat) * scale;
+
+  const cuts = seqBins(points.map((p) => p.median));
+  const maxSamples = Math.max(...points.map((p) => p.samples));
+  const radius = (n) => 6 + 12 * Math.sqrt(n / maxSamples);
+
+  const root = svg('svg', { viewBox: `0 0 ${width} ${height}`, width, height, role: 'img' });
+  root.setAttribute('aria-label', t('mapTitle'));
+
+  const tip = document.createElement('div');
+  tip.className = 'tooltip';
+  host.appendChild(tip);
+
+  // 큰 점이 작은 점을 덮지 않도록 큰 것부터 뒤에 깔고 작은 것을 위에
+  const ordered = [...points].sort((a, b) => b.samples - a.samples);
+  const placed = [];
+  const dots = [];
+
+  for (const p of ordered) {
+    const cx = X(p.lon), cy = Y(p.lat), r = radius(p.samples);
+    const g = svg('g', { style: 'cursor:pointer' });
+    g.appendChild(svg('circle', { cx, cy, r: r + 2, fill: 'var(--surface-1)' }));  // 2px 서피스 링
+    const dot = svg('circle', {
+      cx, cy, r, fill: seqColor(p.median, cuts),
+      stroke: state.station === p.station ? 'var(--text-primary)' : 'none',
+      'stroke-width': state.station === p.station ? 2 : 0,
+    });
+    g.appendChild(dot);
+    g.appendChild(svg('circle', { cx, cy, r: Math.max(r + 2, 13), fill: 'transparent' }));  // 히트 영역
+
+    const label = state.lang === 'ko' ? p.label_ko : p.label_ja;
+    const show = () => {
+      tip.innerHTML = '';
+      const head = document.createElement('div');
+      head.className = 'tt-period';
+      head.textContent = `${label} · ${wardLabelByName(p.ward)}`;
+      tip.appendChild(head);
+      for (const [k, v] of [
+        [t('mapMedian'), `${fmt1(p.median)}${t('unitTsuboSuffix')}`],
+        [t('mapSamples'), `${p.samples}${t('unitCase')}`],
+      ]) {
+        const row = document.createElement('div');
+        row.className = 'tt-row';
+        const nm = document.createElement('span');
+        nm.className = 'tt-name';
+        nm.textContent = k;
+        const val = document.createElement('span');
+        val.className = 'tt-val';
+        val.textContent = v;
+        row.append(nm, val);
+        tip.appendChild(row);
+      }
+      tip.classList.add('on');
+      tip.style.left = `${Math.min(Math.max(cx - 80, 4), host.clientWidth - tip.offsetWidth - 4)}px`;
+      tip.style.top = `${Math.max(4, cy - tip.offsetHeight - 14)}px`;
+    };
+    g.addEventListener('mouseenter', show);
+    g.addEventListener('mouseleave', () => tip.classList.remove('on'));
+    g.addEventListener('click', () => {
+      state.station = state.station === p.station ? null : p.station;
+      renderMap();
+      renderNewListings();
+    });
+    root.appendChild(g);
+
+    dots.push({ cx, cy, r, label });
+  }
+
+  // 라벨은 점을 전부 깔고 난 뒤 맨 위에 얹는다. 섞어 그리면 나중 점이 앞 라벨을 덮는다.
+  const labelLayer = svg('g', {});
+  for (const d of dots) {
+    if (placed.length >= 12) break;
+    const lx = d.cx, ly = d.cy - d.r - 7;
+    const halfWidth = d.label.length * 5.6 + 4;
+
+    // 다른 라벨과도, 다른 점과도 겹치면 건다
+    const hitsLabel = placed.some((q) => Math.abs(q.x - lx) < q.half + halfWidth && Math.abs(q.y - ly) < 14);
+    const hitsDot = dots.some((o) => o !== d && Math.abs(o.cx - lx) < o.r + halfWidth && Math.abs(o.cy - ly) < o.r + 7);
+    if (hitsLabel || hitsDot) continue;
+    if (lx - halfWidth < 2 || lx + halfWidth > width - 2 || ly < 12) continue;
+
+    placed.push({ x: lx, y: ly, half: halfWidth });
+    const txt = svg('text', {
+      x: lx, y: ly, 'text-anchor': 'middle',
+      fill: 'var(--text-secondary)', 'font-size': 11,
+      stroke: 'var(--surface-1)', 'stroke-width': 3, 'paint-order': 'stroke',
+    });
+    txt.textContent = d.label;
+    labelLayer.appendChild(txt);
+  }
+  root.appendChild(labelLayer);
+
+  host.appendChild(root);
+
+  const note = document.createElement('p');
+  note.className = 'map-note';
+  note.textContent = t('mapNote');
+  host.appendChild(note);
+
+  renderMapLegend(cuts, maxSamples);
+  renderMapTable(points);
+}
+
+function renderMapLegend(cuts, maxSamples) {
+  const host = document.getElementById('map-legend');
+  host.textContent = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'scale-legend';
+
+  const lo = document.createElement('span');
+  lo.textContent = t('mapLow');
+  const sw = document.createElement('span');
+  sw.className = 'swatches';
+  for (const c of SEQ) {
+    const b = document.createElement('span');
+    b.className = 'sw';
+    b.style.background = c;
+    sw.appendChild(b);
+  }
+  const hi = document.createElement('span');
+  hi.textContent = t('mapHigh');
+  wrap.append(lo, sw, hi);
+
+  const size = document.createElement('span');
+  size.className = 'size-key';
+  for (const n of [0.25, 1]) {
+    const b = document.createElement('span');
+    b.className = 'bub';
+    const r = 6 + 12 * Math.sqrt(n);
+    b.style.width = `${r}px`;
+    b.style.height = `${r}px`;
+    size.appendChild(b);
+  }
+  size.append(document.createTextNode(t('mapSizeKey', { n: maxSamples })));
+  wrap.appendChild(size);
+
+  host.appendChild(wrap);
+}
+
+function renderMapTable(points) {
+  const host = document.getElementById('map-table');
+  host.hidden = !state.showMapTable;
+  host.textContent = '';
+  if (!state.showMapTable) return;
+
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const hr = document.createElement('tr');
+  for (const label of [t('mapColArea'), t('fArea'), t('mapMedian'), t('mapSamples')]) {
+    hr.appendChild(Object.assign(document.createElement('th'), { textContent: label }));
+  }
+  thead.appendChild(hr);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  for (const p of [...points].sort((a, b) => b.median - a.median)) {
+    const tr = document.createElement('tr');
+    const cells = [
+      state.lang === 'ko' ? p.label_ko : p.label_ja,
+      wardLabelByName(p.ward),
+      fmt1(p.median),
+      String(p.samples),
+    ];
+    cells.forEach((c) => tr.appendChild(Object.assign(document.createElement('td'), { textContent: c })));
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  host.appendChild(table);
+}
+
+/* ------------------------------------------------- 역세권별 추이 */
+
+function renderStationFacets() {
+  const host = document.getElementById('station-facets');
+  const card = document.getElementById('station-card');
+  host.textContent = '';
+  const st = stationData();
+  const stage = state.stage === 'both' ? 'used' : state.stage;
+
+  if (!st) { card.hidden = true; return; }
+  card.hidden = false;
+
+  const rows = st.series
+    .filter((x) => x.stage === stage && state.wards.has(x.ward_code))
+    .sort((a, b) => (b.latest ?? 0) - (a.latest ?? 0))
+    .slice(0, 12);
+
+  document.getElementById('station-sub').textContent = t('stationSub', {
+    units: state.units, stage: stageLabel(stage), n: rows.length,
+  });
+
+  if (!rows.length) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = t('mapEmpty', { units: state.units });
+    host.appendChild(p);
+    return;
+  }
+
+  const pending = [];
+  for (const row of rows) {
+    const box = document.createElement('div');
+    box.className = 'facet';
+    const h = document.createElement('h3');
+    h.textContent = state.lang === 'ko' ? row.label_ko : row.label_ja;
+    const meta = document.createElement('div');
+    meta.className = 'facet-meta';
+    meta.textContent = `${wardLabelByName(row.ward)} · ${fmt1(row.latest)}${t('unitTsuboSuffix')}`
+      + (row.change_pct === null ? '' : ` · ${fmtPct(row.change_pct)}`);
+    const chart = document.createElement('div');
+    chart.className = 'chart-host';
+    box.append(h, meta, chart);
+    host.appendChild(box);
+    pending.push({ chart, row });
+  }
+
+  for (const { chart, row } of pending) {
+    renderLineChart(chart, {
+      series: [{
+        id: row.id,
+        label: state.lang === 'ko' ? row.label_ko : row.label_ja,
+        color: wardColor(row.ward_code),
+        points: row.points,
+      }],
+      periods: st.periods,
+      height: 150,
+      endLabels: false,
+      valueSuffix: t('unitTsuboSuffix'),
+      ariaLabel: `${row.label_ja} ${t('unitTsubo')}`,
+    });
+  }
+}
+
 /* -------------------------------------------------------------- 렌더 */
 
 function renderScope() {
   const host = document.getElementById('scope-chips');
   host.textContent = '';
-  const trends = data.market?.listing_trends;
+  const trends = trendsData();
   const bits = [
-    `대상 ${wardOrder.length}개 구`,
-    `총 ${trends?.min_total_units ?? 200}세대 이상`,
-    '中古 · 新築分譲',
+    t('scopeWards', { n: wardOrder.length }),
+    t('scopeUnits', { units: trends?.min_total_units ?? 500 }),
+    t('scopeKinds'),
     trends ? `${trends.periods[0]} – ${trends.periods[trends.periods.length - 1]}` : '',
   ].filter(Boolean);
   for (const b of bits) {
@@ -451,7 +927,7 @@ function renderWardChips() {
     dot.className = 'dot';
     const text = document.createElement('span');
     text.style.color = 'var(--text-primary)';
-    text.textContent = wardNames[code] ?? code;
+    text.textContent = wardLabel(code);
     if (!state.wards.has(code)) text.style.color = 'var(--text-secondary)';
     btn.append(dot, text);
     btn.addEventListener('click', () => {
@@ -471,7 +947,7 @@ function renderWardChips() {
 function renderTiles() {
   const host = document.getElementById('tiles');
   host.textContent = '';
-  const trends = data.market?.listing_trends;
+  const trends = trendsData();
   if (!trends) return;
 
   const periods = visiblePeriods();
@@ -494,56 +970,60 @@ function renderTiles() {
   const tiles = [
     {
       hero: true,
-      label: `선택 지역 중고 坪単価 중앙값 · ${latest ?? '—'}`,
+      label: t('tileHero', { period: latest ?? '—' }),
       value: fmt1(usedNow),
-      unit: '万円/坪',
+      unit: t('unitTsubo'),
       delta: usedNow && usedThen ? { pct: (usedNow / usedThen - 1) * 100, since: first } : null,
     },
     {
-      label: `신축 분양 坪単価 중앙값 · ${latest ?? '—'}`,
+      label: t('tileNew', { period: latest ?? '—' }),
       value: fmt1(newNow),
-      unit: '万円/坪',
+      unit: t('unitTsubo'),
     },
     {
-      label: '신축 프리미엄 (중고 대비)',
+      label: t('tilePremium'),
       value: gap === null ? '—' : `+${gap.toFixed(0)}`,
       unit: '%',
     },
     {
-      label: '오늘 신규 등록',
-      value: String(data.changes?.summary?.new ?? 0),
-      unit: '件',
-      sub: `가격변경 ${data.changes?.summary?.price_changed ?? 0} · 게재종료 ${data.changes?.summary?.removed ?? 0}`,
+      label: t('tileToday'),
+      value: String(data.recent?.count ?? data.changes?.summary?.new ?? 0),
+      unit: t('unitCase'),
+      sub: t('tileSub', {
+        changed: data.changes?.summary?.price_changed ?? 0,
+        removed: data.changes?.summary?.removed ?? 0,
+      }),
     },
   ];
 
-  for (const t of tiles) {
+  // 반복 변수 이름은 t 를 피한다 — 번역 함수 t() 를 가려버린다
+  for (const tile of tiles) {
     const card = document.createElement('div');
-    card.className = 'tile' + (t.hero ? ' hero' : '');
+    card.className = 'tile' + (tile.hero ? ' hero' : '');
     const label = document.createElement('div');
     label.className = 'label';
-    label.textContent = t.label;
+    label.textContent = tile.label;
     const value = document.createElement('div');
     value.className = 'value';
-    value.textContent = t.value;
+    value.textContent = tile.value;
     const unit = document.createElement('span');
     unit.className = 'unit';
-    unit.textContent = t.unit;
+    unit.textContent = tile.unit;
     value.appendChild(unit);
     card.append(label, value);
 
-    if (t.delta) {
+    if (tile.delta) {
       const d = document.createElement('div');
       d.className = 'delta';
       const span = document.createElement('span');
-      span.className = t.delta.pct >= 0 ? 'up' : 'down';
-      span.textContent = fmtPct(t.delta.pct);
-      d.append(span, document.createTextNode(` · ${t.delta.since} 대비`));
+      span.className = tile.delta.pct >= 0 ? 'up' : 'down';
+      span.textContent = fmtPct(tile.delta.pct);
+      d.append(span, document.createTextNode(` · ${t('tileSince', { period: tile.delta.since })}`));
       card.appendChild(d);
-    } else if (t.sub) {
+    } else if (tile.sub) {
       const d = document.createElement('div');
       d.className = 'delta';
-      d.textContent = t.sub;
+      d.textContent = tile.sub;
       card.appendChild(d);
     }
     host.appendChild(card);
@@ -553,14 +1033,14 @@ function renderTiles() {
 function renderMain() {
   const series = mainSeries();
   const periods = visiblePeriods();
-  const suffix = state.scale === 'idx' ? '' : ' 万円/坪';
+  const suffix = state.scale === 'idx' ? '' : t('unitTsuboSuffix');
 
   document.getElementById('main-title').textContent =
-    state.stage === 'both' ? '선택 지역 종합 — 중고 vs 신축 분양' : `구별 坪単価 추이 · ${STAGE_LABEL[state.stage]}`;
+    state.stage === 'both' ? t('mainTitleBoth') : t('mainTitleStage', { stage: stageLabel(state.stage) });
   document.getElementById('main-sub').textContent =
-    (state.scale === 'idx' ? `${periods[0] ?? ''} = 100 지수` : '万円/坪 중앙값')
-    + ` · 총 ${data.market?.listing_trends?.min_total_units ?? 200}세대 이상`
-    + (state.stage === 'both' ? ' · 구별 내역은 아래 상세 참조' : '');
+    (state.scale === 'idx' ? t('mainSubIdx', { base: periods[0] ?? '' }) : t('mainSubAbs'))
+    + ' · ' + t('mainSubUnits', { units: trendsData()?.min_total_units ?? 500 })
+    + (state.stage === 'both' ? ' · ' + t('mainSubBoth') : '');
 
   renderLineChart(document.getElementById('main-chart'), {
     series, periods, height: 330, valueSuffix: suffix,
@@ -596,7 +1076,7 @@ function renderLegend(host, series) {
   if (state.stage === 'both') {
     const note = document.createElement('span');
     note.className = 'legend-note';
-    note.textContent = '실선 = 중고 · 파선 = 신축 분양';
+    note.textContent = t('legendNote');
     host.appendChild(note);
   }
 }
@@ -609,7 +1089,7 @@ function renderTable(host, series, periods) {
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const hr = document.createElement('tr');
-  hr.appendChild(Object.assign(document.createElement('th'), { textContent: '분기' }));
+  hr.appendChild(Object.assign(document.createElement('th'), { textContent: t('tableHeadPeriod') }));
   for (const s of series) hr.appendChild(Object.assign(document.createElement('th'), { textContent: s.label }));
   thead.appendChild(hr);
   table.appendChild(thead);
@@ -631,7 +1111,7 @@ function renderTable(host, series, periods) {
 function renderFacets() {
   const host = document.getElementById('facets');
   host.textContent = '';
-  const trends = data.market?.listing_trends;
+  const trends = trendsData();
   if (!trends) return;
   const periods = visiblePeriods();
   const pending = [];
@@ -644,7 +1124,8 @@ function renderFacets() {
         if (!row) return null;
         return {
           id: `${code}|${stage}|facet`,
-          label: STAGE_LABEL[stage],
+          stage,
+          label: stageLabel(stage),
           color: wardColor(code),
           dashed: stage === 'new',
           points: clipPoints(row.points, periods),
@@ -657,12 +1138,14 @@ function renderFacets() {
     const box = document.createElement('div');
     box.className = 'facet';
     const h = document.createElement('h3');
-    h.textContent = wardNames[code] ?? code;
+    h.textContent = wardLabel(code);
     const meta = document.createElement('div');
     meta.className = 'facet-meta';
-    const used = rows.find((r) => r.label === STAGE_LABEL.used);
+    const used = rows.find((r) => r.stage === 'used');
     const last = used ? [...used.points].reverse().find((p) => p.value !== null) : null;
-    meta.textContent = last ? `중고 ${fmt1(last.value)} 万円/坪 · ${last.period}` : '표본 부족';
+    meta.textContent = last
+      ? t('facetMeta', { value: fmt1(last.value), period: last.period })
+      : t('noSample');
     const chart = document.createElement('div');
     chart.className = 'chart-host';
     box.append(h, meta, chart);
@@ -674,13 +1157,13 @@ function renderFacets() {
   for (const { chart, rows, code } of pending) {
     renderLineChart(chart, {
       series: rows, periods, height: 168, endLabels: false,
-      valueSuffix: ' 万円/坪', ariaLabel: `${wardNames[code]} 坪単価 추이`,
+      valueSuffix: t('unitTsuboSuffix'), ariaLabel: `${wardLabel(code)} ${t('unitTsubo')}`,
     });
   }
 }
 
 function renderChange() {
-  const trends = data.market?.listing_trends;
+  const trends = trendsData();
   const host = document.getElementById('change-chart');
   if (!trends) return;
   const periods = visiblePeriods();
@@ -694,13 +1177,14 @@ function renderChange() {
       const pts = clipPoints(row.points, periods).filter((p) => p.value !== null);
       if (pts.length < 2) return null;
       const value = (pts[pts.length - 1].value / pts[0].value - 1) * 100;
-      return { label: wardNames[code] ?? code, value, color: wardColor(code) };
+      return { label: wardLabel(code), value, color: wardColor(code) };
     })
     .filter(Boolean)
     .sort((a, b) => b.value - a.value);
 
-  document.getElementById('change-sub').textContent =
-    `${periods[0] ?? ''} → ${periods[periods.length - 1] ?? ''} · ${STAGE_LABEL[stage]} 坪単価 중앙값 기준`;
+  document.getElementById('change-sub').textContent = t('changeSub', {
+    from: periods[0] ?? '', to: periods[periods.length - 1] ?? '', stage: stageLabel(stage),
+  });
   renderChangeChart(host, rows);
 }
 
@@ -712,11 +1196,11 @@ function renderOfficial() {
 
   const series = official.series
     .filter((s) => state.wards.has(s.ward_code))
-    .map((s) => ({ id: s.id, label: s.ward, color: wardColor(s.ward_code), points: s.points }));
+    .map((s) => ({ id: s.id, label: wardLabel(s.ward_code), color: wardColor(s.ward_code), points: s.points }));
 
   renderLineChart(document.getElementById('official-chart'), {
     series, periods: official.periods, height: 280,
-    valueSuffix: ' 万円/坪', ariaLabel: '국토교통성 성약가 추이',
+    valueSuffix: t('unitTsuboSuffix'), ariaLabel: t('officialTitle'),
   });
   renderLegend(document.getElementById('official-legend'), series);
 }
@@ -724,7 +1208,7 @@ function renderOfficial() {
 function renderNewListings() {
   const host = document.getElementById('new-listings');
   host.textContent = '';
-  const minUnits = data.market?.listing_trends?.min_total_units ?? 200;
+  const minUnits = trendsData()?.min_total_units ?? 500;
   const wardNameSet = new Set(wardOrder.filter((w) => state.wards.has(w)).map((w) => wardNames[w]));
 
   // 신규가 0건인 날에도 섹션이 비지 않도록 최근 며칠치를 굴려서 보여준다
@@ -733,18 +1217,32 @@ function renderNewListings() {
 
   const items = pool
     .filter((x) => wardNameSet.has(x.city) && (x.total_units ?? 0) >= minUnits)
+    .filter((x) => !state.station || x.sub_area === state.station)
     .sort((a, b) => (b.found_on ?? '').localeCompare(a.found_on ?? '') || (b.price_yen ?? 0) - (a.price_yen ?? 0))
     .slice(0, 24);
 
   document.getElementById('new-sub').textContent =
-    (windowDays ? `최근 ${windowDays}일 신규` : `${data.changes?.date ?? ''} 수집분`)
-    + ` · 선택 지역 · ${minUnits}세대 이상 · ${items.length}건`
-    + (data.changes?.summary ? ` (오늘 ${data.changes.summary.new}건)` : '');
+    (windowDays ? t('newSubWindow', { days: windowDays }) : t('newSubDate', { date: data.changes?.date ?? '' }))
+    + ' · ' + t('newSubTail', { units: minUnits, n: items.length })
+    + (data.changes?.summary ? ' ' + t('newSubToday', { n: data.changes.summary.new }) : '');
+
+  const clear = document.getElementById('station-clear');
+  if (clear) clear.remove();
+  if (state.station) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'station-clear';
+    btn.className = 'linkish';
+    btn.style.marginBottom = '10px';
+    btn.textContent = t('stationFilter', { station: state.station });
+    btn.addEventListener('click', () => { state.station = null; renderMap(); renderNewListings(); });
+    host.appendChild(btn);
+  }
 
   if (!items.length) {
     const p = document.createElement('p');
     p.className = 'empty';
-    p.textContent = '조건에 맞는 신규 등록 물건이 없습니다.';
+    p.textContent = t('emptyNoListings');
     host.appendChild(p);
     return;
   }
@@ -764,11 +1262,11 @@ function renderNewListings() {
     const dot = document.createElement('span');
     dot.className = 'dot';
     dot.style.background = wardColor(code);
-    ward.append(dot, document.createTextNode(x.city));
+    ward.append(dot, document.createTextNode(wardLabelByName(x.city)));
     row1.appendChild(ward);
     const badge = document.createElement('span');
     badge.className = 'badge ' + (x.stage === 'new' ? 'shinchiku' : 'new');
-    badge.textContent = x.stage === 'new' ? '신축 분양' : '신규';
+    badge.textContent = x.stage === 'new' ? t('badgeShinchiku') : t('badgeNew');
     row1.appendChild(badge);
     card.appendChild(row1);
 
@@ -779,14 +1277,14 @@ function renderNewListings() {
 
     const price = document.createElement('div');
     price.className = 'price';
-    price.textContent = `${fmt1(x.price_man)} 万円`;
+    price.textContent = `${fmt1(x.price_man)} ${t('unitMan')}`;
     card.appendChild(price);
 
     const meta = document.createElement('div');
     meta.className = 'meta';
     meta.textContent = [
       x.layout, x.area_m2 ? `${x.area_m2}㎡` : null,
-      x.unit_price_man_per_tsubo ? `${fmt1(x.unit_price_man_per_tsubo)} 万円/坪` : null,
+      x.unit_price_man_per_tsubo ? `${fmt1(x.unit_price_man_per_tsubo)} ${t('unitTsubo')}` : null,
     ].filter(Boolean).join(' · ');
     card.appendChild(meta);
 
@@ -818,7 +1316,7 @@ function renderSources() {
     nm.textContent = s.name;
     const st = document.createElement('span');
     st.className = `state ${s.state}`;
-    st.textContent = s.state === 'ok' ? `연결됨 ${s.count}件` : s.state === 'error' ? '오류' : '미연결';
+    st.textContent = s.state === 'ok' ? t('srcOk', { n: s.count }) : s.state === 'error' ? t('srcErr') : t('srcSkip');
     const rs = document.createElement('div');
     rs.className = 'rs';
     rs.textContent = s.reason || notes[s.key]?.access_note || '';
@@ -829,15 +1327,56 @@ function renderSources() {
 }
 
 function renderAll() {
+  applyLang();   // 세대수 기준이 바뀌면 안내 문구의 숫자도 같이 바뀌어야 한다
   renderTiles();
   renderMain();
   renderFacets();
+  renderMap();
+  renderStationFacets();
   renderChange();
   renderOfficial();
   renderNewListings();
 }
 
 /* --------------------------------------------------------------- 부트 */
+
+function renderUnitsSeg() {
+  const host = document.getElementById('units-seg');
+  host.textContent = '';
+  const options = data.market?.thresholds ?? [Number(state.units)];
+  for (const n of options) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.units = String(n);
+    b.setAttribute('aria-pressed', String(String(n) === state.units));
+    b.textContent = t('unitsOption', { n });
+    b.addEventListener('click', () => {
+      state.units = String(n);
+      state.station = null;
+      state.hidden.clear();
+      renderUnitsSeg();
+      renderAll();
+    });
+    host.appendChild(b);
+  }
+}
+
+/** 사전에 있는 문구를 화면에 바른다. */
+function applyLang() {
+  document.documentElement.lang = t('htmlLang');
+  document.title = t('title');
+  for (const el of document.querySelectorAll('[data-i18n]')) {
+    el.textContent = t(el.dataset.i18n);
+  }
+  for (const el of document.querySelectorAll('[data-i18n-html]')) {
+    el.innerHTML = t(el.dataset.i18nHtml, { units: trendsData()?.min_total_units ?? state.units });
+  }
+  for (const btn of document.querySelectorAll('#lang-seg button')) {
+    btn.setAttribute('aria-pressed', String(btn.dataset.lang === state.lang));
+  }
+  document.getElementById('toggle-table').textContent = t(state.showTable ? 'tableClose' : 'tableOpen');
+  document.getElementById('toggle-map-table').textContent = t(state.showMapTable ? 'tableClose' : 'tableOpen');
+}
 
 function wireSegments() {
   const bind = (id, key, cb) => {
@@ -858,8 +1397,29 @@ function wireSegments() {
   toggle.addEventListener('click', () => {
     state.showTable = !state.showTable;
     toggle.setAttribute('aria-expanded', String(state.showTable));
-    toggle.textContent = state.showTable ? '표 닫기' : '표로 보기';
+    toggle.textContent = t(state.showTable ? 'tableClose' : 'tableOpen');
     renderMain();
+  });
+
+  const mapToggle = document.getElementById('toggle-map-table');
+  mapToggle.addEventListener('click', () => {
+    state.showMapTable = !state.showMapTable;
+    mapToggle.setAttribute('aria-expanded', String(state.showMapTable));
+    mapToggle.textContent = t(state.showMapTable ? 'tableClose' : 'tableOpen');
+    renderMap();
+  });
+
+  document.getElementById('lang-seg').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn || btn.dataset.lang === state.lang) return;
+    state.lang = btn.dataset.lang;
+    try { localStorage.setItem('re-lang', state.lang); } catch { /* 저장 못해도 동작에는 지장 없다 */ }
+    applyLang();
+    renderScope();
+    renderWardChips();
+    renderUnitsSeg();
+    renderSources();
+    renderAll();
   });
 }
 
@@ -879,7 +1439,7 @@ async function boot() {
     load('market'), load('latest-changes'), load('sources'), load('recent-new'),
   ]);
 
-  const trends = data.market?.listing_trends;
+  const trends = trendsData();
   if (!trends) {
     document.getElementById('main-chart').innerHTML =
       '<p class="empty">추이 데이터가 아직 없습니다. 수집기를 먼저 실행하세요 — <code>python3 -m realestate.collector.run</code></p>';
@@ -890,20 +1450,22 @@ async function boot() {
   wardNames = trends.ward_names ?? {};
   state.wards = new Set(wardOrder);
 
+  applyLang();
+
   const banner = document.getElementById('synthetic-banner');
   banner.hidden = !trends.synthetic;
   if (trends.synthetic) {
-    document.getElementById('synthetic-detail').textContent =
-      `현재 연결된 소스는 샘플(架空データ)뿐입니다. 실제 도쿄 시세가 아니며, 판단 근거로 쓰면 안 됩니다. 출처: ${trends.source}`;
+    document.getElementById('synthetic-detail').textContent = t('syntheticDetail', { source: trends.source });
   }
 
   document.getElementById('generated').textContent =
-    `생성 ${data.market.generated_at ?? '—'} · 추이 출처: ${trends.source}`
-    + (data.market.official_trends ? ` · 성약가: ${data.market.official_trends.source}` : '');
+    t('generated', { time: data.market.generated_at ?? '—', source: trends.source })
+    + (data.market.official_trends ? t('generatedOfficial', { source: data.market.official_trends.source }) : '');
 
   renderScope();
   renderWardChips();
-  renderSources();   // 필터와 무관 — 한 번만 그린다
+  renderUnitsSeg();
+  renderSources();   // 필터와 무관 — 언어 바뀔 때만 다시 그린다
   wireSegments();
   renderAll();
 
