@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -87,6 +87,7 @@ class Store:
         self.latest_changes_path = self.root / "latest-changes.json"
         # 추이의 원천. 스냅샷과 달리 한 번 기록한 관측은 지우지 않는다.
         self.observations_path = self.root / "observations.jsonl"
+        self.recent_new_path = self.root / "recent-new.json"
 
     # ------------------------------------------------------------------
     def load_previous(self) -> dict[str, Listing]:
@@ -172,6 +173,53 @@ class Store:
         # 掲載終了된 물건은 다음 스냅샷에 없으므로, 이력 파일이 유일한 기록이다.
         _write_json(self.changes_dir / f"{_today()}.json", changes_payload)
 
+
+    # ------------------------------------------------------------------
+    def update_recent(
+        self,
+        changes: Changes,
+        listings: Iterable[Listing],
+        days: int = 7,
+        cap: int = 240,
+    ) -> int:
+        """'최근 N일 신규 매물' 목록을 갱신한다.
+
+        두 갈래를 합친다:
+          * 게재일(情報公開日)이 N일 이내인 물건 — 수집 첫날부터 바로 잡힌다
+          * 게재일이 없는 소스는 차분에서 오늘 처음 본 물건으로 대체
+        하루 차분만 쓰면 신규 0건인 날 섹션이 통째로 비고, 수집을 막 시작한
+        시점에는 아예 아무것도 못 보여준다.
+        """
+        today = _today()
+        cutoff = (
+            datetime.now(timezone.utc).astimezone() - timedelta(days=days)
+        ).strftime("%Y-%m-%d")
+
+        picked: dict[str, dict[str, Any]] = {}
+
+        for listing in listings:
+            if listing.listed_on and listing.listed_on >= cutoff:
+                picked[listing.key] = {**listing.to_dict(), "found_on": listing.listed_on}
+
+        for listing in changes.new:                      # 게재일이 없는 소스 보완
+            picked.setdefault(listing.key, {**listing.to_dict(), "found_on": today})
+
+        items = sorted(
+            picked.values(),
+            key=lambda x: (x.get("found_on", ""), x.get("price_yen") or 0),
+            reverse=True,
+        )[:cap]
+
+        _write_json(
+            self.recent_new_path,
+            {
+                "generated_at": _now_iso(),
+                "window_days": days,
+                "count": len(items),
+                "items": items,
+            },
+        )
+        return len(items)
 
     # ------------------------------------------------------------------
     def load_observations(self) -> list[dict[str, Any]]:

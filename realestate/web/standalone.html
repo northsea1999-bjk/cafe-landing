@@ -1,0 +1,1586 @@
+<!doctype html>
+<html lang="ko" data-theme="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>도쿄 7구 대규모 맨션 가격추이</title>
+<meta name="description" content="千代田・中央・港・新宿・文京・江東・渋谷 7개 구, 총 200세대 이상 맨션의 중고·신축분양 坪単価 추이">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🏙️</text></svg>">
+<style>
+/* 도쿄 7구 대규모 맨션 가격추이 — 스타일
+ *
+ * 색은 역할(role)로만 참조한다. 라이트/다크 값을 여기 한 곳에서 바꾸면
+ * 차트까지 같이 따라온다. 계열 색은 '구(区)'에 고정이며, 필터로 계열이
+ * 줄어도 남은 구의 색은 절대 바뀌지 않는다.
+ */
+
+:root {
+  color-scheme: light;
+
+  --page: #f9f9f7;
+  --surface-1: #fcfcfb;
+  --surface-2: #f2f1ed;
+
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+
+  --gridline: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.10);
+
+  --good: #0ca30c;
+  --good-text: #006300;
+  --critical: #d03b3b;
+  --warning: #fab219;
+
+  /* 계열 슬롯 — 고정 순서 (CVD 검증 통과) */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #4a3aa7;
+
+  --radius: 10px;
+  --font: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN",
+    "Noto Sans JP", "Apple SD Gothic Neo", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --page: #0d0d0d;
+    --surface-1: #1a1a19;
+    --surface-2: #222220;
+
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+
+    --gridline: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+
+    --good-text: #0ca30c;
+
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+    --series-7: #9085e9;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --page: #0d0d0d;
+  --surface-1: #1a1a19;
+  --surface-2: #222220;
+
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+
+  --gridline: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255, 255, 255, 0.10);
+
+  --good-text: #0ca30c;
+
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 20px 72px;
+}
+
+/* ---------------------------------------------------------- 헤더 */
+
+.masthead { margin-bottom: 20px; }
+
+.masthead h1 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.masthead p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.masthead .scope {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.scope-chip {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+/* --------------------------------------------------- 경고 배너 */
+
+.banner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--warning);
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 0 0 20px;
+}
+
+.banner[hidden] { display: none; }
+
+.banner .icon { font-size: 18px; line-height: 1.4; }
+.banner strong { display: block; font-size: 14px; }
+.banner p { margin: 4px 0 0; font-size: 13px; color: var(--text-secondary); }
+
+/* -------------------------------------------------------- 필터 */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 26px;
+  align-items: flex-end;
+  padding: 16px 18px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 22px;
+}
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+
+.field > .field-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 3px 11px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.chip:hover { border-color: var(--baseline); }
+
+.chip[aria-pressed="true"] {
+  color: var(--text-primary);
+  background: var(--surface-1);
+  border-color: var(--baseline);
+  font-weight: 550;
+}
+
+.chip .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.chip[aria-pressed="false"] .dot { opacity: 0.28; }
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.seg button {
+  font: inherit;
+  font-size: 13px;
+  min-height: 32px;
+  padding: 4px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.seg button + button { border-left: 1px solid var(--border); }
+
+.seg button[aria-pressed="true"] {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font-weight: 550;
+}
+
+/* ---------------------------------------------------- 스탯 타일 */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.tile {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 15px 17px;
+}
+
+.tile .label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.tile .value {
+  font-size: 27px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.tile .value .unit {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-left: 3px;
+}
+
+.tile .delta { font-size: 12.5px; margin-top: 5px; color: var(--text-secondary); }
+.tile .delta .up { color: var(--good-text); font-weight: 600; }
+.tile .delta .down { color: var(--critical); font-weight: 600; }
+
+.tile.hero .value { font-size: 48px; }
+
+/* -------------------------------------------------------- 카드 */
+
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px 20px;
+  margin-bottom: 22px;
+}
+
+.card-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.card-head h2 { margin: 0; font-size: 16px; font-weight: 620; }
+.card-head .sub { margin: 0; font-size: 12.5px; color: var(--text-secondary); }
+
+.linkish {
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--baseline);
+  padding: 0 0 1px;
+  cursor: pointer;
+}
+
+.linkish:hover { color: var(--text-primary); }
+
+/* -------------------------------------------------------- 차트 */
+
+.chart-host { position: relative; margin-top: 10px; }
+.chart-host svg { display: block; width: 100%; overflow: visible; }
+.chart-host svg:focus-visible { outline: 2px solid var(--series-1); outline-offset: 3px; }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--gridline);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  background: none;
+  border: 0;
+  padding: 3px 2px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.legend-item .key { width: 14px; height: 3px; border-radius: 2px; background: currentColor; flex: none; }
+.legend-item[aria-pressed="false"] { opacity: 0.38; }
+.legend-item:hover { color: var(--text-primary); }
+
+.legend-note {
+  width: 100%;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  min-width: 168px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.14);
+  padding: 9px 11px;
+  font-size: 12.5px;
+  opacity: 0;
+  transition: opacity 90ms linear;
+}
+
+.tooltip.on { opacity: 1; }
+.tooltip .tt-period { font-weight: 620; margin-bottom: 6px; font-size: 12px; }
+
+.tooltip .tt-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  padding: 1.5px 0;
+}
+
+.tooltip .tt-name { display: inline-flex; align-items: center; gap: 6px; }
+.tooltip .tt-swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+.tooltip .tt-val { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+/* 소규모 다중 차트 */
+
+.facets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.facet { border: 1px solid var(--gridline); border-radius: 8px; padding: 11px 12px 8px; }
+.facet h3 { margin: 0; font-size: 13.5px; font-weight: 620; }
+
+.facet .facet-meta {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  margin: 2px 0 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* -------------------------------------------------------- 표 */
+
+.table-wrap { overflow-x: auto; margin-top: 14px; }
+
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+
+th, td {
+  text-align: right;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--gridline);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+th:first-child, td:first-child { text-align: left; font-variant-numeric: normal; }
+thead th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+tbody tr:hover { background: var(--surface-2); }
+
+/* ------------------------------------------------- 신규 매물 */
+
+.listing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: 13px;
+  margin-top: 14px;
+}
+
+.listing {
+  border: 1px solid var(--gridline);
+  border-radius: 9px;
+  padding: 13px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.listing .row1 { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.badge.new { color: var(--good-text); border-color: currentColor; }
+.badge.shinchiku { color: var(--series-2); border-color: currentColor; }
+
+.listing .name { font-weight: 600; font-size: 14px; }
+.listing .price { font-size: 19px; font-weight: 620; letter-spacing: -0.01em; }
+.listing .meta { font-size: 12.5px; color: var(--text-secondary); }
+.listing .ward { display: inline-flex; align-items: center; gap: 6px; }
+.listing .ward .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+/* -------------------------------------------------------- 출처 */
+
+.sources { display: grid; gap: 10px; margin-top: 12px; }
+
+.source-row {
+  display: grid;
+  grid-template-columns: 150px 88px 1fr;
+  gap: 12px;
+  align-items: start;
+  font-size: 13px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--gridline);
+}
+
+.source-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.source-row .nm { font-weight: 600; }
+.source-row .rs { color: var(--text-secondary); font-size: 12.5px; }
+
+.state {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  justify-self: start;
+  white-space: nowrap;
+}
+
+.state.ok { color: var(--good-text); }
+.state.skipped { color: var(--text-muted); }
+.state.error { color: var(--critical); }
+
+.empty {
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  padding: 22px 0;
+  text-align: center;
+}
+
+footer {
+  margin-top: 36px;
+  padding-top: 18px;
+  border-top: 1px solid var(--gridline);
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+footer a { color: inherit; }
+
+@media (max-width: 620px) {
+  .source-row { grid-template-columns: 1fr; gap: 4px; }
+  .tile.hero .value { font-size: 38px; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>도쿄 7구 대규모 맨션 가격추이</h1>
+    <p>총 <strong>200세대 이상</strong> 맨션의 <strong>중고 호가</strong>와 <strong>신축 분양가</strong>를 구별·분기별 <strong>坪単価 중앙값</strong>으로 추적합니다.</p>
+    <div class="scope" id="scope-chips"></div>
+  </header>
+
+  <div class="banner" id="synthetic-banner" hidden>
+    <span class="icon" aria-hidden="true">⚠</span>
+    <div>
+      <strong>지금 보이는 숫자는 전부 가상 데이터입니다</strong>
+      <p id="synthetic-detail">실제 도쿄 시세가 아닙니다. 파이프라인 검증용 샘플이며, 실제 데이터 소스를 연결하면 자동으로 교체됩니다.</p>
+    </div>
+  </div>
+
+  <!-- 필터는 한 줄로 모아 아래 모든 차트에 동일하게 적용된다 -->
+  <div class="filters" role="group" aria-label="표시 조건">
+    <div class="field">
+      <span class="field-label" id="lbl-wards">지역</span>
+      <div class="chips" id="ward-chips" role="group" aria-labelledby="lbl-wards"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label" id="lbl-stage">구분</span>
+      <div class="seg" id="stage-seg" role="group" aria-labelledby="lbl-stage">
+        <button type="button" data-stage="used" aria-pressed="true">중고</button>
+        <button type="button" data-stage="new" aria-pressed="false">신축 분양</button>
+        <button type="button" data-stage="both" aria-pressed="false">둘 다 비교</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label" id="lbl-range">기간</span>
+      <div class="seg" id="range-seg" role="group" aria-labelledby="lbl-range">
+        <button type="button" data-range="12" aria-pressed="false">3년</button>
+        <button type="button" data-range="20" aria-pressed="false">5년</button>
+        <button type="button" data-range="all" aria-pressed="true">전체</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label" id="lbl-scale">표시</span>
+      <div class="seg" id="scale-seg" role="group" aria-labelledby="lbl-scale">
+        <button type="button" data-scale="abs" aria-pressed="true">실額 万円/坪</button>
+        <button type="button" data-scale="idx" aria-pressed="false">지수 =100</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2 id="main-title">구별 坪単価 추이</h2>
+        <p class="sub" id="main-sub"></p>
+      </div>
+      <button type="button" class="linkish" id="toggle-table" aria-expanded="false">표로 보기</button>
+    </div>
+    <div class="chart-host" id="main-chart"></div>
+    <div class="legend" id="main-legend"></div>
+    <div class="table-wrap" id="main-table" hidden></div>
+  </section>
+
+  <section class="card" id="facet-card">
+    <div class="card-head">
+      <div>
+        <h2>구별 상세 — 중고 vs 신축 분양</h2>
+        <p class="sub">각 구를 따로 떼어 보면 두 계열의 간격(신축 프리미엄)이 드러납니다. 실선 중고 · 파선 신축 분양.</p>
+      </div>
+    </div>
+    <div class="facets" id="facets"></div>
+  </section>
+
+  <section class="card" id="change-card">
+    <div class="card-head">
+      <div>
+        <h2>기간 변동률</h2>
+        <p class="sub" id="change-sub"></p>
+      </div>
+    </div>
+    <div class="chart-host" id="change-chart"></div>
+  </section>
+
+  <section class="card" id="official-card" hidden>
+    <div class="card-head">
+      <div>
+        <h2>참고 — 국토교통성 성약가</h2>
+        <p class="sub">실제로 거래가 성사된 가격입니다. 이 데이터에는 총세대수가 없어 <strong>200세대 필터가 적용되지 않은 구 전체 수치</strong>입니다. 호가보다 낮게 나오는 것이 정상입니다.</p>
+      </div>
+    </div>
+    <div class="chart-host" id="official-chart"></div>
+    <div class="legend" id="official-legend"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>신규 매물</h2>
+        <p class="sub" id="new-sub">최근 수집분 중 조건에 맞는 신규 등록 물건입니다.</p>
+      </div>
+    </div>
+    <div id="new-listings"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>데이터 출처</h2>
+        <p class="sub">각 포털에서 데이터를 받으려면 정당한 접근 경로가 필요합니다. 아래는 현재 연결 상태입니다.</p>
+      </div>
+    </div>
+    <div class="sources" id="sources"></div>
+  </section>
+
+  <footer>
+    <p id="generated"></p>
+    <p>坪単価 = 가격 ÷ (전용면적 ÷ 3.30578). 각 분기 값은 <strong>중앙값</strong>이며, 표본이 기준 미만인 분기는 선을 잇지 않고 비워 둡니다.</p>
+  </footer>
+
+</div>
+<script>window.__REALESTATE_DATA__ = {"market": {"generated_at": "2026-08-09T21:24:23+00:00", "listing_trends": {"generated_at": "2026-08-09T21:24:23+00:00", "synthetic": true, "source": "収集した売出物件（中古・新築分譲）の坪単価中央値", "measure": "median_man_per_tsubo", "measure_label": "売出 坪単価 中央値（万円/坪）", "min_total_units": 200, "granularity": "quarter", "ward_order": ["13101", "13102", "13103", "13104", "13105", "13108", "13113"], "ward_names": {"13101": "千代田区", "13102": "中央区", "13103": "港区", "13104": "新宿区", "13105": "文京区", "13108": "江東区", "13113": "渋谷区"}, "periods": ["2021Q3", "2021Q4", "2022Q1", "2022Q2", "2022Q3", "2022Q4", "2023Q1", "2023Q2", "2023Q3", "2023Q4", "2024Q1", "2024Q2", "2024Q3", "2024Q4", "2025Q1", "2025Q2", "2025Q3", "2025Q4", "2026Q1", "2026Q2", "2026Q3"], "series": [{"id": "13101|used", "ward_code": "13101", "ward": "千代田区", "stage": "used", "stage_label": "中古", "label": "千代田区・中古", "points": [{"period": "2021Q3", "value": 368.6, "samples": 8, "p25": 333.0, "p75": 394.8}, {"period": "2021Q4", "value": 469.2, "samples": 16, "p25": 398.0, "p75": 501.1}, {"period": "2022Q1", "value": 476.0, "samples": 11, "p25": 396.1, "p75": 513.7}, {"period": "2022Q2", "value": 436.2, "samples": 8, "p25": 415.8, "p75": 486.8}, {"period": "2022Q3", "value": 476.4, "samples": 5, "p25": 474.3, "p75": 518.5}, {"period": "2022Q4", "value": 472.1, "samples": 10, "p25": 399.1, "p75": 532.4}, {"period": "2023Q1", "value": 487.7, "samples": 11, "p25": 413.0, "p75": 527.2}, {"period": "2023Q2", "value": 490.9, "samples": 9, "p25": 418.8, "p75": 520.2}, {"period": "2023Q3", "value": 599.7, "samples": 12, "p25": 451.9, "p75": 629.5}, {"period": "2023Q4", "value": 446.3, "samples": 11, "p25": 407.1, "p75": 499.1}, {"period": "2024Q1", "value": 477.8, "samples": 9, "p25": 437.4, "p75": 593.6}, {"period": "2024Q2", "value": 515.2, "samples": 5, "p25": 509.6, "p75": 635.7}, {"period": "2024Q3", "value": 561.7, "samples": 17, "p25": 528.9, "p75": 603.5}, {"period": "2024Q4", "value": 431.9, "samples": 10, "p25": 386.0, "p75": 620.4}, {"period": "2025Q1", "value": 555.3, "samples": 9, "p25": 448.6, "p75": 567.0}, {"period": "2025Q2", "value": 582.8, "samples": 14, "p25": 483.3, "p75": 646.5}, {"period": "2025Q3", "value": 533.2, "samples": 5, "p25": 527.5, "p75": 618.9}, {"period": "2025Q4", "value": 549.0, "samples": 14, "p25": 504.4, "p75": 610.4}, {"period": "2026Q1", "value": 476.2, "samples": 13, "p25": 438.3, "p75": 592.0}, {"period": "2026Q2", "value": 551.8, "samples": 22, "p25": 489.7, "p75": 618.7}, {"period": "2026Q3", "value": null, "samples": 2}], "latest": 551.8, "latest_period": "2026Q2", "first_value": 368.6, "first_period": "2021Q3", "change_pct": 49.7, "total_samples": 221}, {"id": "13101|new", "ward_code": "13101", "ward": "千代田区", "stage": "new", "stage_label": "新築分譲", "label": "千代田区・新築分譲", "points": [{"period": "2021Q3", "value": null, "samples": 4}, {"period": "2021Q4", "value": null, "samples": 1}, {"period": "2022Q1", "value": null, "samples": 2}, {"period": "2022Q2", "value": 811.8, "samples": 7, "p25": 652.2, "p75": 882.2}, {"period": "2022Q3", "value": 833.0, "samples": 5, "p25": 759.1, "p75": 881.9}, {"period": "2022Q4", "value": null, "samples": 3}, {"period": "2023Q1", "value": null, "samples": 4}, {"period": "2023Q2", "value": 839.0, "samples": 5, "p25": 684.6, "p75": 881.7}, {"period": "2023Q3", "value": 801.1, "samples": 8, "p25": 767.0, "p75": 818.9}, {"period": "2023Q4", "value": null, "samples": 2}, {"period": "2024Q1", "value": null, "samples": 3}, {"period": "2024Q2", "value": 842.5, "samples": 6, "p25": 778.3, "p75": 911.9}, {"period": "2024Q3", "value": null, "samples": 3}, {"period": "2024Q4", "value": 823.8, "samples": 8, "p25": 797.4, "p75": 890.3}, {"period": "2025Q1", "value": 807.4, "samples": 5, "p25": 767.5, "p75": 813.1}, {"period": "2025Q2", "value": null, "samples": 3}, {"period": "2025Q3", "value": null, "samples": 2}, {"period": "2025Q4", "value": null, "samples": 4}, {"period": "2026Q1", "value": 893.0, "samples": 9, "p25": 853.0, "p75": 895.3}, {"period": "2026Q2", "value": 933.1, "samples": 6, "p25": 835.4, "p75": 988.6}, {"period": "2026Q3", "value": null, "samples": 0}], "latest": 933.1, "latest_period": "2026Q2", "first_value": 811.8, "first_period": "2022Q2", "change_pct": 14.9, "total_samples": 90}, {"id": "13102|used", "ward_code": "13102", "ward": "中央区", "stage": "used", "stage_label": "中古", "label": "中央区・中古", "points": [{"period": "2021Q3", "value": 433.0, "samples": 7, "p25": 330.6, "p75": 486.1}, {"period": "2021Q4", "value": 382.4, "samples": 10, "p25": 325.9, "p75": 440.8}, {"period": "2022Q1", "value": 435.2, "samples": 17, "p25": 333.5, "p75": 498.2}, {"period": "2022Q2", "value": 429.9, "samples": 18, "p25": 392.8, "p75": 467.1}, {"period": "2022Q3", "value": 437.0, "samples": 10, "p25": 384.9, "p75": 500.9}, {"period": "2022Q4", "value": 429.5, "samples": 16, "p25": 400.0, "p75": 457.7}, {"period": "2023Q1", "value": 405.8, "samples": 17, "p25": 350.2, "p75": 441.2}, {"period": "2023Q2", "value": 444.0, "samples": 19, "p25": 375.4, "p75": 516.3}, {"period": "2023Q3", "value": 440.7, "samples": 19, "p25": 371.2, "p75": 499.0}, {"period": "2023Q4", "value": 444.1, "samples": 12, "p25": 422.0, "p75": 465.1}, {"period": "2024Q1", "value": 465.0, "samples": 15, "p25": 416.8, "p75": 498.4}, {"period": "2024Q2", "value": 431.3, "samples": 19, "p25": 388.1, "p75": 538.8}, {"period": "2024Q3", "value": 399.6, "samples": 18, "p25": 389.4, "p75": 500.1}, {"period": "2024Q4", "value": 420.6, "samples": 23, "p25": 383.6, "p75": 549.5}, {"period": "2025Q1", "value": 497.6, "samples": 16, "p25": 445.0, "p75": 527.8}, {"period": "2025Q2", "value": 432.9, "samples": 14, "p25": 404.6, "p75": 473.3}, {"period": "2025Q3", "value": 499.8, "samples": 19, "p25": 436.1, "p75": 564.2}, {"period": "2025Q4", "value": 461.6, "samples": 15, "p25": 414.8, "p75": 503.0}, {"period": "2026Q1", "value": 562.2, "samples": 11, "p25": 483.4, "p75": 597.6}, {"period": "2026Q2", "value": 473.0, "samples": 37, "p25": 396.9, "p75": 574.2}, {"period": "2026Q3", "value": 568.6, "samples": 14, "p25": 456.6, "p75": 614.9}], "latest": 568.6, "latest_period": "2026Q3", "first_value": 433.0, "first_period": "2021Q3", "change_pct": 31.3, "total_samples": 346}, {"id": "13102|new", "ward_code": "13102", "ward": "中央区", "stage": "new", "stage_label": "新築分譲", "label": "中央区・新築分譲", "points": [{"period": "2021Q3", "value": 631.0, "samples": 7, "p25": 622.5, "p75": 647.4}, {"period": "2021Q4", "value": 604.7, "samples": 7, "p25": 581.4, "p75": 649.8}, {"period": "2022Q1", "value": 606.6, "samples": 7, "p25": 562.6, "p75": 615.5}, {"period": "2022Q2", "value": 628.9, "samples": 7, "p25": 587.6, "p75": 695.2}, {"period": "2022Q3", "value": null, "samples": 4}, {"period": "2022Q4", "value": 736.1, "samples": 9, "p25": 608.4, "p75": 751.5}, {"period": "2023Q1", "value": null, "samples": 4}, {"period": "2023Q2", "value": 697.9, "samples": 7, "p25": 655.7, "p75": 786.4}, {"period": "2023Q3", "value": 702.6, "samples": 9, "p25": 652.0, "p75": 732.2}, {"period": "2023Q4", "value": 692.9, "samples": 8, "p25": 645.8, "p75": 725.4}, {"period": "2024Q1", "value": 706.2, "samples": 8, "p25": 664.0, "p75": 750.1}, {"period": "2024Q2", "value": 695.0, "samples": 6, "p25": 609.5, "p75": 786.0}, {"period": "2024Q3", "value": null, "samples": 3}, {"period": "2024Q4", "value": null, "samples": 4}, {"period": "2025Q1", "value": 849.4, "samples": 8, "p25": 764.1, "p75": 876.9}, {"period": "2025Q2", "value": 760.3, "samples": 11, "p25": 685.1, "p75": 850.8}, {"period": "2025Q3", "value": 863.3, "samples": 11, "p25": 711.6, "p75": 883.2}, {"period": "2025Q4", "value": 787.2, "samples": 6, "p25": 722.5, "p75": 831.3}, {"period": "2026Q1", "value": 772.6, "samples": 12, "p25": 707.9, "p75": 827.9}, {"period": "2026Q2", "value": 894.2, "samples": 6, "p25": 775.2, "p75": 907.2}, {"period": "2026Q3", "value": 795.9, "samples": 12, "p25": 739.0, "p75": 852.4}], "latest": 795.9, "latest_period": "2026Q3", "first_value": 631.0, "first_period": "2021Q3", "change_pct": 26.1, "total_samples": 156}, {"id": "13103|used", "ward_code": "13103", "ward": "港区", "stage": "used", "stage_label": "中古", "label": "港区・中古", "points": [{"period": "2021Q3", "value": 567.3, "samples": 16, "p25": 546.9, "p75": 619.4}, {"period": "2021Q4", "value": 477.7, "samples": 14, "p25": 420.7, "p75": 548.2}, {"period": "2022Q1", "value": 533.5, "samples": 20, "p25": 467.1, "p75": 616.4}, {"period": "2022Q2", "value": 708.6, "samples": 10, "p25": 531.7, "p75": 728.9}, {"period": "2022Q3", "value": 516.5, "samples": 18, "p25": 464.0, "p75": 626.0}, {"period": "2022Q4", "value": 547.1, "samples": 18, "p25": 419.2, "p75": 597.8}, {"period": "2023Q1", "value": 483.9, "samples": 14, "p25": 460.3, "p75": 589.2}, {"period": "2023Q2", "value": 585.9, "samples": 15, "p25": 518.5, "p75": 637.5}, {"period": "2023Q3", "value": 511.9, "samples": 19, "p25": 452.1, "p75": 642.8}, {"period": "2023Q4", "value": 544.5, "samples": 14, "p25": 480.6, "p75": 611.7}, {"period": "2024Q1", "value": 640.0, "samples": 17, "p25": 542.8, "p75": 700.2}, {"period": "2024Q2", "value": 626.2, "samples": 15, "p25": 525.0, "p75": 679.4}, {"period": "2024Q3", "value": 624.9, "samples": 23, "p25": 560.2, "p75": 695.2}, {"period": "2024Q4", "value": 628.7, "samples": 19, "p25": 579.6, "p75": 686.9}, {"period": "2025Q1", "value": 590.7, "samples": 15, "p25": 526.2, "p75": 711.8}, {"period": "2025Q2", "value": 634.7, "samples": 14, "p25": 535.7, "p75": 673.5}, {"period": "2025Q3", "value": 643.0, "samples": 18, "p25": 574.7, "p75": 754.2}, {"period": "2025Q4", "value": 785.5, "samples": 13, "p25": 676.0, "p75": 875.3}, {"period": "2026Q1", "value": 589.0, "samples": 18, "p25": 548.6, "p75": 672.8}, {"period": "2026Q2", "value": 666.0, "samples": 25, "p25": 481.3, "p75": 692.4}, {"period": "2026Q3", "value": 651.2, "samples": 26, "p25": 548.0, "p75": 748.5}], "latest": 651.2, "latest_period": "2026Q3", "first_value": 567.3, "first_period": "2021Q3", "change_pct": 14.8, "total_samples": 361}, {"id": "13103|new", "ward_code": "13103", "ward": "港区", "stage": "new", "stage_label": "新築分譲", "label": "港区・新築分譲", "points": [{"period": "2021Q3", "value": 860.9, "samples": 5, "p25": 737.9, "p75": 949.3}, {"period": "2021Q4", "value": 759.5, "samples": 7, "p25": 748.7, "p75": 852.2}, {"period": "2022Q1", "value": 865.2, "samples": 9, "p25": 788.9, "p75": 926.0}, {"period": "2022Q2", "value": 859.9, "samples": 11, "p25": 844.7, "p75": 922.5}, {"period": "2022Q3", "value": 893.3, "samples": 6, "p25": 842.8, "p75": 934.6}, {"period": "2022Q4", "value": 889.9, "samples": 10, "p25": 762.9, "p75": 965.4}, {"period": "2023Q1", "value": 812.2, "samples": 9, "p25": 763.6, "p75": 949.1}, {"period": "2023Q2", "value": 868.3, "samples": 6, "p25": 808.0, "p75": 958.8}, {"period": "2023Q3", "value": 979.1, "samples": 6, "p25": 943.5, "p75": 1020.0}, {"period": "2023Q4", "value": 944.0, "samples": 7, "p25": 904.3, "p75": 998.0}, {"period": "2024Q1", "value": 985.0, "samples": 10, "p25": 883.2, "p75": 1058.3}, {"period": "2024Q2", "value": 910.6, "samples": 5, "p25": 775.1, "p75": 1073.1}, {"period": "2024Q3", "value": 1042.9, "samples": 7, "p25": 1038.7, "p75": 1123.0}, {"period": "2024Q4", "value": 1014.6, "samples": 6, "p25": 901.8, "p75": 1121.0}, {"period": "2025Q1", "value": 916.4, "samples": 5, "p25": 893.1, "p75": 1096.0}, {"period": "2025Q2", "value": null, "samples": 3}, {"period": "2025Q3", "value": 1053.5, "samples": 8, "p25": 953.6, "p75": 1117.0}, {"period": "2025Q4", "value": 1052.1, "samples": 10, "p25": 971.4, "p75": 1119.3}, {"period": "2026Q1", "value": 965.9, "samples": 14, "p25": 894.1, "p75": 1009.1}, {"period": "2026Q2", "value": 1078.5, "samples": 11, "p25": 989.9, "p75": 1125.0}, {"period": "2026Q3", "value": 1258.8, "samples": 6, "p25": 1010.0, "p75": 1289.3}], "latest": 1258.8, "latest_period": "2026Q3", "first_value": 860.9, "first_period": "2021Q3", "change_pct": 46.2, "total_samples": 161}, {"id": "13104|used", "ward_code": "13104", "ward": "新宿区", "stage": "used", "stage_label": "中古", "label": "新宿区・中古", "points": [{"period": "2021Q3", "value": 384.4, "samples": 8, "p25": 344.6, "p75": 425.2}, {"period": "2021Q4", "value": 396.8, "samples": 14, "p25": 320.5, "p75": 435.1}, {"period": "2022Q1", "value": 387.5, "samples": 12, "p25": 337.3, "p75": 451.6}, {"period": "2022Q2", "value": 343.4, "samples": 13, "p25": 312.3, "p75": 404.5}, {"period": "2022Q3", "value": 363.4, "samples": 15, "p25": 332.6, "p75": 422.6}, {"period": "2022Q4", "value": 374.5, "samples": 19, "p25": 317.8, "p75": 408.8}, {"period": "2023Q1", "value": 392.1, "samples": 17, "p25": 369.1, "p75": 438.4}, {"period": "2023Q2", "value": 429.2, "samples": 9, "p25": 397.4, "p75": 457.5}, {"period": "2023Q3", "value": 373.2, "samples": 9, "p25": 346.1, "p75": 421.8}, {"period": "2023Q4", "value": 386.5, "samples": 20, "p25": 360.1, "p75": 457.9}, {"period": "2024Q1", "value": 404.2, "samples": 16, "p25": 349.6, "p75": 490.3}, {"period": "2024Q2", "value": 401.7, "samples": 16, "p25": 344.2, "p75": 454.1}, {"period": "2024Q3", "value": 444.7, "samples": 19, "p25": 392.4, "p75": 483.6}, {"period": "2024Q4", "value": 395.6, "samples": 7, "p25": 365.4, "p75": 405.1}, {"period": "2025Q1", "value": 439.9, "samples": 13, "p25": 381.2, "p75": 487.1}, {"period": "2025Q2", "value": 460.2, "samples": 14, "p25": 369.3, "p75": 498.4}, {"period": "2025Q3", "value": 396.2, "samples": 14, "p25": 364.9, "p75": 435.4}, {"period": "2025Q4", "value": 436.4, "samples": 16, "p25": 383.5, "p75": 568.5}, {"period": "2026Q1", "value": 416.3, "samples": 14, "p25": 350.9, "p75": 512.0}, {"period": "2026Q2", "value": 434.6, "samples": 29, "p25": 370.4, "p75": 554.7}, {"period": "2026Q3", "value": 477.9, "samples": 20, "p25": 423.4, "p75": 560.1}], "latest": 477.9, "latest_period": "2026Q3", "first_value": 384.4, "first_period": "2021Q3", "change_pct": 24.3, "total_samples": 314}, {"id": "13104|new", "ward_code": "13104", "ward": "新宿区", "stage": "new", "stage_label": "新築分譲", "label": "新宿区・新築分譲", "points": [{"period": "2021Q3", "value": 556.7, "samples": 5, "p25": 528.5, "p75": 560.1}, {"period": "2021Q4", "value": 587.7, "samples": 6, "p25": 576.6, "p75": 619.7}, {"period": "2022Q1", "value": 596.5, "samples": 8, "p25": 567.0, "p75": 621.3}, {"period": "2022Q2", "value": 532.0, "samples": 6, "p25": 521.2, "p75": 579.6}, {"period": "2022Q3", "value": null, "samples": 4}, {"period": "2022Q4", "value": 641.5, "samples": 7, "p25": 546.9, "p75": 659.3}, {"period": "2023Q1", "value": 630.7, "samples": 5, "p25": 555.9, "p75": 665.1}, {"period": "2023Q2", "value": 682.3, "samples": 6, "p25": 630.2, "p75": 691.5}, {"period": "2023Q3", "value": 655.7, "samples": 7, "p25": 560.5, "p75": 715.7}, {"period": "2023Q4", "value": 631.1, "samples": 12, "p25": 586.6, "p75": 665.5}, {"period": "2024Q1", "value": 685.2, "samples": 8, "p25": 634.7, "p75": 746.4}, {"period": "2024Q2", "value": 650.3, "samples": 11, "p25": 573.0, "p75": 684.8}, {"period": "2024Q3", "value": null, "samples": 4}, {"period": "2024Q4", "value": 710.9, "samples": 9, "p25": 656.2, "p75": 742.9}, {"period": "2025Q1", "value": 719.8, "samples": 8, "p25": 607.4, "p75": 801.4}, {"period": "2025Q2", "value": 665.2, "samples": 8, "p25": 627.7, "p75": 704.1}, {"period": "2025Q3", "value": 716.0, "samples": 6, "p25": 683.6, "p75": 763.5}, {"period": "2025Q4", "value": 713.1, "samples": 13, "p25": 662.1, "p75": 747.8}, {"period": "2026Q1", "value": 730.8, "samples": 10, "p25": 697.5, "p75": 784.4}, {"period": "2026Q2", "value": 747.2, "samples": 10, "p25": 649.8, "p75": 817.5}, {"period": "2026Q3", "value": 793.8, "samples": 8, "p25": 782.1, "p75": 798.5}], "latest": 793.8, "latest_period": "2026Q3", "first_value": 556.7, "first_period": "2021Q3", "change_pct": 42.6, "total_samples": 161}, {"id": "13105|used", "ward_code": "13105", "ward": "文京区", "stage": "used", "stage_label": "中古", "label": "文京区・中古", "points": [{"period": "2021Q3", "value": null, "samples": 3}, {"period": "2021Q4", "value": 358.6, "samples": 14, "p25": 291.1, "p75": 376.5}, {"period": "2022Q1", "value": 364.9, "samples": 16, "p25": 315.1, "p75": 386.5}, {"period": "2022Q2", "value": 380.9, "samples": 10, "p25": 344.8, "p75": 443.1}, {"period": "2022Q3", "value": 372.6, "samples": 17, "p25": 341.9, "p75": 406.2}, {"period": "2022Q4", "value": 348.0, "samples": 6, "p25": 311.0, "p75": 386.6}, {"period": "2023Q1", "value": 393.8, "samples": 14, "p25": 366.9, "p75": 451.6}, {"period": "2023Q2", "value": 370.0, "samples": 17, "p25": 326.5, "p75": 416.0}, {"period": "2023Q3", "value": 383.3, "samples": 13, "p25": 323.9, "p75": 443.8}, {"period": "2023Q4", "value": 398.0, "samples": 14, "p25": 363.2, "p75": 446.6}, {"period": "2024Q1", "value": 374.5, "samples": 16, "p25": 336.9, "p75": 435.9}, {"period": "2024Q2", "value": 325.1, "samples": 6, "p25": 292.4, "p75": 365.2}, {"period": "2024Q3", "value": 375.6, "samples": 12, "p25": 346.2, "p75": 414.4}, {"period": "2024Q4", "value": 382.5, "samples": 10, "p25": 345.8, "p75": 435.9}, {"period": "2025Q1", "value": 369.8, "samples": 15, "p25": 342.0, "p75": 460.6}, {"period": "2025Q2", "value": 380.8, "samples": 17, "p25": 353.3, "p75": 449.6}, {"period": "2025Q3", "value": 399.3, "samples": 11, "p25": 354.6, "p75": 454.0}, {"period": "2025Q4", "value": 431.9, "samples": 23, "p25": 388.2, "p75": 457.9}, {"period": "2026Q1", "value": 405.0, "samples": 15, "p25": 374.0, "p75": 464.8}, {"period": "2026Q2", "value": 420.4, "samples": 19, "p25": 401.1, "p75": 521.0}, {"period": "2026Q3", "value": 452.4, "samples": 8, "p25": 430.6, "p75": 495.9}], "latest": 452.4, "latest_period": "2026Q3", "first_value": 358.6, "first_period": "2021Q4", "change_pct": 26.2, "total_samples": 276}, {"id": "13105|new", "ward_code": "13105", "ward": "文京区", "stage": "new", "stage_label": "新築分譲", "label": "文京区・新築分譲", "points": [{"period": "2021Q3", "value": 597.0, "samples": 5, "p25": 500.8, "p75": 603.3}, {"period": "2021Q4", "value": 571.7, "samples": 5, "p25": 554.2, "p75": 580.1}, {"period": "2022Q1", "value": null, "samples": 4}, {"period": "2022Q2", "value": 583.4, "samples": 8, "p25": 489.9, "p75": 645.7}, {"period": "2022Q3", "value": 552.3, "samples": 5, "p25": 537.2, "p75": 594.1}, {"period": "2022Q4", "value": 558.7, "samples": 11, "p25": 539.2, "p75": 598.2}, {"period": "2023Q1", "value": 625.0, "samples": 8, "p25": 607.0, "p75": 694.5}, {"period": "2023Q2", "value": 654.2, "samples": 9, "p25": 638.4, "p75": 669.7}, {"period": "2023Q3", "value": null, "samples": 3}, {"period": "2023Q4", "value": 627.0, "samples": 5, "p25": 622.2, "p75": 630.4}, {"period": "2024Q1", "value": 594.8, "samples": 8, "p25": 574.9, "p75": 683.7}, {"period": "2024Q2", "value": 701.3, "samples": 5, "p25": 677.3, "p75": 709.2}, {"period": "2024Q3", "value": 611.6, "samples": 5, "p25": 569.5, "p75": 658.8}, {"period": "2024Q4", "value": 680.2, "samples": 5, "p25": 638.7, "p75": 689.5}, {"period": "2025Q1", "value": 648.9, "samples": 8, "p25": 614.7, "p75": 692.3}, {"period": "2025Q2", "value": 652.5, "samples": 10, "p25": 615.9, "p75": 749.7}, {"period": "2025Q3", "value": 673.4, "samples": 5, "p25": 653.1, "p75": 749.8}, {"period": "2025Q4", "value": 721.2, "samples": 8, "p25": 683.8, "p75": 762.0}, {"period": "2026Q1", "value": 697.5, "samples": 6, "p25": 630.9, "p75": 775.4}, {"period": "2026Q2", "value": 718.2, "samples": 10, "p25": 695.1, "p75": 734.4}, {"period": "2026Q3", "value": null, "samples": 0}], "latest": 718.2, "latest_period": "2026Q2", "first_value": 597.0, "first_period": "2021Q3", "change_pct": 20.3, "total_samples": 133}, {"id": "13108|used", "ward_code": "13108", "ward": "江東区", "stage": "used", "stage_label": "中古", "label": "江東区・中古", "points": [{"period": "2021Q3", "value": 288.8, "samples": 12, "p25": 253.6, "p75": 331.0}, {"period": "2021Q4", "value": 297.9, "samples": 19, "p25": 272.9, "p75": 329.3}, {"period": "2022Q1", "value": 273.2, "samples": 20, "p25": 245.6, "p75": 323.9}, {"period": "2022Q2", "value": 305.2, "samples": 13, "p25": 285.6, "p75": 329.8}, {"period": "2022Q3", "value": 279.9, "samples": 13, "p25": 254.0, "p75": 311.9}, {"period": "2022Q4", "value": 314.6, "samples": 22, "p25": 263.5, "p75": 363.1}, {"period": "2023Q1", "value": 306.5, "samples": 18, "p25": 234.7, "p75": 347.7}, {"period": "2023Q2", "value": 278.4, "samples": 19, "p25": 256.7, "p75": 336.2}, {"period": "2023Q3", "value": 325.1, "samples": 23, "p25": 290.3, "p75": 359.1}, {"period": "2023Q4", "value": 283.2, "samples": 17, "p25": 269.3, "p75": 340.1}, {"period": "2024Q1", "value": 284.4, "samples": 15, "p25": 244.4, "p75": 338.4}, {"period": "2024Q2", "value": 360.2, "samples": 17, "p25": 289.7, "p75": 382.3}, {"period": "2024Q3", "value": 330.7, "samples": 13, "p25": 261.7, "p75": 345.4}, {"period": "2024Q4", "value": 332.1, "samples": 16, "p25": 273.3, "p75": 355.2}, {"period": "2025Q1", "value": 335.6, "samples": 19, "p25": 316.9, "p75": 365.5}, {"period": "2025Q2", "value": 354.4, "samples": 15, "p25": 245.9, "p75": 386.9}, {"period": "2025Q3", "value": 354.2, "samples": 23, "p25": 309.9, "p75": 380.0}, {"period": "2025Q4", "value": 337.4, "samples": 22, "p25": 282.0, "p75": 374.9}, {"period": "2026Q1", "value": 329.3, "samples": 16, "p25": 267.9, "p75": 399.4}, {"period": "2026Q2", "value": 342.4, "samples": 23, "p25": 295.5, "p75": 384.5}, {"period": "2026Q3", "value": 340.8, "samples": 20, "p25": 283.7, "p75": 377.7}], "latest": 340.8, "latest_period": "2026Q3", "first_value": 288.8, "first_period": "2021Q3", "change_pct": 18.0, "total_samples": 375}, {"id": "13108|new", "ward_code": "13108", "ward": "江東区", "stage": "new", "stage_label": "新築分譲", "label": "江東区・新築分譲", "points": [{"period": "2021Q3", "value": null, "samples": 2}, {"period": "2021Q4", "value": 467.5, "samples": 7, "p25": 455.0, "p75": 488.4}, {"period": "2022Q1", "value": 439.5, "samples": 13, "p25": 428.2, "p75": 476.6}, {"period": "2022Q2", "value": 512.0, "samples": 7, "p25": 451.9, "p75": 536.0}, {"period": "2022Q3", "value": 490.9, "samples": 8, "p25": 440.9, "p75": 518.0}, {"period": "2022Q4", "value": 516.7, "samples": 6, "p25": 505.2, "p75": 545.6}, {"period": "2023Q1", "value": 501.9, "samples": 9, "p25": 449.3, "p75": 540.7}, {"period": "2023Q2", "value": 508.1, "samples": 5, "p25": 489.6, "p75": 556.1}, {"period": "2023Q3", "value": 531.8, "samples": 9, "p25": 471.1, "p75": 563.0}, {"period": "2023Q4", "value": 466.1, "samples": 7, "p25": 448.6, "p75": 500.4}, {"period": "2024Q1", "value": 518.7, "samples": 8, "p25": 463.3, "p75": 539.1}, {"period": "2024Q2", "value": 502.8, "samples": 8, "p25": 436.6, "p75": 573.7}, {"period": "2024Q3", "value": 504.5, "samples": 6, "p25": 476.6, "p75": 542.6}, {"period": "2024Q4", "value": 513.3, "samples": 5, "p25": 497.6, "p75": 519.6}, {"period": "2025Q1", "value": null, "samples": 2}, {"period": "2025Q2", "value": 542.2, "samples": 11, "p25": 512.6, "p75": 586.9}, {"period": "2025Q3", "value": 595.7, "samples": 7, "p25": 538.9, "p75": 624.8}, {"period": "2025Q4", "value": 567.5, "samples": 7, "p25": 533.0, "p75": 603.2}, {"period": "2026Q1", "value": 571.9, "samples": 15, "p25": 526.0, "p75": 668.8}, {"period": "2026Q2", "value": 586.8, "samples": 22, "p25": 547.0, "p75": 675.0}, {"period": "2026Q3", "value": null, "samples": 4}], "latest": 586.8, "latest_period": "2026Q2", "first_value": 467.5, "first_period": "2021Q4", "change_pct": 25.5, "total_samples": 168}, {"id": "13113|used", "ward_code": "13113", "ward": "渋谷区", "stage": "used", "stage_label": "中古", "label": "渋谷区・中古", "points": [{"period": "2021Q3", "value": 470.6, "samples": 13, "p25": 445.0, "p75": 544.6}, {"period": "2021Q4", "value": 467.4, "samples": 18, "p25": 418.7, "p75": 512.2}, {"period": "2022Q1", "value": 437.1, "samples": 13, "p25": 388.2, "p75": 486.2}, {"period": "2022Q2", "value": 416.4, "samples": 15, "p25": 399.2, "p75": 453.3}, {"period": "2022Q3", "value": 506.6, "samples": 19, "p25": 462.0, "p75": 598.2}, {"period": "2022Q4", "value": 523.5, "samples": 13, "p25": 467.5, "p75": 540.3}, {"period": "2023Q1", "value": 472.9, "samples": 15, "p25": 418.4, "p75": 560.5}, {"period": "2023Q2", "value": 532.9, "samples": 12, "p25": 477.8, "p75": 584.6}, {"period": "2023Q3", "value": 475.7, "samples": 16, "p25": 413.3, "p75": 571.6}, {"period": "2023Q4", "value": 540.0, "samples": 18, "p25": 486.5, "p75": 555.9}, {"period": "2024Q1", "value": 571.1, "samples": 21, "p25": 482.4, "p75": 595.2}, {"period": "2024Q2", "value": 623.4, "samples": 10, "p25": 508.4, "p75": 666.9}, {"period": "2024Q3", "value": 518.5, "samples": 19, "p25": 417.9, "p75": 597.2}, {"period": "2024Q4", "value": 588.5, "samples": 19, "p25": 512.2, "p75": 635.0}, {"period": "2025Q1", "value": 532.7, "samples": 16, "p25": 458.7, "p75": 568.5}, {"period": "2025Q2", "value": 546.2, "samples": 15, "p25": 508.9, "p75": 578.8}, {"period": "2025Q3", "value": 638.8, "samples": 19, "p25": 510.8, "p75": 690.0}, {"period": "2025Q4", "value": 477.2, "samples": 14, "p25": 430.0, "p75": 569.8}, {"period": "2026Q1", "value": 566.6, "samples": 12, "p25": 435.4, "p75": 675.4}, {"period": "2026Q2", "value": 536.1, "samples": 18, "p25": 449.1, "p75": 573.0}, {"period": "2026Q3", "value": 686.1, "samples": 18, "p25": 622.8, "p75": 712.2}], "latest": 686.1, "latest_period": "2026Q3", "first_value": 470.6, "first_period": "2021Q3", "change_pct": 45.8, "total_samples": 333}, {"id": "13113|new", "ward_code": "13113", "ward": "渋谷区", "stage": "new", "stage_label": "新築分譲", "label": "渋谷区・新築分譲", "points": [{"period": "2021Q3", "value": null, "samples": 4}, {"period": "2021Q4", "value": 677.1, "samples": 9, "p25": 644.7, "p75": 719.7}, {"period": "2022Q1", "value": null, "samples": 3}, {"period": "2022Q2", "value": 774.8, "samples": 6, "p25": 670.9, "p75": 823.2}, {"period": "2022Q3", "value": 826.9, "samples": 7, "p25": 760.9, "p75": 901.6}, {"period": "2022Q4", "value": 845.2, "samples": 9, "p25": 767.5, "p75": 893.8}, {"period": "2023Q1", "value": 757.5, "samples": 6, "p25": 716.0, "p75": 894.7}, {"period": "2023Q2", "value": 813.6, "samples": 11, "p25": 795.3, "p75": 896.0}, {"period": "2023Q3", "value": null, "samples": 3}, {"period": "2023Q4", "value": 831.1, "samples": 7, "p25": 779.5, "p75": 899.5}, {"period": "2024Q1", "value": 834.1, "samples": 10, "p25": 801.2, "p75": 897.5}, {"period": "2024Q2", "value": 891.3, "samples": 6, "p25": 831.5, "p75": 985.5}, {"period": "2024Q3", "value": null, "samples": 4}, {"period": "2024Q4", "value": 933.5, "samples": 9, "p25": 891.7, "p75": 1020.3}, {"period": "2025Q1", "value": 978.0, "samples": 7, "p25": 926.8, "p75": 1033.0}, {"period": "2025Q2", "value": 939.5, "samples": 8, "p25": 911.5, "p75": 1006.4}, {"period": "2025Q3", "value": 987.4, "samples": 8, "p25": 960.4, "p75": 1023.2}, {"period": "2025Q4", "value": 989.5, "samples": 6, "p25": 898.0, "p75": 1031.3}, {"period": "2026Q1", "value": null, "samples": 1}, {"period": "2026Q2", "value": 1004.8, "samples": 19, "p25": 865.8, "p75": 1022.0}, {"period": "2026Q3", "value": 1125.4, "samples": 6, "p25": 999.0, "p75": 1132.5}], "latest": 1125.4, "latest_period": "2026Q3", "first_value": 677.1, "first_period": "2021Q4", "change_pct": 66.2, "total_samples": 149}], "sources": ["sample"], "notes": {"dropped_no_total_units": 0}}, "official_trends": null}, "latest-changes": {"date": "2026-08-09", "summary": {"new": 0, "price_changed": 0, "removed": 0, "unchanged": 498}, "new": []}, "sources": {"generated_at": "2026-08-09T21:24:23+00:00", "status": [{"key": "suumo", "name": "SUUMO", "state": "skipped", "reason": "SUUMO: 비활성 (access_mode=off)"}, {"key": "homes", "name": "LIFULL HOME'S", "state": "skipped", "reason": "LIFULL HOME'S: 비활성 (access_mode=off)"}, {"key": "athome", "name": "アットホーム (at home)", "state": "skipped", "reason": "アットホーム (at home): 비활성 (access_mode=off)"}, {"key": "fudousan_japan", "name": "不動産ジャパン", "state": "skipped", "reason": "不動産ジャパン: 비활성 (access_mode=off)"}, {"key": "feed", "name": "ライセンス済み物件フィード", "state": "skipped", "reason": "sources.feed.enabled = false"}, {"key": "sample", "name": "サンプル（架空データ）", "state": "ok", "count": 498}], "portals": [{"key": "suumo", "name": "SUUMO", "operator": "株式会社リクルート", "home_url": "https://suumo.jp/", "access_note": "제3자용 공개 물건 API 없음. 利用規約이 자동수집을 금지한다. 실무 경로: 掲載企業(불동산회사)로서 리쿠르트와 계약하고 물건 데이터를 주고받거나, 제휴 API 계약을 별도로 맺는 것."}, {"key": "homes", "name": "LIFULL HOME'S", "operator": "株式会社LIFULL", "home_url": "https://www.homes.co.jp/", "access_note": "과거 공개 API(HOME'S API)는 종료. 현재는 加盟店/파트너 계약 경로. 연구 목적이라면 'LIFULL HOME'S データセット'(情報学研究データリポジトリ 경유) 신청이 별도로 존재한다 — 다만 연구 한정이고 실시간이 아니다."}, {"key": "athome", "name": "アットホーム (at home)", "operator": "アットホーム株式会社", "home_url": "https://www.athome.co.jp/", "access_note": "加盟店(부동산회사) 대상 물件データ 연携 서비스가 있다. 일반 이용자용 공개 API는 없음."}, {"key": "fudousan_japan", "name": "不動産ジャパン", "operator": "公益財団法人 不動産流通推進センター", "home_url": "https://www.fudousan.or.jp/", "access_note": "REINS 등록 물건 중 공개 가능분을 일반에 보여주는 사이트. 영리 목적 대량 취득은 별도 협의 대상이며, 공개 API는 제공하지 않는다."}]}, "recent-new": {"window_days": 7, "items": [{"title": "グランドメゾン中央", "city": "中央区", "stage": "used", "price_man": 15950.0, "price_yen": 159500000, "layout": "1LDK", "area_m2": 87.29, "unit_price_man_per_tsubo": 604.0, "total_units": 14, "built_year": 2022, "station_labels": ["東京メトロ東西線 南砂町 徒歩15分"], "found_on": "2026-08-09"}, {"title": "ドゥ・トゥール中央", "city": "中央区", "stage": "used", "price_man": 8590.0, "price_yen": 85900000, "layout": "1LDK", "area_m2": 84.84, "unit_price_man_per_tsubo": 334.7, "total_units": 138, "built_year": 1990, "station_labels": ["東京メトロ有楽町線 江戸川橋 徒歩2分"], "found_on": "2026-08-09"}, {"title": "ライオンズ本郷三丁目", "city": "中央区", "stage": "used", "price_man": 20650.0, "price_yen": 206500000, "layout": "2LDK+S", "area_m2": 108.57, "unit_price_man_per_tsubo": 628.8, "total_units": 340, "built_year": 2013, "station_labels": ["東京メトロ丸ノ内線 本郷三丁目 徒歩9分"], "found_on": "2026-08-08"}, {"title": "パークホームズ駒込", "city": "港区", "stage": "used", "price_man": 13570.0, "price_yen": 135700000, "layout": "3LDK+S", "area_m2": 74.0, "unit_price_man_per_tsubo": 606.2, "total_units": 136, "built_year": 2018, "station_labels": ["JR山手線 駒込 徒歩10分"], "found_on": "2026-08-08"}, {"title": "ザ・パークハウス渋谷", "city": "渋谷区", "stage": "used", "price_man": 11820.0, "price_yen": 118200000, "layout": "1K", "area_m2": 60.33, "unit_price_man_per_tsubo": 647.7, "total_units": 58, "built_year": 2008, "station_labels": ["東京メトロ南北線 東大前 徒歩14分"], "found_on": "2026-08-08"}, {"title": "パークホームズ江戸川橋", "city": "豊島区", "stage": "used", "price_man": 11790.0, "price_yen": 117900000, "layout": "2LDK+S", "area_m2": 83.81, "unit_price_man_per_tsubo": 465.0, "total_units": 108, "built_year": 2011, "station_labels": ["東京メトロ有楽町線 江戸川橋 徒歩15分"], "found_on": "2026-08-08"}, {"title": "オープンレジデンシア渋谷", "city": "渋谷区", "stage": "used", "price_man": 8530.0, "price_yen": 85300000, "layout": "2LDK+S", "area_m2": 43.55, "unit_price_man_per_tsubo": 647.5, "total_units": 28, "built_year": 2012, "station_labels": ["都営大江戸線 月島 徒歩6分"], "found_on": "2026-08-08"}, {"title": "サンウッド新宿三丁目", "city": "千代田区", "stage": "used", "price_man": 17430.0, "price_yen": 174300000, "layout": "1LDK", "area_m2": 105.74, "unit_price_man_per_tsubo": 544.9, "total_units": 168, "built_year": 2009, "station_labels": ["東京メトロ丸ノ内線 新宿三丁目 徒歩9分"], "found_on": "2026-08-07"}, {"title": "シティタワー港", "city": "港区", "stage": "used", "price_man": 9870.0, "price_yen": 98700000, "layout": "3LDK", "area_m2": 35.22, "unit_price_man_per_tsubo": 926.4, "total_units": 720, "built_year": 2023, "station_labels": ["東京メトロ南北線 麻布十番 徒歩7分"], "found_on": "2026-08-07"}, {"title": "シティタワー江東", "city": "江東区", "stage": "used", "price_man": 9120.0, "price_yen": 91200000, "layout": "1K", "area_m2": 104.25, "unit_price_man_per_tsubo": 289.2, "total_units": 90, "built_year": 2003, "station_labels": ["東急東横線 代官山 徒歩9分"], "found_on": "2026-08-07"}, {"title": "（新築）ドゥ・トゥール江東", "city": "江東区", "stage": "new", "price_man": 8770.0, "price_yen": 87700000, "layout": "2LDK", "area_m2": 50.8, "unit_price_man_per_tsubo": 570.7, "total_units": 570, "built_year": 2027, "station_labels": ["東京メトロ東西線 門前仲町 徒歩7分"], "found_on": "2026-08-07"}, {"title": "ドゥ・トゥール駒込", "city": "江東区", "stage": "used", "price_man": 8090.0, "price_yen": 80900000, "layout": "1K", "area_m2": 91.94, "unit_price_man_per_tsubo": 290.9, "total_units": 160, "built_year": 1991, "station_labels": ["JR山手線 駒込 徒歩5分"], "found_on": "2026-08-07"}, {"title": "クレヴィア六本木", "city": "渋谷区", "stage": "used", "price_man": 7380.0, "price_yen": 73800000, "layout": "1K", "area_m2": 53.28, "unit_price_man_per_tsubo": 457.9, "total_units": 60, "built_year": 1995, "station_labels": ["都営大江戸線 六本木 徒歩15分"], "found_on": "2026-08-07"}, {"title": "オープンレジデンシア文京", "city": "文京区", "stage": "used", "price_man": 5660.0, "price_yen": 56600000, "layout": "2LDK", "area_m2": 33.22, "unit_price_man_per_tsubo": 563.2, "total_units": 630, "built_year": 2014, "station_labels": ["東京メトロ南北線 麻布十番 徒歩9分"], "found_on": "2026-08-07"}, {"title": "（新築）グランドメゾン五反田", "city": "品川区", "stage": "new", "price_man": 13820.0, "price_yen": 138200000, "layout": "3LDK+S", "area_m2": 65.9, "unit_price_man_per_tsubo": 693.3, "total_units": 210, "built_year": 2026, "station_labels": ["JR山手線 五反田 徒歩8分"], "found_on": "2026-08-06"}, {"title": "オープンレジデンシア江東", "city": "江東区", "stage": "used", "price_man": 9710.0, "price_yen": 97100000, "layout": "4LDK", "area_m2": 102.14, "unit_price_man_per_tsubo": 314.3, "total_units": 360, "built_year": 2006, "station_labels": ["東京メトロ東西線 早稲田 徒歩6分"], "found_on": "2026-08-06"}, {"title": "ドゥ・トゥール文京", "city": "文京区", "stage": "used", "price_man": 8570.0, "price_yen": 85700000, "layout": "2LDK+S", "area_m2": 67.34, "unit_price_man_per_tsubo": 420.7, "total_units": 120, "built_year": 2020, "station_labels": ["都営大江戸線 月島 徒歩7分"], "found_on": "2026-08-06"}, {"title": "ライオンズ早稲田", "city": "千代田区", "stage": "used", "price_man": 7930.0, "price_yen": 79300000, "layout": "1K", "area_m2": 61.75, "unit_price_man_per_tsubo": 424.5, "total_units": 160, "built_year": 1988, "station_labels": ["東京メトロ東西線 早稲田 徒歩3分"], "found_on": "2026-08-06"}, {"title": "パークコート本駒込", "city": "文京区", "stage": "used", "price_man": 5510.0, "price_yen": 55100000, "layout": "4LDK", "area_m2": 42.57, "unit_price_man_per_tsubo": 427.9, "total_units": 830, "built_year": 2000, "station_labels": ["東京メトロ南北線 本駒込 徒歩5分"], "found_on": "2026-08-06"}, {"title": "ブリリア清澄白河", "city": "港区", "stage": "used", "price_man": 4890.0, "price_yen": 48900000, "layout": "1K", "area_m2": 29.11, "unit_price_man_per_tsubo": 555.3, "total_units": 530, "built_year": 1989, "station_labels": ["都営大江戸線 清澄白河 徒歩6分"], "found_on": "2026-08-06"}, {"title": "（新築）パークコート中央", "city": "中央区", "stage": "new", "price_man": 13940.0, "price_yen": 139400000, "layout": "3LDK", "area_m2": 54.06, "unit_price_man_per_tsubo": 852.4, "total_units": 720, "built_year": 2026, "station_labels": ["東京メトロ南北線 麻布十番 徒歩8分"], "found_on": "2026-08-05"}, {"title": "パークホームズ恵比寿", "city": "江東区", "stage": "used", "price_man": 8770.0, "price_yen": 87700000, "layout": "2LDK", "area_m2": 84.31, "unit_price_man_per_tsubo": 343.9, "total_units": 66, "built_year": 2011, "station_labels": ["JR山手線 恵比寿 徒歩15分"], "found_on": "2026-08-05"}, {"title": "プラウド品川", "city": "品川区", "stage": "used", "price_man": 4890.0, "price_yen": 48900000, "layout": "4LDK", "area_m2": 40.32, "unit_price_man_per_tsubo": 400.9, "total_units": 148, "built_year": 2022, "station_labels": ["東京メトロ南北線 東大前 徒歩9分"], "found_on": "2026-08-05"}, {"title": "クレヴィア護国寺", "city": "文京区", "stage": "used", "price_man": 4170.0, "price_yen": 41700000, "layout": "2LDK+S", "area_m2": 34.44, "unit_price_man_per_tsubo": 400.3, "total_units": 176, "built_year": 2015, "station_labels": ["東京メトロ有楽町線 護国寺 徒歩10分"], "found_on": "2026-08-05"}, {"title": "ザ・パークハウス江東", "city": "江東区", "stage": "used", "price_man": 3280.0, "price_yen": 32800000, "layout": "2LDK+S", "area_m2": 28.71, "unit_price_man_per_tsubo": 377.7, "total_units": 220, "built_year": 2019, "station_labels": ["東京メトロ丸ノ内線 中野坂上 徒歩13分"], "found_on": "2026-08-05"}, {"title": "（新築）ザ・パークハウス田町", "city": "目黒区", "stage": "new", "price_man": 22600.0, "price_yen": 226000000, "layout": "2LDK+S", "area_m2": 96.41, "unit_price_man_per_tsubo": 774.9, "total_units": 20, "built_year": 2026, "station_labels": ["JR山手線 田町 徒歩1分"], "found_on": "2026-08-04"}, {"title": "ドゥ・トゥール江東", "city": "江東区", "stage": "used", "price_man": 8180.0, "price_yen": 81800000, "layout": "4LDK", "area_m2": 74.16, "unit_price_man_per_tsubo": 364.6, "total_units": 570, "built_year": 2000, "station_labels": ["東京メトロ丸ノ内線 新宿三丁目 徒歩12分"], "found_on": "2026-08-04"}, {"title": "グランドメゾン護国寺", "city": "港区", "stage": "used", "price_man": 28630.0, "price_yen": 286300000, "layout": "4LDK", "area_m2": 106.75, "unit_price_man_per_tsubo": 886.6, "total_units": 610, "built_year": 2017, "station_labels": ["東京メトロ有楽町線 護国寺 徒歩9分"], "found_on": "2026-08-03"}, {"title": "ザ・パークハウス都立大学", "city": "新宿区", "stage": "used", "price_man": 15370.0, "price_yen": 153700000, "layout": "2LDK+S", "area_m2": 88.12, "unit_price_man_per_tsubo": 576.6, "total_units": 300, "built_year": 2018, "station_labels": ["東急東横線 都立大学 徒歩6分"], "found_on": "2026-08-03"}, {"title": "オープンレジデンシア中央", "city": "中央区", "stage": "used", "price_man": 14740.0, "price_yen": 147400000, "layout": "2LDK+S", "area_m2": 85.48, "unit_price_man_per_tsubo": 570.0, "total_units": 100, "built_year": 2012, "station_labels": ["JR山手線 駒込 徒歩13分"], "found_on": "2026-08-03"}, {"title": "（新築）サンウッド中央", "city": "中央区", "stage": "new", "price_man": 14590.0, "price_yen": 145900000, "layout": "2LDK", "area_m2": 66.3, "unit_price_man_per_tsubo": 727.5, "total_units": 830, "built_year": 2026, "station_labels": ["東京メトロ東西線 早稲田 徒歩13分"], "found_on": "2026-08-03"}, {"title": "アトラス月島", "city": "江東区", "stage": "used", "price_man": 13760.0, "price_yen": 137600000, "layout": "3LDK+S", "area_m2": 88.23, "unit_price_man_per_tsubo": 515.6, "total_units": 550, "built_year": 2024, "station_labels": ["東京メトロ有楽町線 月島 徒歩14分"], "found_on": "2026-08-03"}, {"title": "グランドメゾン江戸川橋", "city": "新宿区", "stage": "used", "price_man": 7700.0, "price_yen": 77000000, "layout": "2LDK", "area_m2": 45.45, "unit_price_man_per_tsubo": 560.1, "total_units": 330, "built_year": 2021, "station_labels": ["東京メトロ有楽町線 江戸川橋 徒歩3分"], "found_on": "2026-08-03"}, {"title": "（新築）ブリリア清澄白河", "city": "渋谷区", "stage": "new", "price_man": 27460.0, "price_yen": 274600000, "layout": "2LDK+S", "area_m2": 80.66, "unit_price_man_per_tsubo": 1125.4, "total_units": 740, "built_year": 2026, "station_labels": ["都営大江戸線 清澄白河 徒歩9分"], "found_on": "2026-08-02"}, {"title": "（新築）ライオンズ中井", "city": "渋谷区", "stage": "new", "price_man": 21200.0, "price_yen": 212000000, "layout": "2LDK+S", "area_m2": 61.76, "unit_price_man_per_tsubo": 1134.8, "total_units": 800, "built_year": 2026, "station_labels": ["都営大江戸線 中井 徒歩7分"], "found_on": "2026-08-02"}, {"title": "プラウド港", "city": "港区", "stage": "used", "price_man": 16810.0, "price_yen": 168100000, "layout": "3LDK", "area_m2": 101.4, "unit_price_man_per_tsubo": 548.0, "total_units": 230, "built_year": 2001, "station_labels": ["都営大江戸線 麻布十番 徒歩10分"], "found_on": "2026-08-02"}, {"title": "（新築）パークコート豊洲", "city": "中央区", "stage": "new", "price_man": 16040.0, "price_yen": 160400000, "layout": "2LDK+S", "area_m2": 51.2, "unit_price_man_per_tsubo": 1035.6, "total_units": 220, "built_year": 2026, "station_labels": ["東京メトロ有楽町線 豊洲 徒歩8分"], "found_on": "2026-08-02"}, {"title": "ザ・パークハウス港", "city": "港区", "stage": "used", "price_man": 15710.0, "price_yen": 157100000, "layout": "4LDK", "area_m2": 87.44, "unit_price_man_per_tsubo": 593.9, "total_units": 66, "built_year": 1996, "station_labels": ["都営大江戸線 清澄白河 徒歩1分"], "found_on": "2026-08-02"}, {"title": "ライオンズ中央", "city": "中央区", "stage": "used", "price_man": 6470.0, "price_yen": 64700000, "layout": "1K", "area_m2": 42.98, "unit_price_man_per_tsubo": 497.6, "total_units": 148, "built_year": 1998, "station_labels": ["東京メトロ東西線 南砂町 徒歩11分"], "found_on": "2026-08-02"}, {"title": "プラウド新宿", "city": "新宿区", "stage": "used", "price_man": 3870.0, "price_yen": 38700000, "layout": "3LDK", "area_m2": 38.03, "unit_price_man_per_tsubo": 336.4, "total_units": 114, "built_year": 1988, "station_labels": ["東京メトロ南北線 白金台 徒歩3分"], "found_on": "2026-08-02"}]}};</script>
+<script>
+/* 도쿄 7구 대규모 맨션 가격추이 — 뷰어
+ *
+ * 의존성 없음. data/*.json 을 읽어 SVG를 직접 그린다.
+ * 색 규칙: 계열 색은 '구(区)'에 고정. 필터로 계열이 줄어도 남은 구의 색은
+ * 바뀌지 않는다. 라이트 모드에서 대비가 낮은 슬롯이 있으므로, 값은 항상
+ * 직접 라벨 + 표 보기로도 읽을 수 있게 한다(색만으로 정보를 주지 않는다).
+ */
+
+const SLOTS = 7;
+const NS = 'http://www.w3.org/2000/svg';
+const STAGE_LABEL = { used: '중고', new: '신축 분양' };
+
+const state = {
+  wards: new Set(),
+  stage: 'used',
+  range: 'all',
+  scale: 'abs',
+  hidden: new Set(),
+  showTable: false,
+};
+
+const data = { market: null, changes: null, sources: null, recent: null };
+let wardOrder = [];
+let wardNames = {};
+
+/* ------------------------------------------------------------------ 유틸 */
+
+const fmt1 = (n) => (n === null || n === undefined || Number.isNaN(n) ? '—' : n.toLocaleString('ja-JP', { maximumFractionDigits: 1 }));
+const fmtPct = (n) => (n === null || n === undefined ? '—' : `${n > 0 ? '+' : ''}${n.toFixed(1)}%`);
+
+function wardColor(code) {
+  const i = wardOrder.indexOf(code);
+  return `var(--series-${(i < 0 ? 0 : i % SLOTS) + 1})`;
+}
+
+function svg(tag, attrs = {}) {
+  const node = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v !== null && v !== undefined) node.setAttribute(k, String(v));
+  }
+  return node;
+}
+
+function median(values) {
+  if (!values.length) return null;
+  const s = [...values].sort((a, b) => a - b);
+  const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
+/** 보이는 기간 구간만 잘라낸다. */
+function visiblePeriods() {
+  const all = data.market?.listing_trends?.periods ?? [];
+  if (state.range === 'all') return all;
+  const n = Number(state.range);
+  return all.slice(Math.max(0, all.length - n));
+}
+
+/** 지수 모드면 첫 관측=100 으로 환산한다. */
+function scaleSeries(points) {
+  if (state.scale !== 'idx') return points;
+  const base = points.find((p) => p.value !== null)?.value;
+  if (!base) return points;
+  return points.map((p) => (p.value === null ? p : { ...p, value: (p.value / base) * 100, raw: p.value }));
+}
+
+function clipPoints(points, periods) {
+  const keep = new Set(periods);
+  return points.filter((p) => keep.has(p.period));
+}
+
+/* -------------------------------------------------------- 계열 만들기 */
+
+/** 현재 필터에 맞는 메인 차트 계열. */
+function mainSeries() {
+  const trends = data.market?.listing_trends;
+  if (!trends) return [];
+  const periods = visiblePeriods();
+  const wards = wardOrder.filter((w) => state.wards.has(w));
+
+  if (state.stage === 'both') {
+    // 14개 선을 겹치면 읽을 수 없다 → 선택 지역 종합 2개 선으로 요약하고,
+    // 구별 내역은 아래 소규모 다중 차트가 담당한다.
+    return ['used', 'new'].map((stage, i) => {
+      const rows = trends.series.filter((s) => s.stage === stage && state.wards.has(s.ward_code));
+      const points = periods.map((period) => {
+        const values = rows
+          .map((s) => s.points.find((p) => p.period === period)?.value)
+          .filter((v) => v !== null && v !== undefined);
+        const samples = rows.reduce((sum, s) => sum + (s.points.find((p) => p.period === period)?.samples ?? 0), 0);
+        return { period, value: values.length ? Number(median(values).toFixed(1)) : null, samples };
+      });
+      return {
+        id: `all|${stage}`,
+        label: `선택 지역 ${STAGE_LABEL[stage]}`,
+        color: `var(--series-${i + 1})`,
+        dashed: stage === 'new',
+        points: scaleSeries(points),
+      };
+    }).filter((s) => s.points.some((p) => p.value !== null));
+  }
+
+  return wards
+    .map((code) => {
+      const row = trends.series.find((s) => s.ward_code === code && s.stage === state.stage);
+      if (!row) return null;
+      return {
+        id: row.id,
+        label: wardNames[code] ?? code,
+        color: wardColor(code),
+        points: scaleSeries(clipPoints(row.points, periods)),
+      };
+    })
+    .filter((s) => s && s.points.some((p) => p.value !== null));
+}
+
+/* ------------------------------------------------------------ 선 차트 */
+
+function renderLineChart(host, opts) {
+  const { series, periods, height = 300, valueSuffix = '', endLabels = true } = opts;
+  host.textContent = '';
+
+  if (!series.length || periods.length < 2) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = '표시할 데이터가 없습니다. 지역이나 기간을 넓혀 보세요.';
+    host.appendChild(p);
+    return;
+  }
+
+  // clientWidth 는 레이아웃 직후 0 이 나올 수 있다. 0 을 폴백값으로 오인하면
+  // viewBox 가 컨테이너보다 커져 차트가 통째로 축소된다 — 실측을 우선한다.
+  const measured = Math.round(host.getBoundingClientRect().width) || host.clientWidth
+    || host.parentElement?.getBoundingClientRect().width || 0;
+  const width = Math.max(260, Math.round(measured) || 720);
+  const shown = series.filter((s) => !state.hidden.has(s.id));
+
+  // 끝점 라벨이 들어갈 만큼만 오른쪽 여백을 준다. 잘린 라벨은 없느니만 못하다.
+  const labelWidth = (text) => text.length * 6.7 + 14;
+  const longest = endLabels
+    ? Math.max(0, ...shown.map((s) => {
+        const last = [...s.points].reverse().find((p) => p.value !== null);
+        return last ? labelWidth(`${s.label} ${fmt1(last.value)}`) : 0;
+      }))
+    : 0;
+  const rightPad = endLabels ? Math.min(Math.max(58, longest), width * 0.34) : 18;
+
+  const m = { t: 14, r: rightPad, b: 34, l: 52 };
+  const iw = width - m.l - m.r;
+  const ih = height - m.t - m.b;
+  const values = shown.flatMap((s) => s.points.map((p) => p.value)).filter((v) => v !== null);
+  if (!values.length) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = '선택한 계열이 모두 숨겨져 있습니다.';
+    host.appendChild(p);
+    return;
+  }
+
+  const lo = Math.min(...values);
+  const hi = Math.max(...values);
+  const pad = (hi - lo) * 0.14 || Math.max(1, hi * 0.05);
+  const scaleY = niceScale(lo - pad, hi + pad, height < 220 ? 4 : 5);
+  const { y0, y1 } = scaleY;
+
+  const x = (i) => m.l + (periods.length === 1 ? iw / 2 : (iw * i) / (periods.length - 1));
+  const y = (v) => m.t + ih - ((v - y0) / (y1 - y0)) * ih;
+
+  const root = svg('svg', { viewBox: `0 0 ${width} ${height}`, width, height, role: 'img', tabindex: '0' });
+  root.setAttribute('aria-label', opts.ariaLabel || '가격추이 선 그래프');
+
+  // 격자 — 실선 헤어라인, 눈에 띄지 않게
+  for (const tick of scaleY.ticks) {
+    root.appendChild(svg('line', { x1: m.l, x2: m.l + iw, y1: y(tick), y2: y(tick), stroke: 'var(--gridline)', 'stroke-width': 1 }));
+    const label = svg('text', { x: m.l - 9, y: y(tick) + 4, 'text-anchor': 'end', fill: 'var(--text-muted)', 'font-size': 11 });
+    label.style.fontVariantNumeric = 'tabular-nums';
+    label.textContent = fmt1(tick);
+    root.appendChild(label);
+  }
+
+  // x축 기준선 + 라벨 (분기가 많으면 솎아낸다)
+  root.appendChild(svg('line', { x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih, stroke: 'var(--baseline)', 'stroke-width': 1 }));
+  // 폭에 맞춰 눈금을 솎아낸다. 라벨 하나에 최소 58px 은 줘야 안 겹친다.
+  const maxTicks = Math.max(2, Math.floor(iw / 58));
+  const step = Math.max(1, Math.ceil(periods.length / maxTicks));
+  const lastIndex = periods.length - 1;
+  periods.forEach((period, i) => {
+    const isLast = i === lastIndex;
+    if (i % step && !isLast) return;
+    // 마지막 눈금이 직전 눈금과 붙으면 직전 쪽을 버린다
+    if (!isLast && lastIndex - i < step * 0.6) return;
+    const t = svg('text', { x: x(i), y: m.t + ih + 19, 'text-anchor': 'middle', fill: 'var(--text-muted)', 'font-size': 11 });
+    t.style.fontVariantNumeric = 'tabular-nums';
+    t.textContent = period;
+    root.appendChild(t);
+  });
+
+  // 선 — 결측 구간은 잇지 않고 끊는다
+  for (const s of shown) {
+    for (const run of runs(s.points)) {
+      if (run.length === 1) {
+        root.appendChild(svg('circle', { cx: x(run[0].i), cy: y(run[0].value), r: 2.5, fill: s.color }));
+        continue;
+      }
+      const d = run.map((p, k) => `${k ? 'L' : 'M'}${x(p.i).toFixed(1)},${y(p.value).toFixed(1)}`).join(' ');
+      root.appendChild(svg('path', {
+        d, fill: 'none', stroke: s.color, 'stroke-width': 2,
+        'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+        'stroke-dasharray': s.dashed ? '6 4' : null,
+      }));
+    }
+  }
+
+  // 끝점 마커 + 직접 라벨 (겹치면 생략, 최대 4개)
+  const ends = shown
+    .map((s) => {
+      const last = [...s.points].reverse().find((p) => p.value !== null);
+      if (!last) return null;
+      return { s, i: s.points.indexOf(last), value: last.value };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.value - a.value);
+
+  const placed = [];
+  for (const end of ends) {
+    const cx = x(end.i);
+    const cy = y(end.value);
+    root.appendChild(svg('circle', { cx, cy, r: 6, fill: 'var(--surface-1)' }));  // 2px 서피스 링
+    root.appendChild(svg('circle', { cx, cy, r: 4, fill: end.s.color }));
+
+    if (!endLabels || placed.length >= 4) continue;
+    if (placed.some((p) => Math.abs(p - cy) < 15)) continue;   // 겹치면 스택하지 않고 생략
+    const text = `${end.s.label} ${fmt1(end.value)}`;
+    if (cx + 10 + labelWidth(text) > width) continue;          // 들어갈 자리가 없으면 범례에 맡긴다
+    placed.push(cy);
+    const t = svg('text', { x: cx + 10, y: cy + 4, fill: 'var(--text-secondary)', 'font-size': 11.5 });
+    t.textContent = text;
+    root.appendChild(t);
+  }
+
+  host.appendChild(root);
+  attachCrosshair(host, root, { shown, periods, x, y, m, iw, ih, valueSuffix });
+}
+
+/** 세로 크로스헤어 + 툴팁. 키보드(←→)로도 같은 값을 읽을 수 있다. */
+function attachCrosshair(host, root, ctx) {
+  const { shown, periods, x, m, iw, ih, valueSuffix } = ctx;
+
+  const rule = svg('line', { y1: m.t, y2: m.t + ih, stroke: 'var(--baseline)', 'stroke-width': 1, opacity: 0 });
+  root.appendChild(rule);
+
+  const tip = document.createElement('div');
+  tip.className = 'tooltip';
+  host.appendChild(tip);
+
+  const hit = svg('rect', { x: m.l, y: m.t, width: iw, height: ih, fill: 'transparent', style: 'cursor:crosshair' });
+  root.appendChild(hit);
+
+  let index = -1;
+
+  const show = (i) => {
+    index = i;
+    const px = x(i);
+    rule.setAttribute('x1', px);
+    rule.setAttribute('x2', px);
+    rule.setAttribute('opacity', 0.55);
+
+    const rows = shown
+      .map((s) => ({ s, p: s.points[i] }))
+      .filter((r) => r.p && r.p.value !== null)
+      .sort((a, b) => b.p.value - a.p.value);
+
+    tip.innerHTML = '';
+    const head = document.createElement('div');
+    head.className = 'tt-period';
+    head.textContent = periods[i];
+    tip.appendChild(head);
+
+    if (!rows.length) {
+      const none = document.createElement('div');
+      none.className = 'tt-row';
+      none.textContent = '표본 부족';
+      tip.appendChild(none);
+    }
+
+    for (const { s, p } of rows) {
+      const row = document.createElement('div');
+      row.className = 'tt-row';
+      const name = document.createElement('span');
+      name.className = 'tt-name';
+      const sw = document.createElement('span');
+      sw.className = 'tt-swatch';
+      sw.style.background = s.color;
+      name.append(sw, document.createTextNode(s.label));
+      const val = document.createElement('span');
+      val.className = 'tt-val';
+      val.textContent = `${fmt1(p.value)}${valueSuffix}` + (p.samples ? ` (n=${p.samples})` : '');
+      row.append(name, val);
+      tip.appendChild(row);
+    }
+
+    tip.classList.add('on');
+    const left = Math.min(Math.max(px - 84, 4), host.clientWidth - tip.offsetWidth - 4);
+    tip.style.left = `${left}px`;
+    tip.style.top = `${m.t + 6}px`;
+  };
+
+  const hide = () => {
+    rule.setAttribute('opacity', 0);
+    tip.classList.remove('on');
+  };
+
+  const nearest = (evt) => {
+    const rect = root.getBoundingClientRect();
+    const rel = ((evt.clientX - rect.left) / rect.width) * root.viewBox.baseVal.width;
+    const t = (rel - m.l) / iw;
+    return Math.min(periods.length - 1, Math.max(0, Math.round(t * (periods.length - 1))));
+  };
+
+  hit.addEventListener('mousemove', (e) => show(nearest(e)));
+  hit.addEventListener('mouseleave', hide);
+  root.addEventListener('blur', hide);
+  root.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    const next = index < 0 ? periods.length - 1 : index + (e.key === 'ArrowRight' ? 1 : -1);
+    show(Math.min(periods.length - 1, Math.max(0, next)));
+  });
+}
+
+function runs(points) {
+  const out = [];
+  let cur = [];
+  points.forEach((p, i) => {
+    if (p.value === null || p.value === undefined) {
+      if (cur.length) out.push(cur);
+      cur = [];
+    } else {
+      cur.push({ ...p, i });
+    }
+  });
+  if (cur.length) out.push(cur);
+  return out;
+}
+
+/** 눈금이 딱 떨어지는 수(0/200/400…)가 되도록 간격을 먼저 정하고 경계를 맞춘다. */
+function niceScale(lo, hi, targetTicks = 5) {
+  const span = hi - lo || Math.abs(hi) || 1;
+  const raw = span / targetTicks;
+  const mag = 10 ** Math.floor(Math.log10(raw));
+  const step = [1, 2, 2.5, 5, 10].map((f) => f * mag).find((s) => s >= raw) ?? 10 * mag;
+  const y0 = Math.floor(lo / step) * step;
+  const y1 = Math.ceil(hi / step) * step;
+  const out = [];
+  for (let v = y0; v <= y1 + step / 2; v += step) out.push(Number(v.toFixed(6)));
+  return { y0, y1, ticks: out };
+}
+
+/* ------------------------------------------------------------ 막대 차트 */
+
+function renderChangeChart(host, rows, suffix = '%') {
+  host.textContent = '';
+  if (!rows.length) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = '변동률을 계산할 표본이 부족합니다.';
+    host.appendChild(p);
+    return;
+  }
+
+  const measured = Math.round(host.getBoundingClientRect().width) || host.clientWidth || 720;
+  const width = Math.max(320, measured);
+  const rowH = 34;
+  const m = { t: 8, r: 62, b: 8, l: 84 };
+  const height = m.t + m.b + rows.length * rowH;
+  const iw = width - m.l - m.r;
+
+  // 음수 쪽에 실제 있는 만큼만 폭을 준다 (반씩 나누면 한쪽이 텅 빈다)
+  const maxPos = Math.max(0, ...rows.map((r) => r.value));
+  const maxNeg = Math.max(0, ...rows.map((r) => -r.value));
+  const total = maxPos + maxNeg || 1;
+  const zero = m.l + (iw * maxNeg) / total;
+  const perUnit = (iw - 6) / total;
+
+  const root = svg('svg', { viewBox: `0 0 ${width} ${height}`, width, height, role: 'img' });
+  root.setAttribute('aria-label', '기간 변동률 막대 그래프');
+
+  rows.forEach((r, i) => {
+    const cy = m.t + i * rowH + rowH / 2;
+    const len = Math.max(2, Math.abs(r.value) * perUnit);
+    const barH = 18;                                  // ≤24px
+    const x0 = r.value >= 0 ? zero : zero - len;
+
+    const name = svg('text', { x: m.l - 12, y: cy + 4, 'text-anchor': 'end', fill: 'var(--text-secondary)', 'font-size': 12.5 });
+    name.textContent = r.label;
+    root.appendChild(name);
+
+    // 데이터 끝은 4px 라운드, 기준선 쪽은 각지게
+    const rx = 4;
+    const path = r.value >= 0
+      ? `M${x0},${cy - barH / 2} H${x0 + len - rx} a${rx},${rx} 0 0 1 ${rx},${rx} V${cy + barH / 2 - rx} a${rx},${rx} 0 0 1 -${rx},${rx} H${x0} Z`
+      : `M${x0 + len},${cy - barH / 2} H${x0 + rx} a${rx},${rx} 0 0 0 -${rx},${rx} V${cy + barH / 2 - rx} a${rx},${rx} 0 0 0 ${rx},${rx} H${x0 + len} Z`;
+    root.appendChild(svg('path', { d: path, fill: r.color }));
+
+    const val = svg('text', {
+      x: r.value >= 0 ? x0 + len + 8 : x0 - 8,
+      y: cy + 4,
+      'text-anchor': r.value >= 0 ? 'start' : 'end',
+      fill: 'var(--text-primary)',
+      'font-size': 12.5,
+    });
+    val.style.fontVariantNumeric = 'tabular-nums';
+    val.textContent = `${r.value > 0 ? '+' : ''}${r.value.toFixed(1)}${suffix}`;
+    root.appendChild(val);
+  });
+
+  root.appendChild(svg('line', { x1: zero, x2: zero, y1: m.t, y2: height - m.b, stroke: 'var(--baseline)', 'stroke-width': 1 }));
+  host.appendChild(root);
+}
+
+/* -------------------------------------------------------------- 렌더 */
+
+function renderScope() {
+  const host = document.getElementById('scope-chips');
+  host.textContent = '';
+  const trends = data.market?.listing_trends;
+  const bits = [
+    `대상 ${wardOrder.length}개 구`,
+    `총 ${trends?.min_total_units ?? 200}세대 이상`,
+    '中古 · 新築分譲',
+    trends ? `${trends.periods[0]} – ${trends.periods[trends.periods.length - 1]}` : '',
+  ].filter(Boolean);
+  for (const b of bits) {
+    const s = document.createElement('span');
+    s.className = 'scope-chip';
+    s.textContent = b;
+    host.appendChild(s);
+  }
+}
+
+function renderWardChips() {
+  const host = document.getElementById('ward-chips');
+  host.textContent = '';
+  for (const code of wardOrder) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip';
+    btn.style.color = wardColor(code);
+    btn.setAttribute('aria-pressed', String(state.wards.has(code)));
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    const text = document.createElement('span');
+    text.style.color = 'var(--text-primary)';
+    text.textContent = wardNames[code] ?? code;
+    if (!state.wards.has(code)) text.style.color = 'var(--text-secondary)';
+    btn.append(dot, text);
+    btn.addEventListener('click', () => {
+      if (state.wards.has(code)) {
+        if (state.wards.size === 1) return;      // 최소 1개는 남긴다
+        state.wards.delete(code);
+      } else {
+        state.wards.add(code);
+      }
+      renderWardChips();
+      renderAll();
+    });
+    host.appendChild(btn);
+  }
+}
+
+function renderTiles() {
+  const host = document.getElementById('tiles');
+  host.textContent = '';
+  const trends = data.market?.listing_trends;
+  if (!trends) return;
+
+  const periods = visiblePeriods();
+  const latest = periods[periods.length - 1];
+  const first = periods[0];
+
+  const pick = (stage, period) => {
+    const values = trends.series
+      .filter((s) => s.stage === stage && state.wards.has(s.ward_code))
+      .map((s) => s.points.find((p) => p.period === period)?.value)
+      .filter((v) => v !== null && v !== undefined);
+    return values.length ? median(values) : null;
+  };
+
+  const usedNow = pick('used', latest);
+  const usedThen = pick('used', first);
+  const newNow = pick('new', latest);
+  const gap = usedNow && newNow ? ((newNow / usedNow - 1) * 100) : null;
+
+  const tiles = [
+    {
+      hero: true,
+      label: `선택 지역 중고 坪単価 중앙값 · ${latest ?? '—'}`,
+      value: fmt1(usedNow),
+      unit: '万円/坪',
+      delta: usedNow && usedThen ? { pct: (usedNow / usedThen - 1) * 100, since: first } : null,
+    },
+    {
+      label: `신축 분양 坪単価 중앙값 · ${latest ?? '—'}`,
+      value: fmt1(newNow),
+      unit: '万円/坪',
+    },
+    {
+      label: '신축 프리미엄 (중고 대비)',
+      value: gap === null ? '—' : `+${gap.toFixed(0)}`,
+      unit: '%',
+    },
+    {
+      label: '오늘 신규 등록',
+      value: String(data.changes?.summary?.new ?? 0),
+      unit: '件',
+      sub: `가격변경 ${data.changes?.summary?.price_changed ?? 0} · 게재종료 ${data.changes?.summary?.removed ?? 0}`,
+    },
+  ];
+
+  for (const t of tiles) {
+    const card = document.createElement('div');
+    card.className = 'tile' + (t.hero ? ' hero' : '');
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = t.label;
+    const value = document.createElement('div');
+    value.className = 'value';
+    value.textContent = t.value;
+    const unit = document.createElement('span');
+    unit.className = 'unit';
+    unit.textContent = t.unit;
+    value.appendChild(unit);
+    card.append(label, value);
+
+    if (t.delta) {
+      const d = document.createElement('div');
+      d.className = 'delta';
+      const span = document.createElement('span');
+      span.className = t.delta.pct >= 0 ? 'up' : 'down';
+      span.textContent = fmtPct(t.delta.pct);
+      d.append(span, document.createTextNode(` · ${t.delta.since} 대비`));
+      card.appendChild(d);
+    } else if (t.sub) {
+      const d = document.createElement('div');
+      d.className = 'delta';
+      d.textContent = t.sub;
+      card.appendChild(d);
+    }
+    host.appendChild(card);
+  }
+}
+
+function renderMain() {
+  const series = mainSeries();
+  const periods = visiblePeriods();
+  const suffix = state.scale === 'idx' ? '' : ' 万円/坪';
+
+  document.getElementById('main-title').textContent =
+    state.stage === 'both' ? '선택 지역 종합 — 중고 vs 신축 분양' : `구별 坪単価 추이 · ${STAGE_LABEL[state.stage]}`;
+  document.getElementById('main-sub').textContent =
+    (state.scale === 'idx' ? `${periods[0] ?? ''} = 100 지수` : '万円/坪 중앙값')
+    + ` · 총 ${data.market?.listing_trends?.min_total_units ?? 200}세대 이상`
+    + (state.stage === 'both' ? ' · 구별 내역은 아래 상세 참조' : '');
+
+  renderLineChart(document.getElementById('main-chart'), {
+    series, periods, height: 330, valueSuffix: suffix,
+    ariaLabel: '구별 坪単価 추이',
+  });
+  renderLegend(document.getElementById('main-legend'), series);
+  renderTable(document.getElementById('main-table'), series, periods);
+}
+
+function renderLegend(host, series) {
+  host.textContent = '';
+  if (series.length < 2) return;                 // 1계열이면 제목이 곧 범례다
+  for (const s of series) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'legend-item';
+    btn.style.color = s.color;
+    btn.setAttribute('aria-pressed', String(!state.hidden.has(s.id)));
+    const key = document.createElement('span');
+    key.className = 'key';
+    if (s.dashed) key.style.background = `repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 9px)`;
+    const text = document.createElement('span');
+    text.style.color = 'var(--text-secondary)';
+    text.textContent = s.label;
+    btn.append(key, text);
+    btn.addEventListener('click', () => {
+      if (state.hidden.has(s.id)) state.hidden.delete(s.id);
+      else state.hidden.add(s.id);
+      renderMain();
+    });
+    host.appendChild(btn);
+  }
+  if (state.stage === 'both') {
+    const note = document.createElement('span');
+    note.className = 'legend-note';
+    note.textContent = '실선 = 중고 · 파선 = 신축 분양';
+    host.appendChild(note);
+  }
+}
+
+function renderTable(host, series, periods) {
+  host.hidden = !state.showTable;
+  host.textContent = '';
+  if (!state.showTable || !series.length) return;
+
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const hr = document.createElement('tr');
+  hr.appendChild(Object.assign(document.createElement('th'), { textContent: '분기' }));
+  for (const s of series) hr.appendChild(Object.assign(document.createElement('th'), { textContent: s.label }));
+  thead.appendChild(hr);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  periods.forEach((period, i) => {
+    const tr = document.createElement('tr');
+    tr.appendChild(Object.assign(document.createElement('td'), { textContent: period }));
+    for (const s of series) {
+      const v = s.points[i]?.value;
+      tr.appendChild(Object.assign(document.createElement('td'), { textContent: v === null || v === undefined ? '—' : fmt1(v) }));
+    }
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  host.appendChild(table);
+}
+
+function renderFacets() {
+  const host = document.getElementById('facets');
+  host.textContent = '';
+  const trends = data.market?.listing_trends;
+  if (!trends) return;
+  const periods = visiblePeriods();
+  const pending = [];
+
+  for (const code of wardOrder) {
+    if (!state.wards.has(code)) continue;
+    const rows = ['used', 'new']
+      .map((stage) => {
+        const row = trends.series.find((s) => s.ward_code === code && s.stage === stage);
+        if (!row) return null;
+        return {
+          id: `${code}|${stage}|facet`,
+          label: STAGE_LABEL[stage],
+          color: wardColor(code),
+          dashed: stage === 'new',
+          points: clipPoints(row.points, periods),
+        };
+      })
+      .filter(Boolean);
+
+    if (!rows.length) continue;
+
+    const box = document.createElement('div');
+    box.className = 'facet';
+    const h = document.createElement('h3');
+    h.textContent = wardNames[code] ?? code;
+    const meta = document.createElement('div');
+    meta.className = 'facet-meta';
+    const used = rows.find((r) => r.label === STAGE_LABEL.used);
+    const last = used ? [...used.points].reverse().find((p) => p.value !== null) : null;
+    meta.textContent = last ? `중고 ${fmt1(last.value)} 万円/坪 · ${last.period}` : '표본 부족';
+    const chart = document.createElement('div');
+    chart.className = 'chart-host';
+    box.append(h, meta, chart);
+    host.appendChild(box);
+    pending.push({ chart, rows, code });
+  }
+
+  // 그리드가 자리를 잡은 뒤에 그린다 — 붙이자마자 재면 첫 칸의 폭이 0으로 나온다
+  for (const { chart, rows, code } of pending) {
+    renderLineChart(chart, {
+      series: rows, periods, height: 168, endLabels: false,
+      valueSuffix: ' 万円/坪', ariaLabel: `${wardNames[code]} 坪単価 추이`,
+    });
+  }
+}
+
+function renderChange() {
+  const trends = data.market?.listing_trends;
+  const host = document.getElementById('change-chart');
+  if (!trends) return;
+  const periods = visiblePeriods();
+  const stage = state.stage === 'both' ? 'used' : state.stage;
+
+  const rows = wardOrder
+    .filter((code) => state.wards.has(code))
+    .map((code) => {
+      const row = trends.series.find((s) => s.ward_code === code && s.stage === stage);
+      if (!row) return null;
+      const pts = clipPoints(row.points, periods).filter((p) => p.value !== null);
+      if (pts.length < 2) return null;
+      const value = (pts[pts.length - 1].value / pts[0].value - 1) * 100;
+      return { label: wardNames[code] ?? code, value, color: wardColor(code) };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.value - a.value);
+
+  document.getElementById('change-sub').textContent =
+    `${periods[0] ?? ''} → ${periods[periods.length - 1] ?? ''} · ${STAGE_LABEL[stage]} 坪単価 중앙값 기준`;
+  renderChangeChart(host, rows);
+}
+
+function renderOfficial() {
+  const card = document.getElementById('official-card');
+  const official = data.market?.official_trends;
+  if (!official) { card.hidden = true; return; }
+  card.hidden = false;
+
+  const series = official.series
+    .filter((s) => state.wards.has(s.ward_code))
+    .map((s) => ({ id: s.id, label: s.ward, color: wardColor(s.ward_code), points: s.points }));
+
+  renderLineChart(document.getElementById('official-chart'), {
+    series, periods: official.periods, height: 280,
+    valueSuffix: ' 万円/坪', ariaLabel: '국토교통성 성약가 추이',
+  });
+  renderLegend(document.getElementById('official-legend'), series);
+}
+
+function renderNewListings() {
+  const host = document.getElementById('new-listings');
+  host.textContent = '';
+  const minUnits = data.market?.listing_trends?.min_total_units ?? 200;
+  const wardNameSet = new Set(wardOrder.filter((w) => state.wards.has(w)).map((w) => wardNames[w]));
+
+  // 신규가 0건인 날에도 섹션이 비지 않도록 최근 며칠치를 굴려서 보여준다
+  const pool = data.recent?.items?.length ? data.recent.items : (data.changes?.new ?? []);
+  const windowDays = data.recent?.window_days;
+
+  const items = pool
+    .filter((x) => wardNameSet.has(x.city) && (x.total_units ?? 0) >= minUnits)
+    .sort((a, b) => (b.found_on ?? '').localeCompare(a.found_on ?? '') || (b.price_yen ?? 0) - (a.price_yen ?? 0))
+    .slice(0, 24);
+
+  document.getElementById('new-sub').textContent =
+    (windowDays ? `최근 ${windowDays}일 신규` : `${data.changes?.date ?? ''} 수집분`)
+    + ` · 선택 지역 · ${minUnits}세대 이상 · ${items.length}건`
+    + (data.changes?.summary ? ` (오늘 ${data.changes.summary.new}건)` : '');
+
+  if (!items.length) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = '조건에 맞는 신규 등록 물건이 없습니다.';
+    host.appendChild(p);
+    return;
+  }
+
+  const grid = document.createElement('div');
+  grid.className = 'listing-grid';
+  for (const x of items) {
+    const code = Object.keys(wardNames).find((k) => wardNames[k] === x.city);
+    const card = document.createElement('div');
+    card.className = 'listing';
+
+    const row1 = document.createElement('div');
+    row1.className = 'row1';
+    const ward = document.createElement('span');
+    ward.className = 'ward';
+    ward.style.color = 'var(--text-secondary)';
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    dot.style.background = wardColor(code);
+    ward.append(dot, document.createTextNode(x.city));
+    row1.appendChild(ward);
+    const badge = document.createElement('span');
+    badge.className = 'badge ' + (x.stage === 'new' ? 'shinchiku' : 'new');
+    badge.textContent = x.stage === 'new' ? '신축 분양' : '신규';
+    row1.appendChild(badge);
+    card.appendChild(row1);
+
+    const name = document.createElement('div');
+    name.className = 'name';
+    name.textContent = x.title;
+    card.appendChild(name);
+
+    const price = document.createElement('div');
+    price.className = 'price';
+    price.textContent = `${fmt1(x.price_man)} 万円`;
+    card.appendChild(price);
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.textContent = [
+      x.layout, x.area_m2 ? `${x.area_m2}㎡` : null,
+      x.unit_price_man_per_tsubo ? `${fmt1(x.unit_price_man_per_tsubo)} 万円/坪` : null,
+    ].filter(Boolean).join(' · ');
+    card.appendChild(meta);
+
+    const meta2 = document.createElement('div');
+    meta2.className = 'meta';
+    meta2.textContent = [
+      x.total_units ? `総戸数 ${x.total_units}` : null,
+      x.built_year ? `${x.built_year}年築` : null,
+      x.station_labels?.[0],
+    ].filter(Boolean).join(' · ');
+    card.appendChild(meta2);
+
+    grid.appendChild(card);
+  }
+  host.appendChild(grid);
+}
+
+function renderSources() {
+  const host = document.getElementById('sources');
+  host.textContent = '';
+  const notes = Object.fromEntries((data.sources?.portals ?? []).map((p) => [p.key, p]));
+
+  for (const s of data.sources?.status ?? []) {
+    const row = document.createElement('div');
+    row.className = 'source-row';
+
+    const nm = document.createElement('div');
+    nm.className = 'nm';
+    nm.textContent = s.name;
+    const st = document.createElement('span');
+    st.className = `state ${s.state}`;
+    st.textContent = s.state === 'ok' ? `연결됨 ${s.count}件` : s.state === 'error' ? '오류' : '미연결';
+    const rs = document.createElement('div');
+    rs.className = 'rs';
+    rs.textContent = s.reason || notes[s.key]?.access_note || '';
+
+    row.append(nm, st, rs);
+    host.appendChild(row);
+  }
+}
+
+function renderAll() {
+  renderTiles();
+  renderMain();
+  renderFacets();
+  renderChange();
+  renderOfficial();
+  renderNewListings();
+}
+
+/* --------------------------------------------------------------- 부트 */
+
+function wireSegments() {
+  const bind = (id, key, cb) => {
+    document.getElementById(id).addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      for (const b of e.currentTarget.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b === btn));
+      state[key] = btn.dataset[key];
+      state.hidden.clear();
+      (cb || renderAll)();
+    });
+  };
+  bind('stage-seg', 'stage');
+  bind('range-seg', 'range');
+  bind('scale-seg', 'scale');
+
+  const toggle = document.getElementById('toggle-table');
+  toggle.addEventListener('click', () => {
+    state.showTable = !state.showTable;
+    toggle.setAttribute('aria-expanded', String(state.showTable));
+    toggle.textContent = state.showTable ? '표 닫기' : '표로 보기';
+    renderMain();
+  });
+}
+
+async function boot() {
+  // 단일 파일로 묶은 배포본은 데이터를 페이지 안에 심어 둔다 (fetch 불가 환경 대응).
+  const embedded = window.__REALESTATE_DATA__;
+
+  const load = async (name) => {
+    if (embedded) return embedded[name] ?? null;
+    try {
+      const res = await fetch(`data/${name}.json`, { cache: 'no-store' });
+      return res.ok ? await res.json() : null;
+    } catch { return null; }
+  };
+
+  [data.market, data.changes, data.sources, data.recent] = await Promise.all([
+    load('market'), load('latest-changes'), load('sources'), load('recent-new'),
+  ]);
+
+  const trends = data.market?.listing_trends;
+  if (!trends) {
+    document.getElementById('main-chart').innerHTML =
+      '<p class="empty">추이 데이터가 아직 없습니다. 수집기를 먼저 실행하세요 — <code>python3 -m realestate.collector.run</code></p>';
+    return;
+  }
+
+  wardOrder = trends.ward_order ?? [];
+  wardNames = trends.ward_names ?? {};
+  state.wards = new Set(wardOrder);
+
+  const banner = document.getElementById('synthetic-banner');
+  banner.hidden = !trends.synthetic;
+  if (trends.synthetic) {
+    document.getElementById('synthetic-detail').textContent =
+      `현재 연결된 소스는 샘플(架空データ)뿐입니다. 실제 도쿄 시세가 아니며, 판단 근거로 쓰면 안 됩니다. 출처: ${trends.source}`;
+  }
+
+  document.getElementById('generated').textContent =
+    `생성 ${data.market.generated_at ?? '—'} · 추이 출처: ${trends.source}`
+    + (data.market.official_trends ? ` · 성약가: ${data.market.official_trends.source}` : '');
+
+  renderScope();
+  renderWardChips();
+  renderSources();   // 필터와 무관 — 한 번만 그린다
+  wireSegments();
+  renderAll();
+
+  let raf;
+  new ResizeObserver(() => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(renderAll);
+  }).observe(document.body);
+}
+
+boot();
+
+</script>
+</body>
+</html>

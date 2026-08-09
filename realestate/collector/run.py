@@ -97,7 +97,8 @@ def main(argv: list[str] | None = None) -> int:
     if seeded:
         print(f"  데모 이력 {seeded}건 시드 (架空データ)")
     appended = store.record_observations(changes)
-    print(f"  관측 로그 +{appended}건")
+    recent = store.update_recent(changes, merged, days=int(config.get("recent_window_days", 7)))
+    print(f"  관측 로그 +{appended}건 · 최근 신규 {recent}건")
 
     # --- 5. 추이 --------------------------------------------------------
     observations = store.load_observations()

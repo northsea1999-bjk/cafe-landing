@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-09T21:13:49+00:00",
+  "generated_at": "2026-08-09T21:24:23+00:00",
   "listing_trends": {
-    "generated_at": "2026-08-09T21:13:49+00:00",
+    "generated_at": "2026-08-09T21:24:23+00:00",
     "synthetic": true,
     "source": "収集した売出物件（中古・新築分譲）の坪単価中央値",
     "measure": "median_man_per_tsubo",

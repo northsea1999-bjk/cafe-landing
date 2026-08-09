@@ -229,6 +229,43 @@ def parse_walk_minutes(text: str) -> int | None:
     return int(m.group(1)) if m else None
 
 
+_PREF_RE = re.compile(r"^\s*(東京都|北海道|京都府|大阪府|.{2,3}県)")
+# 政令指定都市의 「○○市△△区」를 먼저 잡아야 한다. 그러지 않으면 "横浜市"에서 끊긴다.
+_CITY_RE = re.compile(r"(.+?郡.+?[町村]|.+?市.+?区|.+?[市区町村])")
+
+
+def parse_stage(text: str, default: str = STAGE_USED) -> str:
+    """「新築」「中古」「新築分譲」 등의 표기를 stage 값으로."""
+    if not text:
+        return default
+    lowered = text.strip().lower()
+    if lowered in ("new", "shinchiku") or "新築" in text or "分譲" in text:
+        return STAGE_NEW
+    if lowered in ("used", "chuko") or "中古" in text:
+        return STAGE_USED
+    return default
+
+
+def split_address(address: str) -> tuple[str, str]:
+    """「東京都港区六本木3-1-1」→ ("東京都", "港区").
+
+    피드가 都道府県·市区町村 컬럼을 따로 주지 않는 경우가 흔한데, 추이 집계는
+    구 이름으로 묶으므로 주소에서 뽑아낼 수 있어야 한다.
+    """
+    if not address:
+        return "", ""
+    text = address.strip()
+
+    pref = ""
+    match = _PREF_RE.match(text)
+    if match:
+        pref = match.group(1)
+        text = text[match.end():]
+
+    city_match = _CITY_RE.match(text)
+    return pref, city_match.group(1) if city_match else ""
+
+
 def dedupe(listings: Iterable[Listing]) -> list[Listing]:
     """같은 물건이 여러 포털에 중복 게재되는 경우를 하나로 접는다.
 

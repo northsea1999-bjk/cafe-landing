@@ -1,0 +1,2309 @@
+{
+  "generated_at": "2026-08-09T21:24:23+00:00",
+  "window_days": 7,
+  "count": 40,
+  "items": [
+    {
+      "source": "sample",
+      "source_id": "2412-01",
+      "url": "https://example.invalid/listing/2412-01",
+      "title": "グランドメゾン中央",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 159500000,
+      "prefecture": "東京都",
+      "city": "中央区",
+      "address": "東京都中央区六丁目19-13",
+      "stations": [
+        {
+          "line": "東京メトロ東西線",
+          "name": "南砂町",
+          "walk_minutes": 15
+        }
+      ],
+      "area_m2": 87.29,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "1LDK",
+      "built_year": 2022,
+      "built_month": 4,
+      "floor": 12,
+      "total_floors": 12,
+      "total_units": 14,
+      "structure": "RC造",
+      "management_fee_yen": 29000,
+      "repair_reserve_yen": 15000,
+      "image_url": "",
+      "features": [
+        "眺望良好",
+        "２面採光",
+        "コンシェルジュ"
+      ],
+      "agency": "東京シティホーム",
+      "listed_on": "2026-08-09",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 159500000
+        }
+      ],
+      "key": "sample:2412-01",
+      "price_man": 15950.0,
+      "unit_price_man_per_tsubo": 604.0,
+      "building_age": 4,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ東西線 南砂町 徒歩15分"
+      ],
+      "found_on": "2026-08-09"
+    },
+    {
+      "source": "sample",
+      "source_id": "2412-00",
+      "url": "https://example.invalid/listing/2412-00",
+      "title": "ドゥ・トゥール中央",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 85900000,
+      "prefecture": "東京都",
+      "city": "中央区",
+      "address": "東京都中央区三丁目11-9",
+      "stations": [
+        {
+          "line": "東京メトロ有楽町線",
+          "name": "江戸川橋",
+          "walk_minutes": 2
+        }
+      ],
+      "area_m2": 84.84,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "1LDK",
+      "built_year": 1990,
+      "built_month": 9,
+      "floor": 3,
+      "total_floors": 12,
+      "total_units": 138,
+      "structure": "SRC造",
+      "management_fee_yen": 12000,
+      "repair_reserve_yen": 25000,
+      "image_url": "",
+      "features": [
+        "内廊下",
+        "即入居可",
+        "リノベーション済"
+      ],
+      "agency": "コンフォート住販",
+      "listed_on": "2026-08-09",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 85900000
+        }
+      ],
+      "key": "sample:2412-00",
+      "price_man": 8590.0,
+      "unit_price_man_per_tsubo": 334.7,
+      "building_age": 36,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ有楽町線 江戸川橋 徒歩2分"
+      ],
+      "found_on": "2026-08-09"
+    },
+    {
+      "source": "sample",
+      "source_id": "2411-01",
+      "url": "https://example.invalid/listing/2411-01",
+      "title": "ライオンズ本郷三丁目",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 206500000,
+      "prefecture": "東京都",
+      "city": "中央区",
+      "address": "東京都中央区五丁目5-10",
+      "stations": [
+        {
+          "line": "東京メトロ丸ノ内線",
+          "name": "本郷三丁目",
+          "walk_minutes": 9
+        }
+      ],
+      "area_m2": 108.57,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2013,
+      "built_month": 8,
+      "floor": 15,
+      "total_floors": 20,
+      "total_units": 340,
+      "structure": "RC造",
+      "management_fee_yen": 31000,
+      "repair_reserve_yen": 14000,
+      "image_url": "",
+      "features": [
+        "宅配ボックス",
+        "即入居可"
+      ],
+      "agency": "リブレ住宅販売",
+      "listed_on": "2026-08-08",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 206500000
+        }
+      ],
+      "key": "sample:2411-01",
+      "price_man": 20650.0,
+      "unit_price_man_per_tsubo": 628.8,
+      "building_age": 13,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ丸ノ内線 本郷三丁目 徒歩9分"
+      ],
+      "found_on": "2026-08-08"
+    },
+    {
+      "source": "sample",
+      "source_id": "2411-02",
+      "url": "https://example.invalid/listing/2411-02",
+      "title": "パークホームズ駒込",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 135700000,
+      "prefecture": "東京都",
+      "city": "港区",
+      "address": "東京都港区一丁目11-3",
+      "stations": [
+        {
+          "line": "JR山手線",
+          "name": "駒込",
+          "walk_minutes": 10
+        }
+      ],
+      "area_m2": 74.0,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "3LDK+S",
+      "built_year": 2018,
+      "built_month": 4,
+      "floor": 7,
+      "total_floors": 13,
+      "total_units": 136,
+      "structure": "RC造",
+      "management_fee_yen": 20500,
+      "repair_reserve_yen": 22500,
+      "image_url": "",
+      "features": [
+        "内廊下",
+        "南向き",
+        "コンシェルジュ",
+        "駐車場空有",
+        "リノベーション済"
+      ],
+      "agency": "コンフォート住販",
+      "listed_on": "2026-08-08",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 135700000
+        }
+      ],
+      "key": "sample:2411-02",
+      "price_man": 13570.0,
+      "unit_price_man_per_tsubo": 606.2,
+      "building_age": 8,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "JR山手線 駒込 徒歩10分"
+      ],
+      "found_on": "2026-08-08"
+    },
+    {
+      "source": "sample",
+      "source_id": "2411-03",
+      "url": "https://example.invalid/listing/2411-03",
+      "title": "ザ・パークハウス渋谷",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 118200000,
+      "prefecture": "東京都",
+      "city": "渋谷区",
+      "address": "東京都渋谷区二丁目4-6",
+      "stations": [
+        {
+          "line": "東京メトロ南北線",
+          "name": "東大前",
+          "walk_minutes": 14
+        }
+      ],
+      "area_m2": 60.33,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "1K",
+      "built_year": 2008,
+      "built_month": 6,
+      "floor": 2,
+      "total_floors": 6,
+      "total_units": 58,
+      "structure": "RC造",
+      "management_fee_yen": 12500,
+      "repair_reserve_yen": 9000,
+      "image_url": "",
+      "features": [
+        "ペット可",
+        "床暖房",
+        "角部屋"
+      ],
+      "agency": "コンフォート住販",
+      "listed_on": "2026-08-08",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 118200000
+        }
+      ],
+      "key": "sample:2411-03",
+      "price_man": 11820.0,
+      "unit_price_man_per_tsubo": 647.7,
+      "building_age": 18,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ南北線 東大前 徒歩14分"
+      ],
+      "found_on": "2026-08-08"
+    },
+    {
+      "source": "sample",
+      "source_id": "2411-04",
+      "url": "https://example.invalid/listing/2411-04",
+      "title": "パークホームズ江戸川橋",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 117900000,
+      "prefecture": "東京都",
+      "city": "豊島区",
+      "address": "東京都豊島区七丁目30-17",
+      "stations": [
+        {
+          "line": "東京メトロ有楽町線",
+          "name": "江戸川橋",
+          "walk_minutes": 15
+        }
+      ],
+      "area_m2": 83.81,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2011,
+      "built_month": 7,
+      "floor": 3,
+      "total_floors": 11,
+      "total_units": 108,
+      "structure": "SRC造",
+      "management_fee_yen": 27000,
+      "repair_reserve_yen": 15000,
+      "image_url": "",
+      "features": [
+        "眺望良好",
+        "２面採光",
+        "駐車場空有",
+        "オートロック",
+        "南向き"
+      ],
+      "agency": "コンフォート住販",
+      "listed_on": "2026-08-08",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 117900000
+        }
+      ],
+      "key": "sample:2411-04",
+      "price_man": 11790.0,
+      "unit_price_man_per_tsubo": 465.0,
+      "building_age": 15,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ有楽町線 江戸川橋 徒歩15分"
+      ],
+      "found_on": "2026-08-08"
+    },
+    {
+      "source": "sample",
+      "source_id": "2411-00",
+      "url": "https://example.invalid/listing/2411-00",
+      "title": "オープンレジデンシア渋谷",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 85300000,
+      "prefecture": "東京都",
+      "city": "渋谷区",
+      "address": "東京都渋谷区四丁目8-20",
+      "stations": [
+        {
+          "line": "都営大江戸線",
+          "name": "月島",
+          "walk_minutes": 6
+        }
+      ],
+      "area_m2": 43.55,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2012,
+      "built_month": 11,
+      "floor": 3,
+      "total_floors": 15,
+      "total_units": 28,
+      "structure": "RC造",
+      "management_fee_yen": 12000,
+      "repair_reserve_yen": 19000,
+      "image_url": "",
+      "features": [
+        "即入居可",
+        "２面採光",
+        "内廊下",
+        "コンシェルジュ",
+        "免震構造"
+      ],
+      "agency": "みらい不動産販売",
+      "listed_on": "2026-08-08",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 85300000
+        }
+      ],
+      "key": "sample:2411-00",
+      "price_man": 8530.0,
+      "unit_price_man_per_tsubo": 647.5,
+      "building_age": 14,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "都営大江戸線 月島 徒歩6分"
+      ],
+      "found_on": "2026-08-08"
+    },
+    {
+      "source": "sample",
+      "source_id": "2410-04",
+      "url": "https://example.invalid/listing/2410-04",
+      "title": "サンウッド新宿三丁目",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 174300000,
+      "prefecture": "東京都",
+      "city": "千代田区",
+      "address": "東京都千代田区二丁目17-18",
+      "stations": [
+        {
+          "line": "東京メトロ丸ノ内線",
+          "name": "新宿三丁目",
+          "walk_minutes": 9
+        }
+      ],
+      "area_m2": 105.74,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "1LDK",
+      "built_year": 2009,
+      "built_month": 5,
+      "floor": 4,
+      "total_floors": 6,
+      "total_units": 168,
+      "structure": "RC造",
+      "management_fee_yen": 10000,
+      "repair_reserve_yen": 9000,
+      "image_url": "",
+      "features": [
+        "コンシェルジュ",
+        "角部屋",
+        "駐車場空有",
+        "床暖房"
+      ],
+      "agency": "スカイライン不動産",
+      "listed_on": "2026-08-07",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 174300000
+        }
+      ],
+      "key": "sample:2410-04",
+      "price_man": 17430.0,
+      "unit_price_man_per_tsubo": 544.9,
+      "building_age": 17,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ丸ノ内線 新宿三丁目 徒歩9分"
+      ],
+      "found_on": "2026-08-07"
+    },
+    {
+      "source": "sample",
+      "source_id": "2410-06",
+      "url": "https://example.invalid/listing/2410-06",
+      "title": "シティタワー港",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 98700000,
+      "prefecture": "東京都",
+      "city": "港区",
+      "address": "東京都港区四丁目2-14",
+      "stations": [
+        {
+          "line": "東京メトロ南北線",
+          "name": "麻布十番",
+          "walk_minutes": 7
+        }
+      ],
+      "area_m2": 35.22,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "3LDK",
+      "built_year": 2023,
+      "built_month": 4,
+      "floor": 23,
+      "total_floors": 31,
+      "total_units": 720,
+      "structure": "SRC造",
+      "management_fee_yen": 20000,
+      "repair_reserve_yen": 27500,
+      "image_url": "",
+      "features": [
+        "２面採光",
+        "宅配ボックス",
+        "内廊下"
+      ],
+      "agency": "東京シティホーム",
+      "listed_on": "2026-08-07",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 98700000
+        }
+      ],
+      "key": "sample:2410-06",
+      "price_man": 9870.0,
+      "unit_price_man_per_tsubo": 926.4,
+      "building_age": 3,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ南北線 麻布十番 徒歩7分"
+      ],
+      "found_on": "2026-08-07"
+    },
+    {
+      "source": "sample",
+      "source_id": "2410-01",
+      "url": "https://example.invalid/listing/2410-01",
+      "title": "シティタワー江東",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 91200000,
+      "prefecture": "東京都",
+      "city": "江東区",
+      "address": "東京都江東区一丁目23-19",
+      "stations": [
+        {
+          "line": "東急東横線",
+          "name": "代官山",
+          "walk_minutes": 9
+        }
+      ],
+      "area_m2": 104.25,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "1K",
+      "built_year": 2003,
+      "built_month": 6,
+      "floor": 1,
+      "total_floors": 3,
+      "total_units": 90,
+      "structure": "RC造",
+      "management_fee_yen": 32000,
+      "repair_reserve_yen": 22000,
+      "image_url": "",
+      "features": [
+        "２面採光",
+        "角部屋",
+        "オートロック",
+        "免震構造",
+        "床暖房"
+      ],
+      "agency": "コンフォート住販",
+      "listed_on": "2026-08-07",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 91200000
+        }
+      ],
+      "key": "sample:2410-01",
+      "price_man": 9120.0,
+      "unit_price_man_per_tsubo": 289.2,
+      "building_age": 23,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東急東横線 代官山 徒歩9分"
+      ],
+      "found_on": "2026-08-07"
+    },
+    {
+      "source": "sample",
+      "source_id": "2410-03",
+      "url": "https://example.invalid/listing/2410-03",
+      "title": "（新築）ドゥ・トゥール江東",
+      "kind": "mansion",
+      "stage": "new",
+      "price_yen": 87700000,
+      "prefecture": "東京都",
+      "city": "江東区",
+      "address": "東京都江東区三丁目28-18",
+      "stations": [
+        {
+          "line": "東京メトロ東西線",
+          "name": "門前仲町",
+          "walk_minutes": 7
+        }
+      ],
+      "area_m2": 50.8,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK",
+      "built_year": 2027,
+      "built_month": 8,
+      "floor": 35,
+      "total_floors": 45,
+      "total_units": 570,
+      "structure": "RC造",
+      "management_fee_yen": 28500,
+      "repair_reserve_yen": 25000,
+      "image_url": "",
+      "features": [
+        "内廊下",
+        "南向き",
+        "免震構造"
+      ],
+      "agency": "リブレ住宅販売",
+      "listed_on": "2026-08-07",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 87700000
+        }
+      ],
+      "key": "sample:2410-03",
+      "price_man": 8770.0,
+      "unit_price_man_per_tsubo": 570.7,
+      "building_age": 0,
+      "kind_label": "マンション",
+      "stage_label": "新築分譲",
+      "station_labels": [
+        "東京メトロ東西線 門前仲町 徒歩7分"
+      ],
+      "found_on": "2026-08-07"
+    },
+    {
+      "source": "sample",
+      "source_id": "2410-05",
+      "url": "https://example.invalid/listing/2410-05",
+      "title": "ドゥ・トゥール駒込",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 80900000,
+      "prefecture": "東京都",
+      "city": "江東区",
+      "address": "東京都江東区二丁目16-2",
+      "stations": [
+        {
+          "line": "JR山手線",
+          "name": "駒込",
+          "walk_minutes": 5
+        }
+      ],
+      "area_m2": 91.94,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "1K",
+      "built_year": 1991,
+      "built_month": 11,
+      "floor": 8,
+      "total_floors": 11,
+      "total_units": 160,
+      "structure": "SRC造",
+      "management_fee_yen": 9000,
+      "repair_reserve_yen": 16500,
+      "image_url": "",
+      "features": [
+        "２面採光",
+        "内廊下",
+        "駐車場空有"
+      ],
+      "agency": "スカイライン不動産",
+      "listed_on": "2026-08-07",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 80900000
+        }
+      ],
+      "key": "sample:2410-05",
+      "price_man": 8090.0,
+      "unit_price_man_per_tsubo": 290.9,
+      "building_age": 35,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "JR山手線 駒込 徒歩5分"
+      ],
+      "found_on": "2026-08-07"
+    },
+    {
+      "source": "sample",
+      "source_id": "2410-02",
+      "url": "https://example.invalid/listing/2410-02",
+      "title": "クレヴィア六本木",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 73800000,
+      "prefecture": "東京都",
+      "city": "渋谷区",
+      "address": "東京都渋谷区三丁目8-13",
+      "stations": [
+        {
+          "line": "都営大江戸線",
+          "name": "六本木",
+          "walk_minutes": 15
+        }
+      ],
+      "area_m2": 53.28,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "1K",
+      "built_year": 1995,
+      "built_month": 3,
+      "floor": 7,
+      "total_floors": 11,
+      "total_units": 60,
+      "structure": "SRC造",
+      "management_fee_yen": 23000,
+      "repair_reserve_yen": 7500,
+      "image_url": "",
+      "features": [
+        "床暖房",
+        "コンシェルジュ",
+        "南向き",
+        "眺望良好"
+      ],
+      "agency": "コンフォート住販",
+      "listed_on": "2026-08-07",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 73800000
+        }
+      ],
+      "key": "sample:2410-02",
+      "price_man": 7380.0,
+      "unit_price_man_per_tsubo": 457.9,
+      "building_age": 31,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "都営大江戸線 六本木 徒歩15分"
+      ],
+      "found_on": "2026-08-07"
+    },
+    {
+      "source": "sample",
+      "source_id": "2410-00",
+      "url": "https://example.invalid/listing/2410-00",
+      "title": "オープンレジデンシア文京",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 56600000,
+      "prefecture": "東京都",
+      "city": "文京区",
+      "address": "東京都文京区五丁目30-1",
+      "stations": [
+        {
+          "line": "東京メトロ南北線",
+          "name": "麻布十番",
+          "walk_minutes": 9
+        }
+      ],
+      "area_m2": 33.22,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK",
+      "built_year": 2014,
+      "built_month": 2,
+      "floor": 8,
+      "total_floors": 8,
+      "total_units": 630,
+      "structure": "SRC造",
+      "management_fee_yen": 25000,
+      "repair_reserve_yen": 25500,
+      "image_url": "",
+      "features": [
+        "即入居可",
+        "免震構造",
+        "角部屋"
+      ],
+      "agency": "東京シティホーム",
+      "listed_on": "2026-08-07",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 56600000
+        }
+      ],
+      "key": "sample:2410-00",
+      "price_man": 5660.0,
+      "unit_price_man_per_tsubo": 563.2,
+      "building_age": 12,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ南北線 麻布十番 徒歩9分"
+      ],
+      "found_on": "2026-08-07"
+    },
+    {
+      "source": "sample",
+      "source_id": "2409-01",
+      "url": "https://example.invalid/listing/2409-01",
+      "title": "（新築）グランドメゾン五反田",
+      "kind": "mansion",
+      "stage": "new",
+      "price_yen": 138200000,
+      "prefecture": "東京都",
+      "city": "品川区",
+      "address": "東京都品川区三丁目18-9",
+      "stations": [
+        {
+          "line": "JR山手線",
+          "name": "五反田",
+          "walk_minutes": 8
+        }
+      ],
+      "area_m2": 65.9,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "3LDK+S",
+      "built_year": 2026,
+      "built_month": 3,
+      "floor": 9,
+      "total_floors": 21,
+      "total_units": 210,
+      "structure": "RC造",
+      "management_fee_yen": 15000,
+      "repair_reserve_yen": 15500,
+      "image_url": "",
+      "features": [
+        "床暖房",
+        "即入居可",
+        "２面採光",
+        "ペット可"
+      ],
+      "agency": "スカイライン不動産",
+      "listed_on": "2026-08-06",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 138200000
+        }
+      ],
+      "key": "sample:2409-01",
+      "price_man": 13820.0,
+      "unit_price_man_per_tsubo": 693.3,
+      "building_age": 0,
+      "kind_label": "マンション",
+      "stage_label": "新築分譲",
+      "station_labels": [
+        "JR山手線 五反田 徒歩8分"
+      ],
+      "found_on": "2026-08-06"
+    },
+    {
+      "source": "sample",
+      "source_id": "2409-02",
+      "url": "https://example.invalid/listing/2409-02",
+      "title": "オープンレジデンシア江東",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 97100000,
+      "prefecture": "東京都",
+      "city": "江東区",
+      "address": "東京都江東区二丁目14-12",
+      "stations": [
+        {
+          "line": "東京メトロ東西線",
+          "name": "早稲田",
+          "walk_minutes": 6
+        }
+      ],
+      "area_m2": 102.14,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "4LDK",
+      "built_year": 2006,
+      "built_month": 10,
+      "floor": 4,
+      "total_floors": 8,
+      "total_units": 360,
+      "structure": "SRC造",
+      "management_fee_yen": 12500,
+      "repair_reserve_yen": 10000,
+      "image_url": "",
+      "features": [
+        "角部屋",
+        "駐車場空有",
+        "免震構造"
+      ],
+      "agency": "スカイライン不動産",
+      "listed_on": "2026-08-06",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 97100000
+        }
+      ],
+      "key": "sample:2409-02",
+      "price_man": 9710.0,
+      "unit_price_man_per_tsubo": 314.3,
+      "building_age": 20,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ東西線 早稲田 徒歩6分"
+      ],
+      "found_on": "2026-08-06"
+    },
+    {
+      "source": "sample",
+      "source_id": "2409-05",
+      "url": "https://example.invalid/listing/2409-05",
+      "title": "ドゥ・トゥール文京",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 85700000,
+      "prefecture": "東京都",
+      "city": "文京区",
+      "address": "東京都文京区六丁目24-16",
+      "stations": [
+        {
+          "line": "都営大江戸線",
+          "name": "月島",
+          "walk_minutes": 7
+        }
+      ],
+      "area_m2": 67.34,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2020,
+      "built_month": 1,
+      "floor": 3,
+      "total_floors": 6,
+      "total_units": 120,
+      "structure": "RC造",
+      "management_fee_yen": 23500,
+      "repair_reserve_yen": 22000,
+      "image_url": "",
+      "features": [
+        "２面採光",
+        "床暖房",
+        "ペット可",
+        "角部屋"
+      ],
+      "agency": "みらい不動産販売",
+      "listed_on": "2026-08-06",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 85700000
+        }
+      ],
+      "key": "sample:2409-05",
+      "price_man": 8570.0,
+      "unit_price_man_per_tsubo": 420.7,
+      "building_age": 6,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "都営大江戸線 月島 徒歩7分"
+      ],
+      "found_on": "2026-08-06"
+    },
+    {
+      "source": "sample",
+      "source_id": "2409-00",
+      "url": "https://example.invalid/listing/2409-00",
+      "title": "ライオンズ早稲田",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 79300000,
+      "prefecture": "東京都",
+      "city": "千代田区",
+      "address": "東京都千代田区四丁目1-20",
+      "stations": [
+        {
+          "line": "東京メトロ東西線",
+          "name": "早稲田",
+          "walk_minutes": 3
+        }
+      ],
+      "area_m2": 61.75,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "1K",
+      "built_year": 1988,
+      "built_month": 10,
+      "floor": 7,
+      "total_floors": 11,
+      "total_units": 160,
+      "structure": "SRC造",
+      "management_fee_yen": 20500,
+      "repair_reserve_yen": 22500,
+      "image_url": "",
+      "features": [
+        "眺望良好",
+        "２面採光",
+        "免震構造",
+        "駐車場空有"
+      ],
+      "agency": "スカイライン不動産",
+      "listed_on": "2026-08-06",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 79300000
+        }
+      ],
+      "key": "sample:2409-00",
+      "price_man": 7930.0,
+      "unit_price_man_per_tsubo": 424.5,
+      "building_age": 38,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ東西線 早稲田 徒歩3分"
+      ],
+      "found_on": "2026-08-06"
+    },
+    {
+      "source": "sample",
+      "source_id": "2409-03",
+      "url": "https://example.invalid/listing/2409-03",
+      "title": "パークコート本駒込",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 55100000,
+      "prefecture": "東京都",
+      "city": "文京区",
+      "address": "東京都文京区一丁目24-16",
+      "stations": [
+        {
+          "line": "東京メトロ南北線",
+          "name": "本駒込",
+          "walk_minutes": 5
+        }
+      ],
+      "area_m2": 42.57,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "4LDK",
+      "built_year": 2000,
+      "built_month": 9,
+      "floor": 27,
+      "total_floors": 36,
+      "total_units": 830,
+      "structure": "RC造",
+      "management_fee_yen": 22000,
+      "repair_reserve_yen": 17500,
+      "image_url": "",
+      "features": [
+        "２面採光",
+        "床暖房"
+      ],
+      "agency": "スカイライン不動産",
+      "listed_on": "2026-08-06",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 55100000
+        }
+      ],
+      "key": "sample:2409-03",
+      "price_man": 5510.0,
+      "unit_price_man_per_tsubo": 427.9,
+      "building_age": 26,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ南北線 本駒込 徒歩5分"
+      ],
+      "found_on": "2026-08-06"
+    },
+    {
+      "source": "sample",
+      "source_id": "2409-04",
+      "url": "https://example.invalid/listing/2409-04",
+      "title": "ブリリア清澄白河",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 48900000,
+      "prefecture": "東京都",
+      "city": "港区",
+      "address": "東京都港区三丁目1-14",
+      "stations": [
+        {
+          "line": "都営大江戸線",
+          "name": "清澄白河",
+          "walk_minutes": 6
+        }
+      ],
+      "area_m2": 29.11,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "1K",
+      "built_year": 1989,
+      "built_month": 5,
+      "floor": 9,
+      "total_floors": 16,
+      "total_units": 530,
+      "structure": "RC造",
+      "management_fee_yen": 18000,
+      "repair_reserve_yen": 25000,
+      "image_url": "",
+      "features": [
+        "内廊下",
+        "２面採光",
+        "駐車場空有"
+      ],
+      "agency": "東京シティホーム",
+      "listed_on": "2026-08-06",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 48900000
+        }
+      ],
+      "key": "sample:2409-04",
+      "price_man": 4890.0,
+      "unit_price_man_per_tsubo": 555.3,
+      "building_age": 37,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "都営大江戸線 清澄白河 徒歩6分"
+      ],
+      "found_on": "2026-08-06"
+    },
+    {
+      "source": "sample",
+      "source_id": "2408-03",
+      "url": "https://example.invalid/listing/2408-03",
+      "title": "（新築）パークコート中央",
+      "kind": "mansion",
+      "stage": "new",
+      "price_yen": 139400000,
+      "prefecture": "東京都",
+      "city": "中央区",
+      "address": "東京都中央区五丁目11-15",
+      "stations": [
+        {
+          "line": "東京メトロ南北線",
+          "name": "麻布十番",
+          "walk_minutes": 8
+        }
+      ],
+      "area_m2": 54.06,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "3LDK",
+      "built_year": 2026,
+      "built_month": 11,
+      "floor": 18,
+      "total_floors": 26,
+      "total_units": 720,
+      "structure": "RC造",
+      "management_fee_yen": 24000,
+      "repair_reserve_yen": 9500,
+      "image_url": "",
+      "features": [
+        "ペット可",
+        "宅配ボックス",
+        "免震構造",
+        "角部屋"
+      ],
+      "agency": "みらい不動産販売",
+      "listed_on": "2026-08-05",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 139400000
+        }
+      ],
+      "key": "sample:2408-03",
+      "price_man": 13940.0,
+      "unit_price_man_per_tsubo": 852.4,
+      "building_age": 0,
+      "kind_label": "マンション",
+      "stage_label": "新築分譲",
+      "station_labels": [
+        "東京メトロ南北線 麻布十番 徒歩8分"
+      ],
+      "found_on": "2026-08-05"
+    },
+    {
+      "source": "sample",
+      "source_id": "2408-00",
+      "url": "https://example.invalid/listing/2408-00",
+      "title": "パークホームズ恵比寿",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 87700000,
+      "prefecture": "東京都",
+      "city": "江東区",
+      "address": "東京都江東区六丁目16-6",
+      "stations": [
+        {
+          "line": "JR山手線",
+          "name": "恵比寿",
+          "walk_minutes": 15
+        }
+      ],
+      "area_m2": 84.31,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK",
+      "built_year": 2011,
+      "built_month": 6,
+      "floor": 1,
+      "total_floors": 4,
+      "total_units": 66,
+      "structure": "SRC造",
+      "management_fee_yen": 8000,
+      "repair_reserve_yen": 13000,
+      "image_url": "",
+      "features": [
+        "角部屋",
+        "リノベーション済",
+        "駐車場空有",
+        "即入居可",
+        "南向き"
+      ],
+      "agency": "リブレ住宅販売",
+      "listed_on": "2026-08-05",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 87700000
+        }
+      ],
+      "key": "sample:2408-00",
+      "price_man": 8770.0,
+      "unit_price_man_per_tsubo": 343.9,
+      "building_age": 15,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "JR山手線 恵比寿 徒歩15分"
+      ],
+      "found_on": "2026-08-05"
+    },
+    {
+      "source": "sample",
+      "source_id": "2408-02",
+      "url": "https://example.invalid/listing/2408-02",
+      "title": "プラウド品川",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 48900000,
+      "prefecture": "東京都",
+      "city": "品川区",
+      "address": "東京都品川区五丁目26-9",
+      "stations": [
+        {
+          "line": "東京メトロ南北線",
+          "name": "東大前",
+          "walk_minutes": 9
+        }
+      ],
+      "area_m2": 40.32,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "4LDK",
+      "built_year": 2022,
+      "built_month": 4,
+      "floor": 2,
+      "total_floors": 7,
+      "total_units": 148,
+      "structure": "SRC造",
+      "management_fee_yen": 11000,
+      "repair_reserve_yen": 6500,
+      "image_url": "",
+      "features": [
+        "リノベーション済",
+        "オートロック",
+        "駐車場空有"
+      ],
+      "agency": "東京シティホーム",
+      "listed_on": "2026-08-05",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 48900000
+        }
+      ],
+      "key": "sample:2408-02",
+      "price_man": 4890.0,
+      "unit_price_man_per_tsubo": 400.9,
+      "building_age": 4,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ南北線 東大前 徒歩9分"
+      ],
+      "found_on": "2026-08-05"
+    },
+    {
+      "source": "sample",
+      "source_id": "2408-01",
+      "url": "https://example.invalid/listing/2408-01",
+      "title": "クレヴィア護国寺",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 41700000,
+      "prefecture": "東京都",
+      "city": "文京区",
+      "address": "東京都文京区三丁目19-1",
+      "stations": [
+        {
+          "line": "東京メトロ有楽町線",
+          "name": "護国寺",
+          "walk_minutes": 10
+        }
+      ],
+      "area_m2": 34.44,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2015,
+      "built_month": 2,
+      "floor": 1,
+      "total_floors": 15,
+      "total_units": 176,
+      "structure": "SRC造",
+      "management_fee_yen": 25500,
+      "repair_reserve_yen": 13500,
+      "image_url": "",
+      "features": [
+        "駐車場空有",
+        "免震構造",
+        "コンシェルジュ",
+        "南向き",
+        "リノベーション済"
+      ],
+      "agency": "みらい不動産販売",
+      "listed_on": "2026-08-05",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 41700000
+        }
+      ],
+      "key": "sample:2408-01",
+      "price_man": 4170.0,
+      "unit_price_man_per_tsubo": 400.3,
+      "building_age": 11,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ有楽町線 護国寺 徒歩10分"
+      ],
+      "found_on": "2026-08-05"
+    },
+    {
+      "source": "sample",
+      "source_id": "2408-04",
+      "url": "https://example.invalid/listing/2408-04",
+      "title": "ザ・パークハウス江東",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 32800000,
+      "prefecture": "東京都",
+      "city": "江東区",
+      "address": "東京都江東区二丁目21-6",
+      "stations": [
+        {
+          "line": "東京メトロ丸ノ内線",
+          "name": "中野坂上",
+          "walk_minutes": 13
+        }
+      ],
+      "area_m2": 28.71,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2019,
+      "built_month": 2,
+      "floor": 8,
+      "total_floors": 24,
+      "total_units": 220,
+      "structure": "RC造",
+      "management_fee_yen": 8000,
+      "repair_reserve_yen": 26000,
+      "image_url": "",
+      "features": [
+        "角部屋",
+        "２面採光"
+      ],
+      "agency": "みらい不動産販売",
+      "listed_on": "2026-08-05",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 32800000
+        }
+      ],
+      "key": "sample:2408-04",
+      "price_man": 3280.0,
+      "unit_price_man_per_tsubo": 377.7,
+      "building_age": 7,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ丸ノ内線 中野坂上 徒歩13分"
+      ],
+      "found_on": "2026-08-05"
+    },
+    {
+      "source": "sample",
+      "source_id": "2407-00",
+      "url": "https://example.invalid/listing/2407-00",
+      "title": "（新築）ザ・パークハウス田町",
+      "kind": "mansion",
+      "stage": "new",
+      "price_yen": 226000000,
+      "prefecture": "東京都",
+      "city": "目黒区",
+      "address": "東京都目黒区六丁目28-15",
+      "stations": [
+        {
+          "line": "JR山手線",
+          "name": "田町",
+          "walk_minutes": 1
+        }
+      ],
+      "area_m2": 96.41,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2026,
+      "built_month": 4,
+      "floor": 4,
+      "total_floors": 6,
+      "total_units": 20,
+      "structure": "RC造",
+      "management_fee_yen": 30500,
+      "repair_reserve_yen": 8500,
+      "image_url": "",
+      "features": [
+        "ペット可",
+        "免震構造",
+        "即入居可",
+        "リノベーション済"
+      ],
+      "agency": "スカイライン不動産",
+      "listed_on": "2026-08-04",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 226000000
+        }
+      ],
+      "key": "sample:2407-00",
+      "price_man": 22600.0,
+      "unit_price_man_per_tsubo": 774.9,
+      "building_age": 0,
+      "kind_label": "マンション",
+      "stage_label": "新築分譲",
+      "station_labels": [
+        "JR山手線 田町 徒歩1分"
+      ],
+      "found_on": "2026-08-04"
+    },
+    {
+      "source": "sample",
+      "source_id": "2407-01",
+      "url": "https://example.invalid/listing/2407-01",
+      "title": "ドゥ・トゥール江東",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 81800000,
+      "prefecture": "東京都",
+      "city": "江東区",
+      "address": "東京都江東区五丁目12-15",
+      "stations": [
+        {
+          "line": "東京メトロ丸ノ内線",
+          "name": "新宿三丁目",
+          "walk_minutes": 12
+        }
+      ],
+      "area_m2": 74.16,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "4LDK",
+      "built_year": 2000,
+      "built_month": 6,
+      "floor": 13,
+      "total_floors": 45,
+      "total_units": 570,
+      "structure": "SRC造",
+      "management_fee_yen": 20000,
+      "repair_reserve_yen": 17500,
+      "image_url": "",
+      "features": [
+        "免震構造",
+        "南向き",
+        "ペット可"
+      ],
+      "agency": "東京シティホーム",
+      "listed_on": "2026-08-04",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 81800000
+        }
+      ],
+      "key": "sample:2407-01",
+      "price_man": 8180.0,
+      "unit_price_man_per_tsubo": 364.6,
+      "building_age": 26,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ丸ノ内線 新宿三丁目 徒歩12分"
+      ],
+      "found_on": "2026-08-04"
+    },
+    {
+      "source": "sample",
+      "source_id": "2406-05",
+      "url": "https://example.invalid/listing/2406-05",
+      "title": "グランドメゾン護国寺",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 286300000,
+      "prefecture": "東京都",
+      "city": "港区",
+      "address": "東京都港区四丁目28-20",
+      "stations": [
+        {
+          "line": "東京メトロ有楽町線",
+          "name": "護国寺",
+          "walk_minutes": 9
+        }
+      ],
+      "area_m2": 106.75,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "4LDK",
+      "built_year": 2017,
+      "built_month": 11,
+      "floor": 18,
+      "total_floors": 19,
+      "total_units": 610,
+      "structure": "SRC造",
+      "management_fee_yen": 24000,
+      "repair_reserve_yen": 8000,
+      "image_url": "",
+      "features": [
+        "２面採光",
+        "眺望良好",
+        "リノベーション済"
+      ],
+      "agency": "コンフォート住販",
+      "listed_on": "2026-08-03",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 286300000
+        }
+      ],
+      "key": "sample:2406-05",
+      "price_man": 28630.0,
+      "unit_price_man_per_tsubo": 886.6,
+      "building_age": 9,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ有楽町線 護国寺 徒歩9分"
+      ],
+      "found_on": "2026-08-03"
+    },
+    {
+      "source": "sample",
+      "source_id": "2406-01",
+      "url": "https://example.invalid/listing/2406-01",
+      "title": "ザ・パークハウス都立大学",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 153700000,
+      "prefecture": "東京都",
+      "city": "新宿区",
+      "address": "東京都新宿区六丁目12-7",
+      "stations": [
+        {
+          "line": "東急東横線",
+          "name": "都立大学",
+          "walk_minutes": 6
+        }
+      ],
+      "area_m2": 88.12,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2018,
+      "built_month": 4,
+      "floor": 7,
+      "total_floors": 35,
+      "total_units": 300,
+      "structure": "SRC造",
+      "management_fee_yen": 8000,
+      "repair_reserve_yen": 23000,
+      "image_url": "",
+      "features": [
+        "内廊下",
+        "宅配ボックス",
+        "オートロック"
+      ],
+      "agency": "スカイライン不動産",
+      "listed_on": "2026-08-03",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 153700000
+        }
+      ],
+      "key": "sample:2406-01",
+      "price_man": 15370.0,
+      "unit_price_man_per_tsubo": 576.6,
+      "building_age": 8,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東急東横線 都立大学 徒歩6分"
+      ],
+      "found_on": "2026-08-03"
+    },
+    {
+      "source": "sample",
+      "source_id": "2406-03",
+      "url": "https://example.invalid/listing/2406-03",
+      "title": "オープンレジデンシア中央",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 147400000,
+      "prefecture": "東京都",
+      "city": "中央区",
+      "address": "東京都中央区五丁目29-17",
+      "stations": [
+        {
+          "line": "JR山手線",
+          "name": "駒込",
+          "walk_minutes": 13
+        }
+      ],
+      "area_m2": 85.48,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2012,
+      "built_month": 5,
+      "floor": 3,
+      "total_floors": 15,
+      "total_units": 100,
+      "structure": "RC造",
+      "management_fee_yen": 26500,
+      "repair_reserve_yen": 7000,
+      "image_url": "",
+      "features": [
+        "南向き",
+        "宅配ボックス",
+        "眺望良好",
+        "コンシェルジュ"
+      ],
+      "agency": "みらい不動産販売",
+      "listed_on": "2026-08-03",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 147400000
+        }
+      ],
+      "key": "sample:2406-03",
+      "price_man": 14740.0,
+      "unit_price_man_per_tsubo": 570.0,
+      "building_age": 14,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "JR山手線 駒込 徒歩13分"
+      ],
+      "found_on": "2026-08-03"
+    },
+    {
+      "source": "sample",
+      "source_id": "2406-02",
+      "url": "https://example.invalid/listing/2406-02",
+      "title": "（新築）サンウッド中央",
+      "kind": "mansion",
+      "stage": "new",
+      "price_yen": 145900000,
+      "prefecture": "東京都",
+      "city": "中央区",
+      "address": "東京都中央区五丁目30-19",
+      "stations": [
+        {
+          "line": "東京メトロ東西線",
+          "name": "早稲田",
+          "walk_minutes": 13
+        }
+      ],
+      "area_m2": 66.3,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK",
+      "built_year": 2026,
+      "built_month": 11,
+      "floor": 10,
+      "total_floors": 43,
+      "total_units": 830,
+      "structure": "RC造",
+      "management_fee_yen": 17500,
+      "repair_reserve_yen": 16500,
+      "image_url": "",
+      "features": [
+        "免震構造",
+        "オートロック",
+        "コンシェルジュ"
+      ],
+      "agency": "みらい不動産販売",
+      "listed_on": "2026-08-03",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 145900000
+        }
+      ],
+      "key": "sample:2406-02",
+      "price_man": 14590.0,
+      "unit_price_man_per_tsubo": 727.5,
+      "building_age": 0,
+      "kind_label": "マンション",
+      "stage_label": "新築分譲",
+      "station_labels": [
+        "東京メトロ東西線 早稲田 徒歩13分"
+      ],
+      "found_on": "2026-08-03"
+    },
+    {
+      "source": "sample",
+      "source_id": "2406-04",
+      "url": "https://example.invalid/listing/2406-04",
+      "title": "アトラス月島",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 137600000,
+      "prefecture": "東京都",
+      "city": "江東区",
+      "address": "東京都江東区一丁目8-5",
+      "stations": [
+        {
+          "line": "東京メトロ有楽町線",
+          "name": "月島",
+          "walk_minutes": 14
+        }
+      ],
+      "area_m2": 88.23,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "3LDK+S",
+      "built_year": 2024,
+      "built_month": 2,
+      "floor": 13,
+      "total_floors": 45,
+      "total_units": 550,
+      "structure": "RC造",
+      "management_fee_yen": 13000,
+      "repair_reserve_yen": 19000,
+      "image_url": "",
+      "features": [
+        "免震構造",
+        "リノベーション済",
+        "角部屋"
+      ],
+      "agency": "リブレ住宅販売",
+      "listed_on": "2026-08-03",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 137600000
+        }
+      ],
+      "key": "sample:2406-04",
+      "price_man": 13760.0,
+      "unit_price_man_per_tsubo": 515.6,
+      "building_age": 2,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ有楽町線 月島 徒歩14分"
+      ],
+      "found_on": "2026-08-03"
+    },
+    {
+      "source": "sample",
+      "source_id": "2406-00",
+      "url": "https://example.invalid/listing/2406-00",
+      "title": "グランドメゾン江戸川橋",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 77000000,
+      "prefecture": "東京都",
+      "city": "新宿区",
+      "address": "東京都新宿区五丁目3-10",
+      "stations": [
+        {
+          "line": "東京メトロ有楽町線",
+          "name": "江戸川橋",
+          "walk_minutes": 3
+        }
+      ],
+      "area_m2": 45.45,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK",
+      "built_year": 2021,
+      "built_month": 5,
+      "floor": 26,
+      "total_floors": 40,
+      "total_units": 330,
+      "structure": "SRC造",
+      "management_fee_yen": 13500,
+      "repair_reserve_yen": 5500,
+      "image_url": "",
+      "features": [
+        "宅配ボックス",
+        "免震構造",
+        "駐車場空有",
+        "コンシェルジュ",
+        "内廊下"
+      ],
+      "agency": "スカイライン不動産",
+      "listed_on": "2026-08-03",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 77000000
+        }
+      ],
+      "key": "sample:2406-00",
+      "price_man": 7700.0,
+      "unit_price_man_per_tsubo": 560.1,
+      "building_age": 5,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ有楽町線 江戸川橋 徒歩3分"
+      ],
+      "found_on": "2026-08-03"
+    },
+    {
+      "source": "sample",
+      "source_id": "2405-06",
+      "url": "https://example.invalid/listing/2405-06",
+      "title": "（新築）ブリリア清澄白河",
+      "kind": "mansion",
+      "stage": "new",
+      "price_yen": 274600000,
+      "prefecture": "東京都",
+      "city": "渋谷区",
+      "address": "東京都渋谷区七丁目30-5",
+      "stations": [
+        {
+          "line": "都営大江戸線",
+          "name": "清澄白河",
+          "walk_minutes": 9
+        }
+      ],
+      "area_m2": 80.66,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2026,
+      "built_month": 8,
+      "floor": 19,
+      "total_floors": 25,
+      "total_units": 740,
+      "structure": "SRC造",
+      "management_fee_yen": 32500,
+      "repair_reserve_yen": 21000,
+      "image_url": "",
+      "features": [
+        "南向き",
+        "２面採光",
+        "角部屋",
+        "内廊下"
+      ],
+      "agency": "コンフォート住販",
+      "listed_on": "2026-08-02",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 274600000
+        }
+      ],
+      "key": "sample:2405-06",
+      "price_man": 27460.0,
+      "unit_price_man_per_tsubo": 1125.4,
+      "building_age": 0,
+      "kind_label": "マンション",
+      "stage_label": "新築分譲",
+      "station_labels": [
+        "都営大江戸線 清澄白河 徒歩9分"
+      ],
+      "found_on": "2026-08-02"
+    },
+    {
+      "source": "sample",
+      "source_id": "2405-01",
+      "url": "https://example.invalid/listing/2405-01",
+      "title": "（新築）ライオンズ中井",
+      "kind": "mansion",
+      "stage": "new",
+      "price_yen": 212000000,
+      "prefecture": "東京都",
+      "city": "渋谷区",
+      "address": "東京都渋谷区一丁目15-8",
+      "stations": [
+        {
+          "line": "都営大江戸線",
+          "name": "中井",
+          "walk_minutes": 7
+        }
+      ],
+      "area_m2": 61.76,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2026,
+      "built_month": 12,
+      "floor": 17,
+      "total_floors": 17,
+      "total_units": 800,
+      "structure": "SRC造",
+      "management_fee_yen": 31500,
+      "repair_reserve_yen": 16500,
+      "image_url": "",
+      "features": [
+        "南向き",
+        "内廊下",
+        "駐車場空有",
+        "コンシェルジュ"
+      ],
+      "agency": "みらい不動産販売",
+      "listed_on": "2026-08-02",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 212000000
+        }
+      ],
+      "key": "sample:2405-01",
+      "price_man": 21200.0,
+      "unit_price_man_per_tsubo": 1134.8,
+      "building_age": 0,
+      "kind_label": "マンション",
+      "stage_label": "新築分譲",
+      "station_labels": [
+        "都営大江戸線 中井 徒歩7分"
+      ],
+      "found_on": "2026-08-02"
+    },
+    {
+      "source": "sample",
+      "source_id": "2405-02",
+      "url": "https://example.invalid/listing/2405-02",
+      "title": "プラウド港",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 168100000,
+      "prefecture": "東京都",
+      "city": "港区",
+      "address": "東京都港区二丁目26-4",
+      "stations": [
+        {
+          "line": "都営大江戸線",
+          "name": "麻布十番",
+          "walk_minutes": 10
+        }
+      ],
+      "area_m2": 101.4,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "3LDK",
+      "built_year": 2001,
+      "built_month": 9,
+      "floor": 34,
+      "total_floors": 41,
+      "total_units": 230,
+      "structure": "SRC造",
+      "management_fee_yen": 16000,
+      "repair_reserve_yen": 20000,
+      "image_url": "",
+      "features": [
+        "オートロック",
+        "宅配ボックス",
+        "床暖房",
+        "２面採光"
+      ],
+      "agency": "東京シティホーム",
+      "listed_on": "2026-08-02",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 168100000
+        }
+      ],
+      "key": "sample:2405-02",
+      "price_man": 16810.0,
+      "unit_price_man_per_tsubo": 548.0,
+      "building_age": 25,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "都営大江戸線 麻布十番 徒歩10分"
+      ],
+      "found_on": "2026-08-02"
+    },
+    {
+      "source": "sample",
+      "source_id": "2405-00",
+      "url": "https://example.invalid/listing/2405-00",
+      "title": "（新築）パークコート豊洲",
+      "kind": "mansion",
+      "stage": "new",
+      "price_yen": 160400000,
+      "prefecture": "東京都",
+      "city": "中央区",
+      "address": "東京都中央区六丁目22-7",
+      "stations": [
+        {
+          "line": "東京メトロ有楽町線",
+          "name": "豊洲",
+          "walk_minutes": 8
+        }
+      ],
+      "area_m2": 51.2,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "2LDK+S",
+      "built_year": 2026,
+      "built_month": 9,
+      "floor": 13,
+      "total_floors": 18,
+      "total_units": 220,
+      "structure": "SRC造",
+      "management_fee_yen": 18000,
+      "repair_reserve_yen": 24000,
+      "image_url": "",
+      "features": [
+        "即入居可",
+        "コンシェルジュ"
+      ],
+      "agency": "コンフォート住販",
+      "listed_on": "2026-08-02",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 160400000
+        }
+      ],
+      "key": "sample:2405-00",
+      "price_man": 16040.0,
+      "unit_price_man_per_tsubo": 1035.6,
+      "building_age": 0,
+      "kind_label": "マンション",
+      "stage_label": "新築分譲",
+      "station_labels": [
+        "東京メトロ有楽町線 豊洲 徒歩8分"
+      ],
+      "found_on": "2026-08-02"
+    },
+    {
+      "source": "sample",
+      "source_id": "2405-05",
+      "url": "https://example.invalid/listing/2405-05",
+      "title": "ザ・パークハウス港",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 157100000,
+      "prefecture": "東京都",
+      "city": "港区",
+      "address": "東京都港区三丁目23-6",
+      "stations": [
+        {
+          "line": "都営大江戸線",
+          "name": "清澄白河",
+          "walk_minutes": 1
+        }
+      ],
+      "area_m2": 87.44,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "4LDK",
+      "built_year": 1996,
+      "built_month": 11,
+      "floor": 9,
+      "total_floors": 10,
+      "total_units": 66,
+      "structure": "SRC造",
+      "management_fee_yen": 19500,
+      "repair_reserve_yen": 9500,
+      "image_url": "",
+      "features": [
+        "駐車場空有",
+        "リノベーション済",
+        "内廊下"
+      ],
+      "agency": "東京シティホーム",
+      "listed_on": "2026-08-02",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 157100000
+        }
+      ],
+      "key": "sample:2405-05",
+      "price_man": 15710.0,
+      "unit_price_man_per_tsubo": 593.9,
+      "building_age": 30,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "都営大江戸線 清澄白河 徒歩1分"
+      ],
+      "found_on": "2026-08-02"
+    },
+    {
+      "source": "sample",
+      "source_id": "2405-04",
+      "url": "https://example.invalid/listing/2405-04",
+      "title": "ライオンズ中央",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 64700000,
+      "prefecture": "東京都",
+      "city": "中央区",
+      "address": "東京都中央区四丁目25-19",
+      "stations": [
+        {
+          "line": "東京メトロ東西線",
+          "name": "南砂町",
+          "walk_minutes": 11
+        }
+      ],
+      "area_m2": 42.98,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "1K",
+      "built_year": 1998,
+      "built_month": 11,
+      "floor": 10,
+      "total_floors": 13,
+      "total_units": 148,
+      "structure": "SRC造",
+      "management_fee_yen": 11000,
+      "repair_reserve_yen": 7500,
+      "image_url": "",
+      "features": [
+        "コンシェルジュ",
+        "角部屋",
+        "２面採光",
+        "宅配ボックス"
+      ],
+      "agency": "スカイライン不動産",
+      "listed_on": "2026-08-02",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 64700000
+        }
+      ],
+      "key": "sample:2405-04",
+      "price_man": 6470.0,
+      "unit_price_man_per_tsubo": 497.6,
+      "building_age": 28,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ東西線 南砂町 徒歩11分"
+      ],
+      "found_on": "2026-08-02"
+    },
+    {
+      "source": "sample",
+      "source_id": "2405-03",
+      "url": "https://example.invalid/listing/2405-03",
+      "title": "プラウド新宿",
+      "kind": "mansion",
+      "stage": "used",
+      "price_yen": 38700000,
+      "prefecture": "東京都",
+      "city": "新宿区",
+      "address": "東京都新宿区二丁目25-2",
+      "stations": [
+        {
+          "line": "東京メトロ南北線",
+          "name": "白金台",
+          "walk_minutes": 3
+        }
+      ],
+      "area_m2": 38.03,
+      "land_area_m2": null,
+      "building_area_m2": null,
+      "layout": "3LDK",
+      "built_year": 1988,
+      "built_month": 5,
+      "floor": 6,
+      "total_floors": 6,
+      "total_units": 114,
+      "structure": "SRC造",
+      "management_fee_yen": 24000,
+      "repair_reserve_yen": 29500,
+      "image_url": "",
+      "features": [
+        "オートロック",
+        "ペット可",
+        "免震構造"
+      ],
+      "agency": "コンフォート住販",
+      "listed_on": "2026-08-02",
+      "first_seen": "2026-08-09T21:11:08+00:00",
+      "last_seen": "2026-08-09T21:24:23+00:00",
+      "price_history": [
+        {
+          "date": "2026-08-09",
+          "price_yen": 38700000
+        }
+      ],
+      "key": "sample:2405-03",
+      "price_man": 3870.0,
+      "unit_price_man_per_tsubo": 336.4,
+      "building_age": 38,
+      "kind_label": "マンション",
+      "stage_label": "中古",
+      "station_labels": [
+        "東京メトロ南北線 白金台 徒歩3分"
+      ],
+      "found_on": "2026-08-02"
+    }
+  ]
+}

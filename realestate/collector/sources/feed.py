@@ -44,7 +44,9 @@ from ..schema import (
     parse_area_m2,
     parse_built,
     parse_price_to_yen,
+    parse_stage,
     parse_walk_minutes,
+    split_address,
 )
 from .base import Source, SourceError
 
@@ -142,15 +144,24 @@ class FeedSource(Source):
         built_year, built_month = parse_built(get("built"))
         station_text = get("station")
 
+        # 都道府県·市区町村 컬럼이 없는 피드가 흔하다. 추이는 구 이름으로 묶으므로
+        # 없으면 주소에서 뽑아낸다 — 여기서 비면 그 물건은 추이에 안 잡힌다.
+        prefecture, city = get("prefecture"), get("city")
+        if not city:
+            derived_pref, derived_city = split_address(address)
+            prefecture = prefecture or derived_pref
+            city = derived_city
+
         return Listing(
             source=self.key,
             source_id=get("source_id") or f"row{index}",
             url=get("url"),
             title=get("title") or address,
             kind=get("kind") or default_kind,
+            stage=parse_stage(get("stage")),
             price_yen=price,
-            prefecture=get("prefecture"),
-            city=get("city"),
+            prefecture=prefecture,
+            city=city,
             address=address,
             stations=(
                 [
@@ -171,11 +182,13 @@ class FeedSource(Source):
             built_month=built_month,
             floor=_to_int(get("floor")),
             total_floors=_to_int(get("total_floors")),
+            total_units=_to_int(get("total_units")),   # 200세대 필터가 이 값을 본다
             structure=get("structure"),
             management_fee_yen=parse_price_to_yen(get("management_fee")),
             repair_reserve_yen=parse_price_to_yen(get("repair_reserve")),
             image_url=get("image_url"),
             agency=get("agency"),
+            listed_on=get("listed_on"),
         )
 
 

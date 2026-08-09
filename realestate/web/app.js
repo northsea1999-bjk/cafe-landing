@@ -19,7 +19,7 @@ const state = {
   showTable: false,
 };
 
-const data = { market: null, changes: null, sources: null };
+const data = { market: null, changes: null, sources: null, recent: null };
 let wardOrder = [];
 let wardNames = {};
 
@@ -727,13 +727,19 @@ function renderNewListings() {
   const minUnits = data.market?.listing_trends?.min_total_units ?? 200;
   const wardNameSet = new Set(wardOrder.filter((w) => state.wards.has(w)).map((w) => wardNames[w]));
 
-  const items = (data.changes?.new ?? [])
+  // 신규가 0건인 날에도 섹션이 비지 않도록 최근 며칠치를 굴려서 보여준다
+  const pool = data.recent?.items?.length ? data.recent.items : (data.changes?.new ?? []);
+  const windowDays = data.recent?.window_days;
+
+  const items = pool
     .filter((x) => wardNameSet.has(x.city) && (x.total_units ?? 0) >= minUnits)
-    .sort((a, b) => (b.price_yen ?? 0) - (a.price_yen ?? 0))
+    .sort((a, b) => (b.found_on ?? '').localeCompare(a.found_on ?? '') || (b.price_yen ?? 0) - (a.price_yen ?? 0))
     .slice(0, 24);
 
   document.getElementById('new-sub').textContent =
-    `${data.changes?.date ?? ''} 수집분 · 선택 지역 · ${minUnits}세대 이상 · ${items.length}건`;
+    (windowDays ? `최근 ${windowDays}일 신규` : `${data.changes?.date ?? ''} 수집분`)
+    + ` · 선택 지역 · ${minUnits}세대 이상 · ${items.length}건`
+    + (data.changes?.summary ? ` (오늘 ${data.changes.summary.new}건)` : '');
 
   if (!items.length) {
     const p = document.createElement('p');
@@ -858,15 +864,19 @@ function wireSegments() {
 }
 
 async function boot() {
+  // 단일 파일로 묶은 배포본은 데이터를 페이지 안에 심어 둔다 (fetch 불가 환경 대응).
+  const embedded = window.__REALESTATE_DATA__;
+
   const load = async (name) => {
+    if (embedded) return embedded[name] ?? null;
     try {
       const res = await fetch(`data/${name}.json`, { cache: 'no-store' });
       return res.ok ? await res.json() : null;
     } catch { return null; }
   };
 
-  [data.market, data.changes, data.sources] = await Promise.all([
-    load('market'), load('latest-changes'), load('sources'),
+  [data.market, data.changes, data.sources, data.recent] = await Promise.all([
+    load('market'), load('latest-changes'), load('sources'), load('recent-new'),
   ]);
 
   const trends = data.market?.listing_trends;
