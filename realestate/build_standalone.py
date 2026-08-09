@@ -60,6 +60,21 @@ def _slim_recent(recent: dict | None) -> dict | None:
     }
 
 
+def build_input_tool() -> Path:
+    """입력 도우미를 한 파일로 — 데이터가 필요 없어 CSS·JS만 합치면 된다."""
+    html = (WEB / "input.html").read_text(encoding="utf-8")
+    css = (WEB / "styles.css").read_text(encoding="utf-8")
+    js = (WEB / "input.js").read_text(encoding="utf-8")
+
+    html = html.replace('<link rel="stylesheet" href="styles.css">', f"<style>\n{css}\n</style>")
+    html = html.replace('<script src="input.js"></script>', f"<script>\n{js}\n</script>")
+    body = html.split("<body>", 1)[1].rsplit("</body>", 1)[0]
+
+    out = WEB / "input-artifact.html"
+    out.write_text("<title>물건 입력 도우미</title>\n" + body, encoding="utf-8")
+    return out
+
+
 def build_artifact() -> Path:
     """호스트가 <html>/<head>/<body> 를 감싸주는 배포용 변형 (본문만 남긴다)."""
     full = build().read_text(encoding="utf-8")
@@ -105,5 +120,10 @@ def build() -> Path:
 if __name__ == "__main__":
     import sys
 
-    path = build_artifact() if "--artifact" in sys.argv else build()
+    if "--input" in sys.argv:
+        path = build_input_tool()
+    elif "--artifact" in sys.argv:
+        path = build_artifact()
+    else:
+        path = build()
     print(f"{path}  ({path.stat().st_size / 1024:.0f} KB)")

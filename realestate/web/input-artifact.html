@@ -1,0 +1,299 @@
+<title>물건 입력 도우미</title>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="masthead-top">
+      <h1>물건 입력 도우미</h1>
+      <a class="ghost" href="index.html" style="text-decoration:none;display:inline-flex;align-items:center">← 그래프로</a>
+    </div>
+    <p>포털 페이지를 눈으로 보고 옮겨 적는 작업을 줄여 줍니다. 다 담으면 CSV로 내려받아 수집기에 넣으세요.</p>
+  </header>
+
+  <section class="card">
+    <div class="card-head"><div><h2>1. 페이지 글자 붙여넣기</h2>
+      <p class="sub">물건 페이지에서 <strong>Ctrl+A → Ctrl+C</strong> 한 뒤 여기에 붙여넣고 버튼을 누르세요. 건너뛰고 아래에 직접 입력해도 됩니다.</p></div></div>
+    <textarea id="paste" placeholder="여기에 붙여넣기"></textarea>
+    <div class="actions"><button type="button" class="ghost" id="parse">값 찾아내기</button></div>
+    <p class="note" id="parsed-note"></p>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><div><h2>2. 확인하고 고치기</h2>
+      <p class="sub">자동으로 찾은 값은 <strong>자주 틀립니다.</strong> 눈으로 확인하고 고쳐 주세요. <strong>총세대수</strong>가 비면 그래프에 안 잡힙니다.</p></div></div>
+    <div class="form" id="form"></div>
+    <p class="warn" id="warn"></p>
+    <div class="actions"><button type="button" class="primary" id="add">이 물건 담기</button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div><h2>3. 담은 물건 <span class="count" id="count">0건</span></h2>
+      <p class="sub">브라우저에 저장되니 창을 닫아도 남아 있습니다.</p></div>
+    </div>
+    <div id="rows"></div>
+    <div class="actions">
+      <button type="button" class="primary" id="download">CSV 내려받기</button>
+      <button type="button" class="ghost" id="clear">전부 비우기</button>
+    </div>
+  </section>
+
+</div>
+<script>
+/* 물건 입력 도우미
+ *
+ * 사람이 포털 페이지를 눈으로 보고 옮겨 적는 작업을 줄여 주는 도구다.
+ * 페이지 글자를 통째로 붙여넣으면 필요한 값을 찾아 칸에 채운다.
+ *
+ * 중요한 설계 원칙: **찾아낸 값을 반드시 눈에 보이게 두고 고칠 수 있게 한다.**
+ * 포털 페이지 구조는 제각각이라 자동 추출은 자주 틀린다. 틀린 값이 조용히
+ * 들어가는 것보다, 화면에 보여주고 사람이 확인하는 편이 훨씬 안전하다.
+ */
+
+const FIELDS = [
+  { key: 'name',    label: '맨션이름',   placeholder: 'パークタワー勝どき' },
+  { key: 'stage',   label: '구분',       placeholder: '중고 / 신축', kind: 'stage' },
+  { key: 'price',   label: '가격',       placeholder: '12800만엔' },
+  { key: 'address', label: '주소',       placeholder: '東京都中央区勝どき4-5-6' },
+  { key: 'station', label: '가까운역',   placeholder: '勝どき' },
+  { key: 'walk',    label: '도보분',     placeholder: '5' },
+  { key: 'area',    label: '전용면적',   placeholder: '74.52' },
+  { key: 'layout',  label: '방구조',     placeholder: '3LDK' },
+  { key: 'built',   label: '준공년월',   placeholder: '2015년3월' },
+  { key: 'floor',   label: '층',         placeholder: '18' },
+  { key: 'floors',  label: '총층수',     placeholder: '32' },
+  { key: 'units',   label: '총세대수',   placeholder: '1420', required: true },
+  { key: 'fee',     label: '관리비',     placeholder: '18500' },
+  { key: 'reserve', label: '수선적립금', placeholder: '12000' },
+  { key: 'url',     label: '주소링크',   placeholder: 'https://suumo.jp/...' },
+  { key: 'date',    label: '등록일',     placeholder: '2026-08-09' },
+];
+
+/** 붙여넣은 글자에서 값을 찾아낸다. 못 찾으면 빈칸으로 두고 사람이 채운다. */
+function extract(text) {
+  const t = text.replace(/　/g, ' ');
+  const one = (re, group = 1) => {
+    const m = t.match(re);
+    return m ? String(m[group]).trim() : '';
+  };
+
+  // 가격 — 「1億2,800万円」「4,980万円」 모두 있는 그대로 넘긴다 (수집기가 해석한다)
+  const price = one(/(\d[\d,]*億[\d,]*万円|\d[\d,]*億円|\d[\d,]*万円)/);
+
+  // 専有面積 — 「74.52m2」「74.52㎡」. 「バルコニー面積」은 피한다
+  let area = one(/専有面積[^\d]{0,12}([\d.]+)\s*(?:m2|㎡|平米)/);
+  if (!area) area = one(/([\d.]+)\s*(?:m2|㎡)\s*(?:\(|（)?\s*(?:壁芯|登記)/);
+  if (!area) area = one(/([\d.]+)\s*(?:m2|㎡)/);
+
+  // 総戸数 — 「総戸数 420戸」
+  const units = one(/総戸数[^\d]{0,10}(\d[\d,]*)\s*戸/);
+
+  // 所在階／階建 — 「18階／32階建」「18階/地上32階建」
+  const floorPair = t.match(/(\d+)\s*階\s*[／/]\s*(?:地上)?(\d+)\s*階建/);
+  const floors = floorPair ? floorPair[2] : one(/(?:地上)?(\d+)\s*階建/);
+  const floor = floorPair ? floorPair[1] : one(/所在階[^\d]{0,10}(\d+)\s*階/);
+
+  // 交通 — SUUMO 표기 「JR山手線「浜松町」歩8分」
+  let station = one(/[「｢]([^」｣]{1,12})[」｣]\s*(?:駅)?\s*(?:歩|徒歩)/);
+  if (!station) station = one(/([^\s、,]{1,12})駅\s*(?:から)?\s*(?:歩|徒歩)/);
+  const walk = one(/(?:歩|徒歩)\s*(\d+)\s*分/);
+
+  // 신축 여부 — 페이지에 新築/分譲 표기가 있으면 신축으로 본다
+  const stage = /新築|新築分譲|未入居/.test(t) && !/中古/.test(t) ? '신축' : '중고';
+
+  // 이름 — 「物件名」 표기가 있으면 그것, 없으면 첫 줄.
+  // 단 「中古マンション」 같은 분류 문구는 이름이 아니므로 건너뛴다.
+  const GENERIC = /^(中古|新築)?(分譲)?(マンション|一戸建て|物件詳細|価格|所在地)$/;
+  const firstReal = t.split('\n').map((x) => x.trim())
+    .find((x) => x && x.length <= 40 && !GENERIC.test(x) && !/^[\d,.\s円㎡]+$/.test(x)) || '';
+
+  return {
+    name: one(/物件名[^\S\n]{0,4}[:：]?\s*(.+)/) || firstReal,
+    stage,
+    price,
+    address: one(/所在地[^\S\n]{0,4}[:：]?\s*(東京都[^\n]{2,40})/) || one(/(東京都[^\s\n]{2,40})/),
+    station,
+    walk,
+    area,
+    layout: one(/(\d?[SLDK]{2,5}\+?S?|\d[SLDK]+)/) || one(/間取り[^\S\n]{0,4}[:：]?\s*([^\s\n]{2,10})/),
+    built: one(/築年月[^\d]{0,6}(\d{4}年\s*\d{1,2}月)/) || one(/(\d{4}年\s*\d{1,2}月)\s*築/) || one(/(\d{4}年\s*\d{1,2}月)/),
+    floor,
+    floors,
+    units,
+    fee: one(/管理費[^\d]{0,10}(\d[\d,]*)\s*円/),
+    reserve: one(/修繕積立金[^\d]{0,10}(\d[\d,]*)\s*円/),
+    url: one(/(https?:\/\/[^\s"'<>]+)/),
+    date: new Date().toISOString().slice(0, 10),
+  };
+}
+
+/* ------------------------------------------------------------------ 화면 */
+
+const rows = [];
+const inputs = {};
+
+function buildForm() {
+  const form = document.getElementById('form');
+  for (const field of FIELDS) {
+    const wrap = document.createElement('label');
+    wrap.className = 'f' + (field.required ? ' req' : '');
+
+    const span = document.createElement('span');
+    span.textContent = field.label + (field.required ? ' *' : '');
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = field.placeholder;
+    input.addEventListener('input', updateWarning);
+    inputs[field.key] = input;
+
+    wrap.append(span, input);
+    form.appendChild(wrap);
+  }
+}
+
+function updateWarning() {
+  const warn = document.getElementById('warn');
+  const missing = FIELDS.filter((f) => f.required && !inputs[f.key].value.trim());
+  const noPrice = !inputs.price.value.trim();
+  const noArea = !inputs.area.value.trim();
+
+  const messages = [];
+  if (missing.length) messages.push(`${missing.map((f) => f.label).join(', ')} 를 채워야 그래프에 잡힙니다`);
+  if (noPrice || noArea) messages.push('가격과 전용면적이 있어야 평당가가 계산됩니다');
+  warn.textContent = messages.join(' · ');
+}
+
+function readForm() {
+  const out = {};
+  for (const field of FIELDS) out[field.key] = inputs[field.key].value.trim();
+  return out;
+}
+
+function fillForm(values) {
+  for (const field of FIELDS) {
+    if (values[field.key]) inputs[field.key].value = values[field.key];
+  }
+  updateWarning();
+}
+
+function renderRows() {
+  const host = document.getElementById('rows');
+  host.textContent = '';
+  document.getElementById('count').textContent = `${rows.length}건`;
+  document.getElementById('download').disabled = rows.length === 0;
+
+  if (!rows.length) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = '아직 담은 물건이 없습니다.';
+    host.appendChild(p);
+    return;
+  }
+
+  const table = document.createElement('table');
+  const head = document.createElement('tr');
+  for (const label of ['맨션이름', '구분', '가격', '전용면적', '총세대수', '가까운역', '']) {
+    head.appendChild(Object.assign(document.createElement('th'), { textContent: label }));
+  }
+  table.appendChild(head);
+
+  rows.forEach((row, index) => {
+    const tr = document.createElement('tr');
+    for (const key of ['name', 'stage', 'price', 'area', 'units', 'station']) {
+      tr.appendChild(Object.assign(document.createElement('td'), { textContent: row[key] || '—' }));
+    }
+    const td = document.createElement('td');
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'del';
+    del.textContent = '삭제';
+    del.addEventListener('click', () => { rows.splice(index, 1); save(); renderRows(); });
+    td.appendChild(del);
+    tr.appendChild(td);
+    table.appendChild(tr);
+  });
+
+  host.appendChild(table);
+}
+
+const HEADERS = ['번호', '맨션이름', '구분', '가격', '주소', '가까운역', '도보분', '역세권',
+  '전용면적', '방구조', '준공년월', '층', '총층수', '총세대수', '관리비', '수선적립금', '주소링크', '등록일'];
+
+function toCsv() {
+  const esc = (v) => {
+    const s = String(v ?? '');
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const lines = [HEADERS.join(',')];
+  rows.forEach((r, i) => {
+    lines.push([
+      i + 1, r.name, r.stage, r.price, r.address, r.station, r.walk,
+      r.station,                       // 역세권은 가까운역과 같게 채워 둔다
+      r.area, r.layout, r.built, r.floor, r.floors, r.units, r.fee, r.reserve, r.url, r.date,
+    ].map(esc).join(','));
+  });
+  // 엑셀이 한글·일본어를 깨뜨리지 않도록 BOM 을 붙인다
+  return '﻿' + lines.join('\n') + '\n';
+}
+
+function save() {
+  try { localStorage.setItem('re-input-rows', JSON.stringify(rows)); } catch { /* 저장 못해도 계속 쓸 수 있다 */ }
+}
+
+function load() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('re-input-rows') || '[]');
+    if (Array.isArray(saved)) rows.push(...saved);
+  } catch { /* 깨졌으면 그냥 빈 상태로 시작 */ }
+}
+
+function boot() {
+  buildForm();
+  load();
+  renderRows();
+
+  document.getElementById('parse').addEventListener('click', () => {
+    const text = document.getElementById('paste').value;
+    if (!text.trim()) return;
+    fillForm(extract(text));
+    document.getElementById('parsed-note').textContent =
+      '찾아낸 값을 아래에 채웠습니다. 틀린 곳은 직접 고쳐 주세요 — 자동 추출은 자주 틀립니다.';
+  });
+
+  document.getElementById('add').addEventListener('click', () => {
+    const row = readForm();
+    if (!row.price && !row.name) return;
+    rows.push(row);
+    save();
+    renderRows();
+    for (const field of FIELDS) {
+      if (field.key !== 'date') inputs[field.key].value = '';
+    }
+    document.getElementById('paste').value = '';
+    document.getElementById('parsed-note').textContent = '';
+    updateWarning();
+  });
+
+  document.getElementById('download').addEventListener('click', () => {
+    const blob = new Blob([toCsv()], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '입력표.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  document.getElementById('clear').addEventListener('click', () => {
+    if (!rows.length) return;
+    rows.length = 0;
+    save();
+    renderRows();
+  });
+
+  updateWarning();
+}
+
+boot();
+
+</script>

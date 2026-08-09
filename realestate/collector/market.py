@@ -181,6 +181,9 @@ def build_official_trends(config: dict[str, Any]) -> dict[str, Any]:
     min_samples = int(cfg.get("min_samples", 5))
 
     buckets: dict[tuple[str, str], list[float]] = defaultdict(list)
+    station_buckets: dict[tuple[str, str], list[float]] = defaultdict(list)
+    station_hits = 0
+
     for ward in wards:
         for year, quarter in quarters:
             params = {
@@ -193,8 +196,16 @@ def build_official_trends(config: dict[str, Any]) -> dict[str, Any]:
                 if _TYPE_TO_KIND.get(str(record.get("Type", ""))) != KIND_MANSION:
                     continue
                 unit = _unit_price(record)
-                if unit is not None:
-                    buckets[(ward, f"{year}Q{quarter}")].append(unit)
+                if unit is None:
+                    continue
+                buckets[(ward, f"{year}Q{quarter}")].append(unit)
+
+                # 성약가에도 最寄駅이 들어 있으면 역 단위로도 쌓아 둔다.
+                # 이 데이터에는 総戸数가 없으므로 세대수 필터는 여전히 못 건다.
+                station = _record_station(record)
+                if station in STATION_AREAS:
+                    station_hits += 1
+                    station_buckets[(station, f"{year}Q{quarter}")].append(unit)
 
     periods = [f"{y}Q{q}" for y, q in reversed(quarters)]
     series: list[dict[str, Any]] = []
@@ -220,11 +231,28 @@ def build_official_trends(config: dict[str, Any]) -> dict[str, Any]:
     if not series:
         raise MarketUnavailable("조건에 맞는 성약 사례가 없음")
 
+    official_stations = [
+        {
+            "station": station,
+            "label_ja": f"{station}駅",
+            "label_ko": STATION_AREAS[station][3],
+            "ward_code": STATION_AREAS[station][0],
+            "lat": STATION_AREAS[station][1],
+            "lon": STATION_AREAS[station][2],
+            "median": round(statistics.median(values), 1),
+            "samples": len(values),
+        }
+        for (station, _period), values in _merge_by_station(station_buckets).items()
+        if len(values) >= min_samples
+    ]
+
     return {
         "generated_at": _now_iso(),
         "synthetic": False,
         "source": "国土交通省 不動産情報ライブラリ (XIT001)",
         "source_url": "https://www.reinfolib.mlit.go.jp/",
+        "stations": official_stations,
+        "station_records_matched": station_hits,
         "measure": "median_man_per_tsubo",
         "measure_label": "成約 坪単価 中央値（万円/坪）",
         "min_total_units": None,  # 이 데이터로는 세대수 필터 불가
@@ -254,6 +282,27 @@ def _request(params: dict[str, str], api_key: str) -> list[dict[str, Any]]:
         return []
     data = payload.get("data")
     return data if isinstance(data, list) else []
+
+
+#: 성약가 레코드에서 最寄駅 이름이 담길 수 있는 필드 후보.
+#: reinfolib 응답을 이 환경에서 직접 열어보지 못해, 알려진 표기를 모두 시도한다.
+_STATION_FIELDS = ("NearestStation", "MinTimeToNearestStation", "Station", "最寄駅：名称")
+
+
+def _merge_by_station(buckets: dict[tuple[str, str], list[float]]) -> dict[tuple[str, str], list[float]]:
+    """분기별로 쪼갠 역 버킷을 역 단위로 합친다 (역별 표본이 적어 기간을 합쳐야 값이 선다)."""
+    merged: dict[tuple[str, str], list[float]] = defaultdict(list)
+    for (station, _period), values in buckets.items():
+        merged[(station, "all")].extend(values)
+    return merged
+
+
+def _record_station(record: dict[str, Any]) -> str:
+    for field_name in _STATION_FIELDS:
+        value = str(record.get(field_name, "") or "").strip()
+        if value and not value.isdigit():
+            return value
+    return ""
 
 
 def _unit_price(record: dict[str, Any]) -> float | None:
