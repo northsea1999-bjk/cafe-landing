@@ -45,13 +45,18 @@ const I18N = {
     mapTitle: '역세권 지도 — 어디가 비싼가',
     mapSub: '{units}세대 이상 · {stage} · {n}개 역세권 · {from}–{to} 합산',
     mapEmpty: '{units}세대 이상 조건에서는 지도에 찍을 역세권이 부족합니다. 세대수 기준을 낮춰 보세요.',
-    mapNote: '점 위치는 역 좌표(개략값)입니다. 행정 경계 지도가 아닙니다. 점을 누르면 아래 매물이 그 역세권으로 좁혀집니다.',
+    mapNote: '경계는 실제 행정구역(국토교통성 국토수치정보, 표시용으로 단순화). 점 위치는 역 좌표 개략값입니다. 점을 누르면 아래 매물이 그 역세권으로 좁혀집니다.',
     mapMedian: '평당가 중앙값', mapSamples: '표본 수',
     mapLow: '저', mapHigh: '고', mapSizeKey: ' 점 크기 = 표본 수 (최대 {n})',
     mapColArea: '역세권',
     stationTitle: '역세권별 추이',
     stationSub: '{units}세대 이상 · {stage} · 최근 값이 높은 {n}곳 (반기 단위)',
     stationFilter: '{station} 만 보기 해제',
+    lTotalUnits: '총 {n}세대', lBuilt: '{y}년 준공', lWalk: '도보 {n}분',
+    lFloor: '{floor}층/{total}층', lRegistered: '등록 {date}',
+    groupCount: '{n}건', stageUsedHead: '중고', stageNewHead: '신축 분양',
+    wardNoItems: '해당 없음',
+    changeFromTo: '{from} → {to}',
     stageUsed: '중고', stageNew: '신축 분양', stageBoth: '둘 다 비교',
     r3y: '3년', r5y: '5년', rAll: '전체',
     scaleAbs: '실제 금액', scaleIdx: '지수 =100',
@@ -108,13 +113,18 @@ const I18N = {
     mapTitle: '駅エリア地図 — どこが高いか',
     mapSub: '{units}戸以上 · {stage} · {n}駅エリア · {from}–{to} 合算',
     mapEmpty: '{units}戸以上の条件では地図に出せる駅エリアが足りません。戸数の基準を下げてみてください。',
-    mapNote: '点の位置は駅座標（概略値）です。行政界の地図ではありません。点を押すと下の物件がその駅エリアに絞り込まれます。',
+    mapNote: '境界は実際の行政区域（国土交通省 国土数値情報、表示用に簡略化）。点の位置は駅座標の概略値です。点を押すと下の物件がその駅エリアに絞り込まれます。',
     mapMedian: '坪単価 中央値', mapSamples: '標本数',
     mapLow: '低', mapHigh: '高', mapSizeKey: ' 点の大きさ = 標本数 (最大 {n})',
     mapColArea: '駅エリア',
     stationTitle: '駅エリア別 推移',
     stationSub: '{units}戸以上 · {stage} · 直近値の高い {n}カ所 (半期単位)',
     stationFilter: '{station} のみ表示を解除',
+    lTotalUnits: '総戸数 {n}', lBuilt: '{y}年築', lWalk: '徒歩{n}分',
+    lFloor: '{floor}階/{total}階', lRegistered: '掲載 {date}',
+    groupCount: '{n}件', stageUsedHead: '中古', stageNewHead: '新築分譲',
+    wardNoItems: '該当なし',
+    changeFromTo: '{from} → {to}',
     stageUsed: '中古', stageNew: '新築分譲', stageBoth: '両方を比較',
     r3y: '3年', r5y: '5年', rAll: '全期間',
     scaleAbs: '実額', scaleIdx: '指数 =100',
@@ -177,6 +187,26 @@ function wardLabel(code) {
   return wardNames[code] ?? code;
 }
 
+/** 역 이름 한국어 표기 — 지도/역세권 데이터가 label_ko 를 함께 실어 준다. */
+let stationKo = {};
+
+function stationLabel(name) {
+  if (!name) return '';
+  if (state.lang === 'ko' && stationKo[name]) return stationKo[name];
+  return `${name}駅`;
+}
+
+function buildStationKo() {
+  stationKo = {};
+  for (const bucket of [data.market?.station_trends, data.market?.area_map]) {
+    for (const set of Object.values(bucket ?? {})) {
+      for (const row of set.series ?? set.points ?? []) {
+        if (row.station && row.label_ko) stationKo[row.station] = row.label_ko;
+      }
+    }
+  }
+}
+
 /** 물건 데이터의 city 는 항상 일본어이므로 코드로 되짚어 번역한다. */
 function wardLabelByName(name) {
   const code = Object.keys(wardNames).find((k) => wardNames[k] === name);
@@ -184,7 +214,7 @@ function wardLabelByName(name) {
 }
 
 
-const data = { market: null, changes: null, sources: null, recent: null };
+const data = { market: null, changes: null, sources: null, recent: null, geo: null };
 let wardOrder = [];
 let wardNames = {};
 
@@ -548,7 +578,7 @@ function renderChangeChart(host, rows, suffix = '%') {
   const measured = Math.round(host.getBoundingClientRect().width) || host.clientWidth || 720;
   const width = Math.max(320, measured);
   const rowH = 34;
-  const m = { t: 8, r: 62, b: 8, l: 84 };
+  const m = { t: 8, r: 210, b: 8, l: 84 };
   const height = m.t + m.b + rows.length * rowH;
   const iw = width - m.l - m.r;
 
@@ -589,6 +619,19 @@ function renderChangeChart(host, rows, suffix = '%') {
     val.style.fontVariantNumeric = 'tabular-nums';
     val.textContent = `${r.value > 0 ? '+' : ''}${r.value.toFixed(1)}${suffix}`;
     root.appendChild(val);
+
+    // % 만으로는 체감이 안 온다. 실제 얼마에서 얼마로 갔는지 같이 적는다.
+    if (r.from !== undefined && r.to !== undefined) {
+      const money = svg('text', {
+        x: r.value >= 0 ? x0 + len + 66 : x0 - 66,
+        y: cy + 4,
+        'text-anchor': r.value >= 0 ? 'start' : 'end',
+        fill: 'var(--text-muted)', 'font-size': 12,
+      });
+      money.style.fontVariantNumeric = 'tabular-nums';
+      money.textContent = t('changeFromTo', { from: fmt1(r.from), to: fmt1(r.to) });
+      root.appendChild(money);
+    }
   });
 
   root.appendChild(svg('line', { x1: zero, x2: zero, y1: m.t, y2: height - m.b, stroke: 'var(--baseline)', 'stroke-width': 1 }));
@@ -611,6 +654,73 @@ function seqBins(values) {
 }
 
 const seqColor = (value, cuts) => SEQ[cuts.filter((c) => value > c).length];
+
+
+/** 실제 행정구역 경계를 깔고 축척을 표시한다. 점은 이 위에 올라간다. */
+function drawBasemap(root, ctx) {
+  const { allWards, X, Y, width, height, m, scale, kx } = ctx;
+  if (!allWards.length) return;
+
+  // 화면 밖으로 삐져나가는 이웃 구를 잘라낸다
+  const clipId = 'map-clip';
+  const defs = svg('defs', {});
+  const clip = svg('clipPath', { id: clipId });
+  clip.appendChild(svg('rect', { x: m.l, y: m.t, width: width - m.l - m.r, height: height - m.t - m.b, rx: 6 }));
+  defs.appendChild(clip);
+  root.appendChild(defs);
+
+  const layer = svg('g', { 'clip-path': `url(#${clipId})` });
+
+  const toPath = (rings) => rings
+    .map((ring) => ring.map(([lon, lat], i) => `${i ? 'L' : 'M'}${X(lon).toFixed(1)},${Y(lat).toFixed(1)}`).join('') + 'Z')
+    .join(' ');
+
+  // 대상이 아닌 구부터 옅게 — 도쿄의 생김새를 알아볼 수 있게 하는 배경
+  for (const w of allWards) {
+    if (state.wards.has(w.code)) continue;
+    layer.appendChild(svg('path', {
+      d: toPath(w.rings), fill: 'var(--surface-2)', stroke: 'var(--gridline)', 'stroke-width': 1,
+    }));
+  }
+  for (const w of allWards) {
+    if (!state.wards.has(w.code)) continue;
+    layer.appendChild(svg('path', {
+      d: toPath(w.rings), fill: 'var(--surface-2)', 'fill-opacity': 0.55,
+      stroke: 'var(--baseline)', 'stroke-width': 1.4, 'stroke-linejoin': 'round',
+    }));
+  }
+
+  root.appendChild(layer);
+
+  // 구 이름 위치만 계산해 둔다. 실제 그리기는 점을 다 깐 뒤 맨 위 층에서 한다 —
+  // 여기서 그리면 점에 가려 글자가 잘린다.
+  const wardLabels = [];
+  for (const w of allWards) {
+    if (!state.wards.has(w.code)) continue;
+    const pts = w.rings.flat();
+    wardLabels.push({
+      x: pts.reduce((a, p) => a + X(p[0]), 0) / pts.length,
+      y: pts.reduce((a, p) => a + Y(p[1]), 0) / pts.length,
+      text: wardLabel(w.code),
+    });
+  }
+
+  // 축척 막대 — 지도라면 거리를 읽을 수 있어야 한다
+  const kmPerDeg = 111.32;
+  const target = [1, 2, 5].map((k) => k).find((k) => (k / kmPerDeg) * scale > 60) ?? 5;
+  const barPx = (target / kmPerDeg) * scale;
+  const bx = m.l + 12, by = height - m.b + 4;
+  const bar = svg('g', {});
+  bar.appendChild(svg('line', { x1: bx, x2: bx + barPx, y1: by, y2: by, stroke: 'var(--text-muted)', 'stroke-width': 2 }));
+  bar.appendChild(svg('line', { x1: bx, x2: bx, y1: by - 4, y2: by + 4, stroke: 'var(--text-muted)', 'stroke-width': 2 }));
+  bar.appendChild(svg('line', { x1: bx + barPx, x2: bx + barPx, y1: by - 4, y2: by + 4, stroke: 'var(--text-muted)', 'stroke-width': 2 }));
+  const scaleText = svg('text', { x: bx + barPx + 8, y: by + 4, fill: 'var(--text-muted)', 'font-size': 11 });
+  scaleText.textContent = `${target} km`;
+  bar.appendChild(scaleText);
+  root.appendChild(bar);
+
+  return wardLabels;
+}
 
 function renderMap() {
   const card = document.getElementById('map-card');
@@ -643,17 +753,39 @@ function renderMap() {
   card.hidden = false;
 
   const width = Math.max(320, Math.round(host.getBoundingClientRect().width) || 720);
-  const height = Math.min(560, Math.max(360, width * 0.62));
+  const height = Math.min(600, Math.max(380, width * 0.68));
   const m = { t: 18, r: 18, b: 30, l: 18 };
 
   // 위경도 → 화면. 위도 35.7°에서 경도 1°는 위도 1°보다 짧으므로 cos 보정.
   const midLat = points.reduce((a, p) => a + p.lat, 0) / points.length;
   const kx = Math.cos((midLat * Math.PI) / 180);
-  const xs = points.map((p) => p.lon * kx);
-  const ys = points.map((p) => p.lat);
-  const pad = 0.006;
-  const x0 = Math.min(...xs) - pad * kx, x1 = Math.max(...xs) + pad * kx;
-  const y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+
+  // 지도 범위는 '선택한 구의 경계'로 잡는다. 점 위치로 잡으면 필터를 바꿀 때마다
+  // 지도가 미세하게 흔들려서 같은 장소가 다른 곳처럼 보인다.
+  const allWards = data.geo?.wards ?? [];
+  const framing = allWards.filter((w) => state.wards.has(w.code));
+  const bboxSource = framing.length ? framing : allWards;
+
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  if (bboxSource.length) {
+    for (const w of bboxSource) {
+      for (const ring of w.rings) {
+        for (const [lon, lat] of ring) {
+          x0 = Math.min(x0, lon * kx); x1 = Math.max(x1, lon * kx);
+          y0 = Math.min(y0, lat); y1 = Math.max(y1, lat);
+        }
+      }
+    }
+  } else {
+    const pad = 0.006;
+    x0 = Math.min(...points.map((p) => p.lon * kx)) - pad * kx;
+    x1 = Math.max(...points.map((p) => p.lon * kx)) + pad * kx;
+    y0 = Math.min(...points.map((p) => p.lat)) - pad;
+    y1 = Math.max(...points.map((p) => p.lat)) + pad;
+  }
+  // 점이 테두리에 딱 붙지 않도록 약간의 여유
+  const padX = (x1 - x0) * 0.04, padY = (y1 - y0) * 0.04;
+  x0 -= padX; x1 += padX; y0 -= padY; y1 += padY;
 
   // 종횡비를 유지해야 지리적 거리가 왜곡되지 않는다
   const iw = width - m.l - m.r, ih = height - m.t - m.b;
@@ -669,6 +801,8 @@ function renderMap() {
 
   const root = svg('svg', { viewBox: `0 0 ${width} ${height}`, width, height, role: 'img' });
   root.setAttribute('aria-label', t('mapTitle'));
+
+  const wardLabels = drawBasemap(root, { allWards, X, Y, width, height, m, scale, kx }) ?? [];
 
   const tip = document.createElement('div');
   tip.className = 'tooltip';
@@ -731,15 +865,30 @@ function renderMap() {
 
   // 라벨은 점을 전부 깔고 난 뒤 맨 위에 얹는다. 섞어 그리면 나중 점이 앞 라벨을 덮는다.
   const labelLayer = svg('g', {});
+  // self 는 그 라벨이 가리키는 점. 자기 점 바로 위에 놓이므로 충돌에서 제외한다.
+  const clear = (lx, ly, half, self) =>
+    !dots.some((o) => o !== self && Math.abs(o.cx - lx) < o.r + half && Math.abs(o.cy - ly) < o.r + 8)
+    && !placed.some((q) => Math.abs(q.x - lx) < q.half + half && Math.abs(q.y - ly) < 15);
+
+  // 구 이름 먼저 — 어디를 보고 있는지 알려주는 쪽이 역 하나 더 적는 것보다 중요하다
+  for (const wl of wardLabels) {
+    const half = wl.text.length * 6.2 + 4;
+    if (!clear(wl.x, wl.y, half, null)) continue;
+    placed.push({ x: wl.x, y: wl.y, half });
+    const txt = svg('text', {
+      x: wl.x, y: wl.y, 'text-anchor': 'middle', fill: 'var(--text-muted)',
+      'font-size': 13, 'font-weight': 600,
+      stroke: 'var(--surface-1)', 'stroke-width': 3.5, 'paint-order': 'stroke',
+    });
+    txt.textContent = wl.text;
+    labelLayer.appendChild(txt);
+  }
+
   for (const d of dots) {
-    if (placed.length >= 12) break;
+    if (placed.length >= 18) break;
     const lx = d.cx, ly = d.cy - d.r - 7;
     const halfWidth = d.label.length * 5.6 + 4;
-
-    // 다른 라벨과도, 다른 점과도 겹치면 건다
-    const hitsLabel = placed.some((q) => Math.abs(q.x - lx) < q.half + halfWidth && Math.abs(q.y - ly) < 14);
-    const hitsDot = dots.some((o) => o !== d && Math.abs(o.cx - lx) < o.r + halfWidth && Math.abs(o.cy - ly) < o.r + 7);
-    if (hitsLabel || hitsDot) continue;
+    if (!clear(lx, ly, halfWidth, d)) continue;
     if (lx - halfWidth < 2 || lx + halfWidth > width - 2 || ly < 12) continue;
 
     placed.push({ x: lx, y: ly, half: halfWidth });
@@ -951,8 +1100,6 @@ function renderTiles() {
   if (!trends) return;
 
   const periods = visiblePeriods();
-  const latest = periods[periods.length - 1];
-  const first = periods[0];
 
   const pick = (stage, period) => {
     const values = trends.series
@@ -962,9 +1109,26 @@ function renderTiles() {
     return values.length ? median(values) : null;
   };
 
-  const usedNow = pick('used', latest);
-  const usedThen = pick('used', first);
-  const newNow = pick('new', latest);
+  // 마지막 분기에 표본이 없을 수 있다 (구를 하나만 고르면 흔하다).
+  // 그때 빈칸을 보여주는 대신, 값이 있는 가장 최근 분기까지 물러난다.
+  const findPeriod = (stage, fromEnd) => {
+    const order = fromEnd ? [...periods].reverse() : periods;
+    for (const period of order) {
+      const value = pick(stage, period);
+      if (value !== null) return { period, value };
+    }
+    return { period: null, value: null };
+  };
+
+  const usedLatest = findPeriod('used', true);
+  const usedFirst = findPeriod('used', false);
+  const newLatest = findPeriod('new', true);
+
+  const latest = usedLatest.period ?? periods[periods.length - 1];
+  const first = usedFirst.period ?? periods[0];
+  const usedNow = usedLatest.value;
+  const usedThen = usedFirst.value;
+  const newNow = newLatest.value;
   const gap = usedNow && newNow ? ((newNow / usedNow - 1) * 100) : null;
 
   const tiles = [
@@ -973,10 +1137,12 @@ function renderTiles() {
       label: t('tileHero', { period: latest ?? '—' }),
       value: fmt1(usedNow),
       unit: t('unitTsubo'),
-      delta: usedNow && usedThen ? { pct: (usedNow / usedThen - 1) * 100, since: first } : null,
+      delta: usedNow && usedThen && first !== latest
+        ? { pct: (usedNow / usedThen - 1) * 100, since: first }
+        : null,
     },
     {
-      label: t('tileNew', { period: latest ?? '—' }),
+      label: t('tileNew', { period: newLatest.period ?? '—' }),
       value: fmt1(newNow),
       unit: t('unitTsubo'),
     },
@@ -1176,8 +1342,8 @@ function renderChange() {
       if (!row) return null;
       const pts = clipPoints(row.points, periods).filter((p) => p.value !== null);
       if (pts.length < 2) return null;
-      const value = (pts[pts.length - 1].value / pts[0].value - 1) * 100;
-      return { label: wardLabel(code), value, color: wardColor(code) };
+      const from = pts[0].value, to = pts[pts.length - 1].value;
+      return { label: wardLabel(code), value: (to / from - 1) * 100, from, to, color: wardColor(code) };
     })
     .filter(Boolean)
     .sort((a, b) => b.value - a.value);
@@ -1205,101 +1371,213 @@ function renderOfficial() {
   renderLegend(document.getElementById('official-legend'), series);
 }
 
+
+/* ------------------------------------------------- 포털 검색 링크
+ * 샘플 물건은 실재하지 않으므로 '그 물건의 원문'으로는 보낼 수 없다.
+ * 대신 같은 조건(구 × 중고/신축)의 **실제 포털 검색 페이지**로 보낸다.
+ * 실데이터를 연결하면 물건마다 url 이 들어오고, 카드 제목이 그 원문으로 걸린다.
+ *
+ * ⚠ 아래 주소 형식은 이 작업 환경에서 포털 접속이 막혀 있어 실제로 열어보고
+ *   확인하지 못했다. 포털이 주소 체계를 바꾸면 여기만 고치면 된다.
+ */
+
+const WARD_SLUG = {
+  '13101': 'chiyoda', '13102': 'chuo', '13103': 'minato', '13104': 'shinjuku',
+  '13105': 'bunkyo', '13108': 'koto', '13113': 'shibuya',
+};
+
+const PORTAL_SEARCH = [
+  {
+    key: 'suumo', name: 'SUUMO',
+    url: (slug, stage) => `https://suumo.jp/ms/${stage === 'new' ? 'shinchiku' : 'chuko'}/tokyo/sc_${slug}/`,
+  },
+  {
+    key: 'homes', name: "HOME'S",
+    url: (slug, stage) => `https://www.homes.co.jp/mansion/${stage === 'new' ? 'shinchiku' : 'chuko'}/tokyo/${slug}-city/list/`,
+  },
+  {
+    key: 'athome', name: 'at home',
+    url: (slug, stage) => `https://www.athome.co.jp/mansion/${stage === 'new' ? 'shinchiku' : 'chuko'}/tokyo/${slug}-city/list/`,
+  },
+];
+
+/** 구 × 중고/신축 조건으로 실제 포털을 열어 주는 링크 줄. */
+function portalLinks(wardCode, stage) {
+  const slug = WARD_SLUG[wardCode];
+  if (!slug) return null;
+
+  const row = document.createElement('div');
+  row.className = 'portal-links';
+  const lead = document.createElement('span');
+  lead.textContent = t('portalLead');
+  row.appendChild(lead);
+
+  for (const portal of PORTAL_SEARCH) {
+    const a = document.createElement('a');
+    a.href = portal.url(slug, stage);
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = portal.name;
+    row.appendChild(a);
+  }
+  return row;
+}
+
+function listingCard(x) {
+  const card = document.createElement('div');
+  card.className = 'listing';
+
+  const row1 = document.createElement('div');
+  row1.className = 'row1';
+  const badge = document.createElement('span');
+  badge.className = 'badge ' + (x.stage === 'new' ? 'shinchiku' : 'new');
+  badge.textContent = x.stage === 'new' ? t('badgeShinchiku') : t('badgeNew');
+  row1.appendChild(badge);
+  if (x.found_on) {
+    const when = document.createElement('span');
+    when.className = 'when';
+    when.textContent = t('lRegistered', { date: x.found_on });
+    row1.appendChild(when);
+  }
+  card.appendChild(row1);
+
+  // 원문 링크 — 진짜 주소가 있을 때만 누를 수 있게 한다.
+  // 샘플 데이터의 example.invalid 는 존재하지 않는 주소라 링크로 만들면 깨진 링크가 된다.
+  const title = String(x.title || '').replace(/^（新築）/, '');
+  const url = String(x.url || '');
+  const linkable = /^https?:\/\//.test(url) && !/\.invalid(\/|$|:)/.test(new URL(url, 'https://x').hostname + '/');
+
+  const name = document.createElement(linkable ? 'a' : 'div');
+  name.className = 'name' + (linkable ? ' linked' : '');
+  name.textContent = title;
+  if (linkable) {
+    name.href = url;
+    name.target = '_blank';
+    name.rel = 'noopener noreferrer';
+    name.title = t('lOpen');
+  } else {
+    name.title = t('lNoLink');
+  }
+  card.appendChild(name);
+
+  const price = document.createElement('div');
+  price.className = 'price';
+  price.textContent = `${fmt1(x.price_man)} ${t('unitMan')}`;
+  card.appendChild(price);
+
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  meta.textContent = [
+    x.layout,
+    x.area_m2 ? `${x.area_m2}㎡` : null,
+    x.unit_price_man_per_tsubo ? `${fmt1(x.unit_price_man_per_tsubo)} ${t('unitTsubo')}` : null,
+  ].filter(Boolean).join(' · ');
+  card.appendChild(meta);
+
+  // 역·층·세대수·준공 — 일본어 원문을 그대로 쓰지 않고 언어에 맞춰 조립한다
+  const first = x.stations?.[0];
+  const meta2 = document.createElement('div');
+  meta2.className = 'meta';
+  meta2.textContent = [
+    first ? `${stationLabel(first.name || x.sub_area)}${first.walk_minutes ? ' ' + t('lWalk', { n: first.walk_minutes }) : ''}` : stationLabel(x.sub_area),
+    x.floor && x.total_floors ? t('lFloor', { floor: x.floor, total: x.total_floors }) : null,
+    x.total_units ? t('lTotalUnits', { n: x.total_units }) : null,
+    x.built_year ? t('lBuilt', { y: x.built_year }) : null,
+  ].filter(Boolean).join(' · ');
+  card.appendChild(meta2);
+
+  if (linkable) {
+    card.classList.add('clickable');
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('a')) return;          // 제목 링크는 스스로 처리한다
+      window.open(url, '_blank', 'noopener');
+    });
+  }
+
+  return card;
+}
+
 function renderNewListings() {
   const host = document.getElementById('new-listings');
   host.textContent = '';
-  const minUnits = trendsData()?.min_total_units ?? 500;
-  const wardNameSet = new Set(wardOrder.filter((w) => state.wards.has(w)).map((w) => wardNames[w]));
+  const minUnits = Number(state.units);
 
-  // 신규가 0건인 날에도 섹션이 비지 않도록 최근 며칠치를 굴려서 보여준다
   const pool = data.recent?.items?.length ? data.recent.items : (data.changes?.new ?? []);
   const windowDays = data.recent?.window_days;
+  const stages = state.stage === 'both' ? ['used', 'new'] : [state.stage];
 
   const items = pool
-    .filter((x) => wardNameSet.has(x.city) && (x.total_units ?? 0) >= minUnits)
+    .filter((x) => (x.total_units ?? 0) >= minUnits)
     .filter((x) => !state.station || x.sub_area === state.station)
-    .sort((a, b) => (b.found_on ?? '').localeCompare(a.found_on ?? '') || (b.price_yen ?? 0) - (a.price_yen ?? 0))
-    .slice(0, 24);
+    .filter((x) => stages.includes(x.stage));
 
   document.getElementById('new-sub').textContent =
     (windowDays ? t('newSubWindow', { days: windowDays }) : t('newSubDate', { date: data.changes?.date ?? '' }))
-    + ' · ' + t('newSubTail', { units: minUnits, n: items.length })
-    + (data.changes?.summary ? ' ' + t('newSubToday', { n: data.changes.summary.new }) : '');
+    + ' · ' + t('newSubTail', { units: minUnits, n: items.length });
 
-  const clear = document.getElementById('station-clear');
-  if (clear) clear.remove();
   if (state.station) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.id = 'station-clear';
     btn.className = 'linkish';
-    btn.style.marginBottom = '10px';
-    btn.textContent = t('stationFilter', { station: state.station });
+    btn.style.marginBottom = '12px';
+    btn.textContent = t('stationFilter', { station: stationLabel(state.station) });
     btn.addEventListener('click', () => { state.station = null; renderMap(); renderNewListings(); });
     host.appendChild(btn);
   }
 
-  if (!items.length) {
+  let shown = 0;
+  for (const code of wardOrder) {
+    if (!state.wards.has(code)) continue;
+    const wardName = wardNames[code];
+    const mine = items.filter((x) => x.city === wardName);
+    if (!mine.length) continue;
+    shown += mine.length;
+
+    const group = document.createElement('section');
+    group.className = 'ward-group';
+
+    const head = document.createElement('h3');
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    dot.style.background = wardColor(code);
+    const count = document.createElement('span');
+    count.className = 'count';
+    count.textContent = t('groupCount', { n: mine.length });
+    head.append(dot, document.createTextNode(wardLabel(code)), count);
+    group.appendChild(head);
+
+    for (const stage of stages) {
+      const rows = mine
+        .filter((x) => x.stage === stage)
+        .sort((a, b) => (b.found_on ?? '').localeCompare(a.found_on ?? '') || (b.price_yen ?? 0) - (a.price_yen ?? 0))
+        .slice(0, 6);
+      if (!rows.length) continue;
+
+      const block = document.createElement('div');
+      block.className = 'stage-block';
+      const h4 = document.createElement('h4');
+      h4.textContent = `${t(stage === 'new' ? 'stageNewHead' : 'stageUsedHead')} · ${t('groupCount', { n: mine.filter((x) => x.stage === stage).length })}`;
+      block.appendChild(h4);
+
+      const links = portalLinks(code, stage);
+      if (links) block.appendChild(links);
+
+      const grid = document.createElement('div');
+      grid.className = 'listing-grid';
+      for (const x of rows) grid.appendChild(listingCard(x));
+      block.appendChild(grid);
+      group.appendChild(block);
+    }
+
+    host.appendChild(group);
+  }
+
+  if (!shown) {
     const p = document.createElement('p');
     p.className = 'empty';
     p.textContent = t('emptyNoListings');
     host.appendChild(p);
-    return;
   }
-
-  const grid = document.createElement('div');
-  grid.className = 'listing-grid';
-  for (const x of items) {
-    const code = Object.keys(wardNames).find((k) => wardNames[k] === x.city);
-    const card = document.createElement('div');
-    card.className = 'listing';
-
-    const row1 = document.createElement('div');
-    row1.className = 'row1';
-    const ward = document.createElement('span');
-    ward.className = 'ward';
-    ward.style.color = 'var(--text-secondary)';
-    const dot = document.createElement('span');
-    dot.className = 'dot';
-    dot.style.background = wardColor(code);
-    ward.append(dot, document.createTextNode(wardLabelByName(x.city)));
-    row1.appendChild(ward);
-    const badge = document.createElement('span');
-    badge.className = 'badge ' + (x.stage === 'new' ? 'shinchiku' : 'new');
-    badge.textContent = x.stage === 'new' ? t('badgeShinchiku') : t('badgeNew');
-    row1.appendChild(badge);
-    card.appendChild(row1);
-
-    const name = document.createElement('div');
-    name.className = 'name';
-    name.textContent = x.title;
-    card.appendChild(name);
-
-    const price = document.createElement('div');
-    price.className = 'price';
-    price.textContent = `${fmt1(x.price_man)} ${t('unitMan')}`;
-    card.appendChild(price);
-
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.textContent = [
-      x.layout, x.area_m2 ? `${x.area_m2}㎡` : null,
-      x.unit_price_man_per_tsubo ? `${fmt1(x.unit_price_man_per_tsubo)} ${t('unitTsubo')}` : null,
-    ].filter(Boolean).join(' · ');
-    card.appendChild(meta);
-
-    const meta2 = document.createElement('div');
-    meta2.className = 'meta';
-    meta2.textContent = [
-      x.total_units ? `総戸数 ${x.total_units}` : null,
-      x.built_year ? `${x.built_year}年築` : null,
-      x.station_labels?.[0],
-    ].filter(Boolean).join(' · ');
-    card.appendChild(meta2);
-
-    grid.appendChild(card);
-  }
-  host.appendChild(grid);
 }
 
 function renderSources() {
@@ -1435,14 +1713,24 @@ async function boot() {
     } catch { return null; }
   };
 
-  [data.market, data.changes, data.sources, data.recent] = await Promise.all([
-    load('market'), load('latest-changes'), load('sources'), load('recent-new'),
+  [data.market, data.changes, data.sources, data.recent, data.geo] = await Promise.all([
+    load('market'), load('latest-changes'), load('sources'), load('recent-new'), load('tokyo-wards'),
   ]);
+
+  // 언어: 저장된 선택 > 브라우저 설정 > 한국어
+  try {
+    const saved = localStorage.getItem('re-lang');
+    if (saved && I18N[saved]) state.lang = saved;
+    else if ((navigator.language || '').toLowerCase().startsWith('ja')) state.lang = 'ja';
+  } catch { /* 저장소를 못 읽어도 기본값으로 동작한다 */ }
+
+  state.units = String(data.market?.default_threshold ?? state.units);
+  buildStationKo();
 
   const trends = trendsData();
   if (!trends) {
     document.getElementById('main-chart').innerHTML =
-      '<p class="empty">추이 데이터가 아직 없습니다. 수집기를 먼저 실행하세요 — <code>python3 -m realestate.collector.run</code></p>';
+      `<p class="empty">${t('bootEmpty')} — <code>python3 -m realestate.collector.run</code></p>`;
     return;
   }
 

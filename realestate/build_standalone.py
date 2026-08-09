@@ -20,6 +20,7 @@ OUT = WEB / "standalone.html"
 LISTING_FIELDS = (
     "title", "city", "sub_area", "stage", "price_man", "price_yen", "layout", "area_m2",
     "unit_price_man_per_tsubo", "total_units", "built_year", "station_labels",
+    "stations", "listed_on", "floor", "total_floors", "url", "source", "agency",
 )
 MAX_LISTINGS = 140
 
@@ -80,6 +81,7 @@ def build() -> Path:
         "latest-changes": _slim_changes(_read_json(DATA / "latest-changes.json")),
         "sources": _read_json(DATA / "sources.json"),
         "recent-new": _slim_recent(_read_json(DATA / "recent-new.json")),
+        "tokyo-wards": _read_json(DATA / "tokyo-wards.json"),
     }
     if payload["market"] is None:
         raise SystemExit("market.json 이 없습니다. 먼저 수집기를 실행하세요.")

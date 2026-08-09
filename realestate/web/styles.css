@@ -566,3 +566,73 @@ footer a { color: inherit; }
 .scale-legend .sw { width: 26px; height: 10px; border-radius: 2px; }
 .scale-legend .size-key { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; }
 .scale-legend .size-key .bub { border-radius: 50%; background: var(--text-muted); opacity: .45; }
+
+/* ------------------------------------------- 신규 매물 구별 묶음 */
+
+.ward-group + .ward-group { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--gridline); }
+
+.ward-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 4px;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.ward-group h3 .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+
+.ward-group h3 .count {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  border-radius: 999px;
+  padding: 1px 9px;
+}
+
+.stage-block { margin-top: 12px; }
+
+.stage-block h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.listing .row1 { justify-content: space-between; }
+.listing .when { font-size: 11.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+.listing.clickable { cursor: pointer; transition: border-color 120ms ease; }
+.listing.clickable:hover { border-color: var(--baseline); }
+
+a.name { color: inherit; text-decoration: none; border-bottom: 1px solid var(--baseline); align-self: flex-start; }
+a.name:hover { border-bottom-color: currentColor; }
+a.name:focus-visible { outline: 2px solid var(--series-1); outline-offset: 2px; }
+
+.portal-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin: 0 0 10px;
+}
+
+.portal-links a {
+  color: var(--text-primary);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 11px;
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-2);
+}
+
+.portal-links a:hover { border-color: var(--baseline); }
+.portal-links a:focus-visible { outline: 2px solid var(--series-1); outline-offset: 2px; }
