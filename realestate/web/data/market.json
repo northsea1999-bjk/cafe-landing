@@ -1,0 +1,2280 @@
+{
+  "generated_at": "2026-08-09T21:13:49+00:00",
+  "listing_trends": {
+    "generated_at": "2026-08-09T21:13:49+00:00",
+    "synthetic": true,
+    "source": "収集した売出物件（中古・新築分譲）の坪単価中央値",
+    "measure": "median_man_per_tsubo",
+    "measure_label": "売出 坪単価 中央値（万円/坪）",
+    "min_total_units": 200,
+    "granularity": "quarter",
+    "ward_order": [
+      "13101",
+      "13102",
+      "13103",
+      "13104",
+      "13105",
+      "13108",
+      "13113"
+    ],
+    "ward_names": {
+      "13101": "千代田区",
+      "13102": "中央区",
+      "13103": "港区",
+      "13104": "新宿区",
+      "13105": "文京区",
+      "13108": "江東区",
+      "13113": "渋谷区"
+    },
+    "periods": [
+      "2021Q3",
+      "2021Q4",
+      "2022Q1",
+      "2022Q2",
+      "2022Q3",
+      "2022Q4",
+      "2023Q1",
+      "2023Q2",
+      "2023Q3",
+      "2023Q4",
+      "2024Q1",
+      "2024Q2",
+      "2024Q3",
+      "2024Q4",
+      "2025Q1",
+      "2025Q2",
+      "2025Q3",
+      "2025Q4",
+      "2026Q1",
+      "2026Q2",
+      "2026Q3"
+    ],
+    "series": [
+      {
+        "id": "13101|used",
+        "ward_code": "13101",
+        "ward": "千代田区",
+        "stage": "used",
+        "stage_label": "中古",
+        "label": "千代田区・中古",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": 368.6,
+            "samples": 8,
+            "p25": 333.0,
+            "p75": 394.8
+          },
+          {
+            "period": "2021Q4",
+            "value": 469.2,
+            "samples": 16,
+            "p25": 398.0,
+            "p75": 501.1
+          },
+          {
+            "period": "2022Q1",
+            "value": 476.0,
+            "samples": 11,
+            "p25": 396.1,
+            "p75": 513.7
+          },
+          {
+            "period": "2022Q2",
+            "value": 436.2,
+            "samples": 8,
+            "p25": 415.8,
+            "p75": 486.8
+          },
+          {
+            "period": "2022Q3",
+            "value": 476.4,
+            "samples": 5,
+            "p25": 474.3,
+            "p75": 518.5
+          },
+          {
+            "period": "2022Q4",
+            "value": 472.1,
+            "samples": 10,
+            "p25": 399.1,
+            "p75": 532.4
+          },
+          {
+            "period": "2023Q1",
+            "value": 487.7,
+            "samples": 11,
+            "p25": 413.0,
+            "p75": 527.2
+          },
+          {
+            "period": "2023Q2",
+            "value": 490.9,
+            "samples": 9,
+            "p25": 418.8,
+            "p75": 520.2
+          },
+          {
+            "period": "2023Q3",
+            "value": 599.7,
+            "samples": 12,
+            "p25": 451.9,
+            "p75": 629.5
+          },
+          {
+            "period": "2023Q4",
+            "value": 446.3,
+            "samples": 11,
+            "p25": 407.1,
+            "p75": 499.1
+          },
+          {
+            "period": "2024Q1",
+            "value": 477.8,
+            "samples": 9,
+            "p25": 437.4,
+            "p75": 593.6
+          },
+          {
+            "period": "2024Q2",
+            "value": 515.2,
+            "samples": 5,
+            "p25": 509.6,
+            "p75": 635.7
+          },
+          {
+            "period": "2024Q3",
+            "value": 561.7,
+            "samples": 17,
+            "p25": 528.9,
+            "p75": 603.5
+          },
+          {
+            "period": "2024Q4",
+            "value": 431.9,
+            "samples": 10,
+            "p25": 386.0,
+            "p75": 620.4
+          },
+          {
+            "period": "2025Q1",
+            "value": 555.3,
+            "samples": 9,
+            "p25": 448.6,
+            "p75": 567.0
+          },
+          {
+            "period": "2025Q2",
+            "value": 582.8,
+            "samples": 14,
+            "p25": 483.3,
+            "p75": 646.5
+          },
+          {
+            "period": "2025Q3",
+            "value": 533.2,
+            "samples": 5,
+            "p25": 527.5,
+            "p75": 618.9
+          },
+          {
+            "period": "2025Q4",
+            "value": 549.0,
+            "samples": 14,
+            "p25": 504.4,
+            "p75": 610.4
+          },
+          {
+            "period": "2026Q1",
+            "value": 476.2,
+            "samples": 13,
+            "p25": 438.3,
+            "p75": 592.0
+          },
+          {
+            "period": "2026Q2",
+            "value": 551.8,
+            "samples": 22,
+            "p25": 489.7,
+            "p75": 618.7
+          },
+          {
+            "period": "2026Q3",
+            "value": null,
+            "samples": 2
+          }
+        ],
+        "latest": 551.8,
+        "latest_period": "2026Q2",
+        "first_value": 368.6,
+        "first_period": "2021Q3",
+        "change_pct": 49.7,
+        "total_samples": 221
+      },
+      {
+        "id": "13101|new",
+        "ward_code": "13101",
+        "ward": "千代田区",
+        "stage": "new",
+        "stage_label": "新築分譲",
+        "label": "千代田区・新築分譲",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2021Q4",
+            "value": null,
+            "samples": 1
+          },
+          {
+            "period": "2022Q1",
+            "value": null,
+            "samples": 2
+          },
+          {
+            "period": "2022Q2",
+            "value": 811.8,
+            "samples": 7,
+            "p25": 652.2,
+            "p75": 882.2
+          },
+          {
+            "period": "2022Q3",
+            "value": 833.0,
+            "samples": 5,
+            "p25": 759.1,
+            "p75": 881.9
+          },
+          {
+            "period": "2022Q4",
+            "value": null,
+            "samples": 3
+          },
+          {
+            "period": "2023Q1",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2023Q2",
+            "value": 839.0,
+            "samples": 5,
+            "p25": 684.6,
+            "p75": 881.7
+          },
+          {
+            "period": "2023Q3",
+            "value": 801.1,
+            "samples": 8,
+            "p25": 767.0,
+            "p75": 818.9
+          },
+          {
+            "period": "2023Q4",
+            "value": null,
+            "samples": 2
+          },
+          {
+            "period": "2024Q1",
+            "value": null,
+            "samples": 3
+          },
+          {
+            "period": "2024Q2",
+            "value": 842.5,
+            "samples": 6,
+            "p25": 778.3,
+            "p75": 911.9
+          },
+          {
+            "period": "2024Q3",
+            "value": null,
+            "samples": 3
+          },
+          {
+            "period": "2024Q4",
+            "value": 823.8,
+            "samples": 8,
+            "p25": 797.4,
+            "p75": 890.3
+          },
+          {
+            "period": "2025Q1",
+            "value": 807.4,
+            "samples": 5,
+            "p25": 767.5,
+            "p75": 813.1
+          },
+          {
+            "period": "2025Q2",
+            "value": null,
+            "samples": 3
+          },
+          {
+            "period": "2025Q3",
+            "value": null,
+            "samples": 2
+          },
+          {
+            "period": "2025Q4",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2026Q1",
+            "value": 893.0,
+            "samples": 9,
+            "p25": 853.0,
+            "p75": 895.3
+          },
+          {
+            "period": "2026Q2",
+            "value": 933.1,
+            "samples": 6,
+            "p25": 835.4,
+            "p75": 988.6
+          },
+          {
+            "period": "2026Q3",
+            "value": null,
+            "samples": 0
+          }
+        ],
+        "latest": 933.1,
+        "latest_period": "2026Q2",
+        "first_value": 811.8,
+        "first_period": "2022Q2",
+        "change_pct": 14.9,
+        "total_samples": 90
+      },
+      {
+        "id": "13102|used",
+        "ward_code": "13102",
+        "ward": "中央区",
+        "stage": "used",
+        "stage_label": "中古",
+        "label": "中央区・中古",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": 433.0,
+            "samples": 7,
+            "p25": 330.6,
+            "p75": 486.1
+          },
+          {
+            "period": "2021Q4",
+            "value": 382.4,
+            "samples": 10,
+            "p25": 325.9,
+            "p75": 440.8
+          },
+          {
+            "period": "2022Q1",
+            "value": 435.2,
+            "samples": 17,
+            "p25": 333.5,
+            "p75": 498.2
+          },
+          {
+            "period": "2022Q2",
+            "value": 429.9,
+            "samples": 18,
+            "p25": 392.8,
+            "p75": 467.1
+          },
+          {
+            "period": "2022Q3",
+            "value": 437.0,
+            "samples": 10,
+            "p25": 384.9,
+            "p75": 500.9
+          },
+          {
+            "period": "2022Q4",
+            "value": 429.5,
+            "samples": 16,
+            "p25": 400.0,
+            "p75": 457.7
+          },
+          {
+            "period": "2023Q1",
+            "value": 405.8,
+            "samples": 17,
+            "p25": 350.2,
+            "p75": 441.2
+          },
+          {
+            "period": "2023Q2",
+            "value": 444.0,
+            "samples": 19,
+            "p25": 375.4,
+            "p75": 516.3
+          },
+          {
+            "period": "2023Q3",
+            "value": 440.7,
+            "samples": 19,
+            "p25": 371.2,
+            "p75": 499.0
+          },
+          {
+            "period": "2023Q4",
+            "value": 444.1,
+            "samples": 12,
+            "p25": 422.0,
+            "p75": 465.1
+          },
+          {
+            "period": "2024Q1",
+            "value": 465.0,
+            "samples": 15,
+            "p25": 416.8,
+            "p75": 498.4
+          },
+          {
+            "period": "2024Q2",
+            "value": 431.3,
+            "samples": 19,
+            "p25": 388.1,
+            "p75": 538.8
+          },
+          {
+            "period": "2024Q3",
+            "value": 399.6,
+            "samples": 18,
+            "p25": 389.4,
+            "p75": 500.1
+          },
+          {
+            "period": "2024Q4",
+            "value": 420.6,
+            "samples": 23,
+            "p25": 383.6,
+            "p75": 549.5
+          },
+          {
+            "period": "2025Q1",
+            "value": 497.6,
+            "samples": 16,
+            "p25": 445.0,
+            "p75": 527.8
+          },
+          {
+            "period": "2025Q2",
+            "value": 432.9,
+            "samples": 14,
+            "p25": 404.6,
+            "p75": 473.3
+          },
+          {
+            "period": "2025Q3",
+            "value": 499.8,
+            "samples": 19,
+            "p25": 436.1,
+            "p75": 564.2
+          },
+          {
+            "period": "2025Q4",
+            "value": 461.6,
+            "samples": 15,
+            "p25": 414.8,
+            "p75": 503.0
+          },
+          {
+            "period": "2026Q1",
+            "value": 562.2,
+            "samples": 11,
+            "p25": 483.4,
+            "p75": 597.6
+          },
+          {
+            "period": "2026Q2",
+            "value": 473.0,
+            "samples": 37,
+            "p25": 396.9,
+            "p75": 574.2
+          },
+          {
+            "period": "2026Q3",
+            "value": 568.6,
+            "samples": 14,
+            "p25": 456.6,
+            "p75": 614.9
+          }
+        ],
+        "latest": 568.6,
+        "latest_period": "2026Q3",
+        "first_value": 433.0,
+        "first_period": "2021Q3",
+        "change_pct": 31.3,
+        "total_samples": 346
+      },
+      {
+        "id": "13102|new",
+        "ward_code": "13102",
+        "ward": "中央区",
+        "stage": "new",
+        "stage_label": "新築分譲",
+        "label": "中央区・新築分譲",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": 631.0,
+            "samples": 7,
+            "p25": 622.5,
+            "p75": 647.4
+          },
+          {
+            "period": "2021Q4",
+            "value": 604.7,
+            "samples": 7,
+            "p25": 581.4,
+            "p75": 649.8
+          },
+          {
+            "period": "2022Q1",
+            "value": 606.6,
+            "samples": 7,
+            "p25": 562.6,
+            "p75": 615.5
+          },
+          {
+            "period": "2022Q2",
+            "value": 628.9,
+            "samples": 7,
+            "p25": 587.6,
+            "p75": 695.2
+          },
+          {
+            "period": "2022Q3",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2022Q4",
+            "value": 736.1,
+            "samples": 9,
+            "p25": 608.4,
+            "p75": 751.5
+          },
+          {
+            "period": "2023Q1",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2023Q2",
+            "value": 697.9,
+            "samples": 7,
+            "p25": 655.7,
+            "p75": 786.4
+          },
+          {
+            "period": "2023Q3",
+            "value": 702.6,
+            "samples": 9,
+            "p25": 652.0,
+            "p75": 732.2
+          },
+          {
+            "period": "2023Q4",
+            "value": 692.9,
+            "samples": 8,
+            "p25": 645.8,
+            "p75": 725.4
+          },
+          {
+            "period": "2024Q1",
+            "value": 706.2,
+            "samples": 8,
+            "p25": 664.0,
+            "p75": 750.1
+          },
+          {
+            "period": "2024Q2",
+            "value": 695.0,
+            "samples": 6,
+            "p25": 609.5,
+            "p75": 786.0
+          },
+          {
+            "period": "2024Q3",
+            "value": null,
+            "samples": 3
+          },
+          {
+            "period": "2024Q4",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2025Q1",
+            "value": 849.4,
+            "samples": 8,
+            "p25": 764.1,
+            "p75": 876.9
+          },
+          {
+            "period": "2025Q2",
+            "value": 760.3,
+            "samples": 11,
+            "p25": 685.1,
+            "p75": 850.8
+          },
+          {
+            "period": "2025Q3",
+            "value": 863.3,
+            "samples": 11,
+            "p25": 711.6,
+            "p75": 883.2
+          },
+          {
+            "period": "2025Q4",
+            "value": 787.2,
+            "samples": 6,
+            "p25": 722.5,
+            "p75": 831.3
+          },
+          {
+            "period": "2026Q1",
+            "value": 772.6,
+            "samples": 12,
+            "p25": 707.9,
+            "p75": 827.9
+          },
+          {
+            "period": "2026Q2",
+            "value": 894.2,
+            "samples": 6,
+            "p25": 775.2,
+            "p75": 907.2
+          },
+          {
+            "period": "2026Q3",
+            "value": 795.9,
+            "samples": 12,
+            "p25": 739.0,
+            "p75": 852.4
+          }
+        ],
+        "latest": 795.9,
+        "latest_period": "2026Q3",
+        "first_value": 631.0,
+        "first_period": "2021Q3",
+        "change_pct": 26.1,
+        "total_samples": 156
+      },
+      {
+        "id": "13103|used",
+        "ward_code": "13103",
+        "ward": "港区",
+        "stage": "used",
+        "stage_label": "中古",
+        "label": "港区・中古",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": 567.3,
+            "samples": 16,
+            "p25": 546.9,
+            "p75": 619.4
+          },
+          {
+            "period": "2021Q4",
+            "value": 477.7,
+            "samples": 14,
+            "p25": 420.7,
+            "p75": 548.2
+          },
+          {
+            "period": "2022Q1",
+            "value": 533.5,
+            "samples": 20,
+            "p25": 467.1,
+            "p75": 616.4
+          },
+          {
+            "period": "2022Q2",
+            "value": 708.6,
+            "samples": 10,
+            "p25": 531.7,
+            "p75": 728.9
+          },
+          {
+            "period": "2022Q3",
+            "value": 516.5,
+            "samples": 18,
+            "p25": 464.0,
+            "p75": 626.0
+          },
+          {
+            "period": "2022Q4",
+            "value": 547.1,
+            "samples": 18,
+            "p25": 419.2,
+            "p75": 597.8
+          },
+          {
+            "period": "2023Q1",
+            "value": 483.9,
+            "samples": 14,
+            "p25": 460.3,
+            "p75": 589.2
+          },
+          {
+            "period": "2023Q2",
+            "value": 585.9,
+            "samples": 15,
+            "p25": 518.5,
+            "p75": 637.5
+          },
+          {
+            "period": "2023Q3",
+            "value": 511.9,
+            "samples": 19,
+            "p25": 452.1,
+            "p75": 642.8
+          },
+          {
+            "period": "2023Q4",
+            "value": 544.5,
+            "samples": 14,
+            "p25": 480.6,
+            "p75": 611.7
+          },
+          {
+            "period": "2024Q1",
+            "value": 640.0,
+            "samples": 17,
+            "p25": 542.8,
+            "p75": 700.2
+          },
+          {
+            "period": "2024Q2",
+            "value": 626.2,
+            "samples": 15,
+            "p25": 525.0,
+            "p75": 679.4
+          },
+          {
+            "period": "2024Q3",
+            "value": 624.9,
+            "samples": 23,
+            "p25": 560.2,
+            "p75": 695.2
+          },
+          {
+            "period": "2024Q4",
+            "value": 628.7,
+            "samples": 19,
+            "p25": 579.6,
+            "p75": 686.9
+          },
+          {
+            "period": "2025Q1",
+            "value": 590.7,
+            "samples": 15,
+            "p25": 526.2,
+            "p75": 711.8
+          },
+          {
+            "period": "2025Q2",
+            "value": 634.7,
+            "samples": 14,
+            "p25": 535.7,
+            "p75": 673.5
+          },
+          {
+            "period": "2025Q3",
+            "value": 643.0,
+            "samples": 18,
+            "p25": 574.7,
+            "p75": 754.2
+          },
+          {
+            "period": "2025Q4",
+            "value": 785.5,
+            "samples": 13,
+            "p25": 676.0,
+            "p75": 875.3
+          },
+          {
+            "period": "2026Q1",
+            "value": 589.0,
+            "samples": 18,
+            "p25": 548.6,
+            "p75": 672.8
+          },
+          {
+            "period": "2026Q2",
+            "value": 666.0,
+            "samples": 25,
+            "p25": 481.3,
+            "p75": 692.4
+          },
+          {
+            "period": "2026Q3",
+            "value": 651.2,
+            "samples": 26,
+            "p25": 548.0,
+            "p75": 748.5
+          }
+        ],
+        "latest": 651.2,
+        "latest_period": "2026Q3",
+        "first_value": 567.3,
+        "first_period": "2021Q3",
+        "change_pct": 14.8,
+        "total_samples": 361
+      },
+      {
+        "id": "13103|new",
+        "ward_code": "13103",
+        "ward": "港区",
+        "stage": "new",
+        "stage_label": "新築分譲",
+        "label": "港区・新築分譲",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": 860.9,
+            "samples": 5,
+            "p25": 737.9,
+            "p75": 949.3
+          },
+          {
+            "period": "2021Q4",
+            "value": 759.5,
+            "samples": 7,
+            "p25": 748.7,
+            "p75": 852.2
+          },
+          {
+            "period": "2022Q1",
+            "value": 865.2,
+            "samples": 9,
+            "p25": 788.9,
+            "p75": 926.0
+          },
+          {
+            "period": "2022Q2",
+            "value": 859.9,
+            "samples": 11,
+            "p25": 844.7,
+            "p75": 922.5
+          },
+          {
+            "period": "2022Q3",
+            "value": 893.3,
+            "samples": 6,
+            "p25": 842.8,
+            "p75": 934.6
+          },
+          {
+            "period": "2022Q4",
+            "value": 889.9,
+            "samples": 10,
+            "p25": 762.9,
+            "p75": 965.4
+          },
+          {
+            "period": "2023Q1",
+            "value": 812.2,
+            "samples": 9,
+            "p25": 763.6,
+            "p75": 949.1
+          },
+          {
+            "period": "2023Q2",
+            "value": 868.3,
+            "samples": 6,
+            "p25": 808.0,
+            "p75": 958.8
+          },
+          {
+            "period": "2023Q3",
+            "value": 979.1,
+            "samples": 6,
+            "p25": 943.5,
+            "p75": 1020.0
+          },
+          {
+            "period": "2023Q4",
+            "value": 944.0,
+            "samples": 7,
+            "p25": 904.3,
+            "p75": 998.0
+          },
+          {
+            "period": "2024Q1",
+            "value": 985.0,
+            "samples": 10,
+            "p25": 883.2,
+            "p75": 1058.3
+          },
+          {
+            "period": "2024Q2",
+            "value": 910.6,
+            "samples": 5,
+            "p25": 775.1,
+            "p75": 1073.1
+          },
+          {
+            "period": "2024Q3",
+            "value": 1042.9,
+            "samples": 7,
+            "p25": 1038.7,
+            "p75": 1123.0
+          },
+          {
+            "period": "2024Q4",
+            "value": 1014.6,
+            "samples": 6,
+            "p25": 901.8,
+            "p75": 1121.0
+          },
+          {
+            "period": "2025Q1",
+            "value": 916.4,
+            "samples": 5,
+            "p25": 893.1,
+            "p75": 1096.0
+          },
+          {
+            "period": "2025Q2",
+            "value": null,
+            "samples": 3
+          },
+          {
+            "period": "2025Q3",
+            "value": 1053.5,
+            "samples": 8,
+            "p25": 953.6,
+            "p75": 1117.0
+          },
+          {
+            "period": "2025Q4",
+            "value": 1052.1,
+            "samples": 10,
+            "p25": 971.4,
+            "p75": 1119.3
+          },
+          {
+            "period": "2026Q1",
+            "value": 965.9,
+            "samples": 14,
+            "p25": 894.1,
+            "p75": 1009.1
+          },
+          {
+            "period": "2026Q2",
+            "value": 1078.5,
+            "samples": 11,
+            "p25": 989.9,
+            "p75": 1125.0
+          },
+          {
+            "period": "2026Q3",
+            "value": 1258.8,
+            "samples": 6,
+            "p25": 1010.0,
+            "p75": 1289.3
+          }
+        ],
+        "latest": 1258.8,
+        "latest_period": "2026Q3",
+        "first_value": 860.9,
+        "first_period": "2021Q3",
+        "change_pct": 46.2,
+        "total_samples": 161
+      },
+      {
+        "id": "13104|used",
+        "ward_code": "13104",
+        "ward": "新宿区",
+        "stage": "used",
+        "stage_label": "中古",
+        "label": "新宿区・中古",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": 384.4,
+            "samples": 8,
+            "p25": 344.6,
+            "p75": 425.2
+          },
+          {
+            "period": "2021Q4",
+            "value": 396.8,
+            "samples": 14,
+            "p25": 320.5,
+            "p75": 435.1
+          },
+          {
+            "period": "2022Q1",
+            "value": 387.5,
+            "samples": 12,
+            "p25": 337.3,
+            "p75": 451.6
+          },
+          {
+            "period": "2022Q2",
+            "value": 343.4,
+            "samples": 13,
+            "p25": 312.3,
+            "p75": 404.5
+          },
+          {
+            "period": "2022Q3",
+            "value": 363.4,
+            "samples": 15,
+            "p25": 332.6,
+            "p75": 422.6
+          },
+          {
+            "period": "2022Q4",
+            "value": 374.5,
+            "samples": 19,
+            "p25": 317.8,
+            "p75": 408.8
+          },
+          {
+            "period": "2023Q1",
+            "value": 392.1,
+            "samples": 17,
+            "p25": 369.1,
+            "p75": 438.4
+          },
+          {
+            "period": "2023Q2",
+            "value": 429.2,
+            "samples": 9,
+            "p25": 397.4,
+            "p75": 457.5
+          },
+          {
+            "period": "2023Q3",
+            "value": 373.2,
+            "samples": 9,
+            "p25": 346.1,
+            "p75": 421.8
+          },
+          {
+            "period": "2023Q4",
+            "value": 386.5,
+            "samples": 20,
+            "p25": 360.1,
+            "p75": 457.9
+          },
+          {
+            "period": "2024Q1",
+            "value": 404.2,
+            "samples": 16,
+            "p25": 349.6,
+            "p75": 490.3
+          },
+          {
+            "period": "2024Q2",
+            "value": 401.7,
+            "samples": 16,
+            "p25": 344.2,
+            "p75": 454.1
+          },
+          {
+            "period": "2024Q3",
+            "value": 444.7,
+            "samples": 19,
+            "p25": 392.4,
+            "p75": 483.6
+          },
+          {
+            "period": "2024Q4",
+            "value": 395.6,
+            "samples": 7,
+            "p25": 365.4,
+            "p75": 405.1
+          },
+          {
+            "period": "2025Q1",
+            "value": 439.9,
+            "samples": 13,
+            "p25": 381.2,
+            "p75": 487.1
+          },
+          {
+            "period": "2025Q2",
+            "value": 460.2,
+            "samples": 14,
+            "p25": 369.3,
+            "p75": 498.4
+          },
+          {
+            "period": "2025Q3",
+            "value": 396.2,
+            "samples": 14,
+            "p25": 364.9,
+            "p75": 435.4
+          },
+          {
+            "period": "2025Q4",
+            "value": 436.4,
+            "samples": 16,
+            "p25": 383.5,
+            "p75": 568.5
+          },
+          {
+            "period": "2026Q1",
+            "value": 416.3,
+            "samples": 14,
+            "p25": 350.9,
+            "p75": 512.0
+          },
+          {
+            "period": "2026Q2",
+            "value": 434.6,
+            "samples": 29,
+            "p25": 370.4,
+            "p75": 554.7
+          },
+          {
+            "period": "2026Q3",
+            "value": 477.9,
+            "samples": 20,
+            "p25": 423.4,
+            "p75": 560.1
+          }
+        ],
+        "latest": 477.9,
+        "latest_period": "2026Q3",
+        "first_value": 384.4,
+        "first_period": "2021Q3",
+        "change_pct": 24.3,
+        "total_samples": 314
+      },
+      {
+        "id": "13104|new",
+        "ward_code": "13104",
+        "ward": "新宿区",
+        "stage": "new",
+        "stage_label": "新築分譲",
+        "label": "新宿区・新築分譲",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": 556.7,
+            "samples": 5,
+            "p25": 528.5,
+            "p75": 560.1
+          },
+          {
+            "period": "2021Q4",
+            "value": 587.7,
+            "samples": 6,
+            "p25": 576.6,
+            "p75": 619.7
+          },
+          {
+            "period": "2022Q1",
+            "value": 596.5,
+            "samples": 8,
+            "p25": 567.0,
+            "p75": 621.3
+          },
+          {
+            "period": "2022Q2",
+            "value": 532.0,
+            "samples": 6,
+            "p25": 521.2,
+            "p75": 579.6
+          },
+          {
+            "period": "2022Q3",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2022Q4",
+            "value": 641.5,
+            "samples": 7,
+            "p25": 546.9,
+            "p75": 659.3
+          },
+          {
+            "period": "2023Q1",
+            "value": 630.7,
+            "samples": 5,
+            "p25": 555.9,
+            "p75": 665.1
+          },
+          {
+            "period": "2023Q2",
+            "value": 682.3,
+            "samples": 6,
+            "p25": 630.2,
+            "p75": 691.5
+          },
+          {
+            "period": "2023Q3",
+            "value": 655.7,
+            "samples": 7,
+            "p25": 560.5,
+            "p75": 715.7
+          },
+          {
+            "period": "2023Q4",
+            "value": 631.1,
+            "samples": 12,
+            "p25": 586.6,
+            "p75": 665.5
+          },
+          {
+            "period": "2024Q1",
+            "value": 685.2,
+            "samples": 8,
+            "p25": 634.7,
+            "p75": 746.4
+          },
+          {
+            "period": "2024Q2",
+            "value": 650.3,
+            "samples": 11,
+            "p25": 573.0,
+            "p75": 684.8
+          },
+          {
+            "period": "2024Q3",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2024Q4",
+            "value": 710.9,
+            "samples": 9,
+            "p25": 656.2,
+            "p75": 742.9
+          },
+          {
+            "period": "2025Q1",
+            "value": 719.8,
+            "samples": 8,
+            "p25": 607.4,
+            "p75": 801.4
+          },
+          {
+            "period": "2025Q2",
+            "value": 665.2,
+            "samples": 8,
+            "p25": 627.7,
+            "p75": 704.1
+          },
+          {
+            "period": "2025Q3",
+            "value": 716.0,
+            "samples": 6,
+            "p25": 683.6,
+            "p75": 763.5
+          },
+          {
+            "period": "2025Q4",
+            "value": 713.1,
+            "samples": 13,
+            "p25": 662.1,
+            "p75": 747.8
+          },
+          {
+            "period": "2026Q1",
+            "value": 730.8,
+            "samples": 10,
+            "p25": 697.5,
+            "p75": 784.4
+          },
+          {
+            "period": "2026Q2",
+            "value": 747.2,
+            "samples": 10,
+            "p25": 649.8,
+            "p75": 817.5
+          },
+          {
+            "period": "2026Q3",
+            "value": 793.8,
+            "samples": 8,
+            "p25": 782.1,
+            "p75": 798.5
+          }
+        ],
+        "latest": 793.8,
+        "latest_period": "2026Q3",
+        "first_value": 556.7,
+        "first_period": "2021Q3",
+        "change_pct": 42.6,
+        "total_samples": 161
+      },
+      {
+        "id": "13105|used",
+        "ward_code": "13105",
+        "ward": "文京区",
+        "stage": "used",
+        "stage_label": "中古",
+        "label": "文京区・中古",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": null,
+            "samples": 3
+          },
+          {
+            "period": "2021Q4",
+            "value": 358.6,
+            "samples": 14,
+            "p25": 291.1,
+            "p75": 376.5
+          },
+          {
+            "period": "2022Q1",
+            "value": 364.9,
+            "samples": 16,
+            "p25": 315.1,
+            "p75": 386.5
+          },
+          {
+            "period": "2022Q2",
+            "value": 380.9,
+            "samples": 10,
+            "p25": 344.8,
+            "p75": 443.1
+          },
+          {
+            "period": "2022Q3",
+            "value": 372.6,
+            "samples": 17,
+            "p25": 341.9,
+            "p75": 406.2
+          },
+          {
+            "period": "2022Q4",
+            "value": 348.0,
+            "samples": 6,
+            "p25": 311.0,
+            "p75": 386.6
+          },
+          {
+            "period": "2023Q1",
+            "value": 393.8,
+            "samples": 14,
+            "p25": 366.9,
+            "p75": 451.6
+          },
+          {
+            "period": "2023Q2",
+            "value": 370.0,
+            "samples": 17,
+            "p25": 326.5,
+            "p75": 416.0
+          },
+          {
+            "period": "2023Q3",
+            "value": 383.3,
+            "samples": 13,
+            "p25": 323.9,
+            "p75": 443.8
+          },
+          {
+            "period": "2023Q4",
+            "value": 398.0,
+            "samples": 14,
+            "p25": 363.2,
+            "p75": 446.6
+          },
+          {
+            "period": "2024Q1",
+            "value": 374.5,
+            "samples": 16,
+            "p25": 336.9,
+            "p75": 435.9
+          },
+          {
+            "period": "2024Q2",
+            "value": 325.1,
+            "samples": 6,
+            "p25": 292.4,
+            "p75": 365.2
+          },
+          {
+            "period": "2024Q3",
+            "value": 375.6,
+            "samples": 12,
+            "p25": 346.2,
+            "p75": 414.4
+          },
+          {
+            "period": "2024Q4",
+            "value": 382.5,
+            "samples": 10,
+            "p25": 345.8,
+            "p75": 435.9
+          },
+          {
+            "period": "2025Q1",
+            "value": 369.8,
+            "samples": 15,
+            "p25": 342.0,
+            "p75": 460.6
+          },
+          {
+            "period": "2025Q2",
+            "value": 380.8,
+            "samples": 17,
+            "p25": 353.3,
+            "p75": 449.6
+          },
+          {
+            "period": "2025Q3",
+            "value": 399.3,
+            "samples": 11,
+            "p25": 354.6,
+            "p75": 454.0
+          },
+          {
+            "period": "2025Q4",
+            "value": 431.9,
+            "samples": 23,
+            "p25": 388.2,
+            "p75": 457.9
+          },
+          {
+            "period": "2026Q1",
+            "value": 405.0,
+            "samples": 15,
+            "p25": 374.0,
+            "p75": 464.8
+          },
+          {
+            "period": "2026Q2",
+            "value": 420.4,
+            "samples": 19,
+            "p25": 401.1,
+            "p75": 521.0
+          },
+          {
+            "period": "2026Q3",
+            "value": 452.4,
+            "samples": 8,
+            "p25": 430.6,
+            "p75": 495.9
+          }
+        ],
+        "latest": 452.4,
+        "latest_period": "2026Q3",
+        "first_value": 358.6,
+        "first_period": "2021Q4",
+        "change_pct": 26.2,
+        "total_samples": 276
+      },
+      {
+        "id": "13105|new",
+        "ward_code": "13105",
+        "ward": "文京区",
+        "stage": "new",
+        "stage_label": "新築分譲",
+        "label": "文京区・新築分譲",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": 597.0,
+            "samples": 5,
+            "p25": 500.8,
+            "p75": 603.3
+          },
+          {
+            "period": "2021Q4",
+            "value": 571.7,
+            "samples": 5,
+            "p25": 554.2,
+            "p75": 580.1
+          },
+          {
+            "period": "2022Q1",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2022Q2",
+            "value": 583.4,
+            "samples": 8,
+            "p25": 489.9,
+            "p75": 645.7
+          },
+          {
+            "period": "2022Q3",
+            "value": 552.3,
+            "samples": 5,
+            "p25": 537.2,
+            "p75": 594.1
+          },
+          {
+            "period": "2022Q4",
+            "value": 558.7,
+            "samples": 11,
+            "p25": 539.2,
+            "p75": 598.2
+          },
+          {
+            "period": "2023Q1",
+            "value": 625.0,
+            "samples": 8,
+            "p25": 607.0,
+            "p75": 694.5
+          },
+          {
+            "period": "2023Q2",
+            "value": 654.2,
+            "samples": 9,
+            "p25": 638.4,
+            "p75": 669.7
+          },
+          {
+            "period": "2023Q3",
+            "value": null,
+            "samples": 3
+          },
+          {
+            "period": "2023Q4",
+            "value": 627.0,
+            "samples": 5,
+            "p25": 622.2,
+            "p75": 630.4
+          },
+          {
+            "period": "2024Q1",
+            "value": 594.8,
+            "samples": 8,
+            "p25": 574.9,
+            "p75": 683.7
+          },
+          {
+            "period": "2024Q2",
+            "value": 701.3,
+            "samples": 5,
+            "p25": 677.3,
+            "p75": 709.2
+          },
+          {
+            "period": "2024Q3",
+            "value": 611.6,
+            "samples": 5,
+            "p25": 569.5,
+            "p75": 658.8
+          },
+          {
+            "period": "2024Q4",
+            "value": 680.2,
+            "samples": 5,
+            "p25": 638.7,
+            "p75": 689.5
+          },
+          {
+            "period": "2025Q1",
+            "value": 648.9,
+            "samples": 8,
+            "p25": 614.7,
+            "p75": 692.3
+          },
+          {
+            "period": "2025Q2",
+            "value": 652.5,
+            "samples": 10,
+            "p25": 615.9,
+            "p75": 749.7
+          },
+          {
+            "period": "2025Q3",
+            "value": 673.4,
+            "samples": 5,
+            "p25": 653.1,
+            "p75": 749.8
+          },
+          {
+            "period": "2025Q4",
+            "value": 721.2,
+            "samples": 8,
+            "p25": 683.8,
+            "p75": 762.0
+          },
+          {
+            "period": "2026Q1",
+            "value": 697.5,
+            "samples": 6,
+            "p25": 630.9,
+            "p75": 775.4
+          },
+          {
+            "period": "2026Q2",
+            "value": 718.2,
+            "samples": 10,
+            "p25": 695.1,
+            "p75": 734.4
+          },
+          {
+            "period": "2026Q3",
+            "value": null,
+            "samples": 0
+          }
+        ],
+        "latest": 718.2,
+        "latest_period": "2026Q2",
+        "first_value": 597.0,
+        "first_period": "2021Q3",
+        "change_pct": 20.3,
+        "total_samples": 133
+      },
+      {
+        "id": "13108|used",
+        "ward_code": "13108",
+        "ward": "江東区",
+        "stage": "used",
+        "stage_label": "中古",
+        "label": "江東区・中古",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": 288.8,
+            "samples": 12,
+            "p25": 253.6,
+            "p75": 331.0
+          },
+          {
+            "period": "2021Q4",
+            "value": 297.9,
+            "samples": 19,
+            "p25": 272.9,
+            "p75": 329.3
+          },
+          {
+            "period": "2022Q1",
+            "value": 273.2,
+            "samples": 20,
+            "p25": 245.6,
+            "p75": 323.9
+          },
+          {
+            "period": "2022Q2",
+            "value": 305.2,
+            "samples": 13,
+            "p25": 285.6,
+            "p75": 329.8
+          },
+          {
+            "period": "2022Q3",
+            "value": 279.9,
+            "samples": 13,
+            "p25": 254.0,
+            "p75": 311.9
+          },
+          {
+            "period": "2022Q4",
+            "value": 314.6,
+            "samples": 22,
+            "p25": 263.5,
+            "p75": 363.1
+          },
+          {
+            "period": "2023Q1",
+            "value": 306.5,
+            "samples": 18,
+            "p25": 234.7,
+            "p75": 347.7
+          },
+          {
+            "period": "2023Q2",
+            "value": 278.4,
+            "samples": 19,
+            "p25": 256.7,
+            "p75": 336.2
+          },
+          {
+            "period": "2023Q3",
+            "value": 325.1,
+            "samples": 23,
+            "p25": 290.3,
+            "p75": 359.1
+          },
+          {
+            "period": "2023Q4",
+            "value": 283.2,
+            "samples": 17,
+            "p25": 269.3,
+            "p75": 340.1
+          },
+          {
+            "period": "2024Q1",
+            "value": 284.4,
+            "samples": 15,
+            "p25": 244.4,
+            "p75": 338.4
+          },
+          {
+            "period": "2024Q2",
+            "value": 360.2,
+            "samples": 17,
+            "p25": 289.7,
+            "p75": 382.3
+          },
+          {
+            "period": "2024Q3",
+            "value": 330.7,
+            "samples": 13,
+            "p25": 261.7,
+            "p75": 345.4
+          },
+          {
+            "period": "2024Q4",
+            "value": 332.1,
+            "samples": 16,
+            "p25": 273.3,
+            "p75": 355.2
+          },
+          {
+            "period": "2025Q1",
+            "value": 335.6,
+            "samples": 19,
+            "p25": 316.9,
+            "p75": 365.5
+          },
+          {
+            "period": "2025Q2",
+            "value": 354.4,
+            "samples": 15,
+            "p25": 245.9,
+            "p75": 386.9
+          },
+          {
+            "period": "2025Q3",
+            "value": 354.2,
+            "samples": 23,
+            "p25": 309.9,
+            "p75": 380.0
+          },
+          {
+            "period": "2025Q4",
+            "value": 337.4,
+            "samples": 22,
+            "p25": 282.0,
+            "p75": 374.9
+          },
+          {
+            "period": "2026Q1",
+            "value": 329.3,
+            "samples": 16,
+            "p25": 267.9,
+            "p75": 399.4
+          },
+          {
+            "period": "2026Q2",
+            "value": 342.4,
+            "samples": 23,
+            "p25": 295.5,
+            "p75": 384.5
+          },
+          {
+            "period": "2026Q3",
+            "value": 340.8,
+            "samples": 20,
+            "p25": 283.7,
+            "p75": 377.7
+          }
+        ],
+        "latest": 340.8,
+        "latest_period": "2026Q3",
+        "first_value": 288.8,
+        "first_period": "2021Q3",
+        "change_pct": 18.0,
+        "total_samples": 375
+      },
+      {
+        "id": "13108|new",
+        "ward_code": "13108",
+        "ward": "江東区",
+        "stage": "new",
+        "stage_label": "新築分譲",
+        "label": "江東区・新築分譲",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": null,
+            "samples": 2
+          },
+          {
+            "period": "2021Q4",
+            "value": 467.5,
+            "samples": 7,
+            "p25": 455.0,
+            "p75": 488.4
+          },
+          {
+            "period": "2022Q1",
+            "value": 439.5,
+            "samples": 13,
+            "p25": 428.2,
+            "p75": 476.6
+          },
+          {
+            "period": "2022Q2",
+            "value": 512.0,
+            "samples": 7,
+            "p25": 451.9,
+            "p75": 536.0
+          },
+          {
+            "period": "2022Q3",
+            "value": 490.9,
+            "samples": 8,
+            "p25": 440.9,
+            "p75": 518.0
+          },
+          {
+            "period": "2022Q4",
+            "value": 516.7,
+            "samples": 6,
+            "p25": 505.2,
+            "p75": 545.6
+          },
+          {
+            "period": "2023Q1",
+            "value": 501.9,
+            "samples": 9,
+            "p25": 449.3,
+            "p75": 540.7
+          },
+          {
+            "period": "2023Q2",
+            "value": 508.1,
+            "samples": 5,
+            "p25": 489.6,
+            "p75": 556.1
+          },
+          {
+            "period": "2023Q3",
+            "value": 531.8,
+            "samples": 9,
+            "p25": 471.1,
+            "p75": 563.0
+          },
+          {
+            "period": "2023Q4",
+            "value": 466.1,
+            "samples": 7,
+            "p25": 448.6,
+            "p75": 500.4
+          },
+          {
+            "period": "2024Q1",
+            "value": 518.7,
+            "samples": 8,
+            "p25": 463.3,
+            "p75": 539.1
+          },
+          {
+            "period": "2024Q2",
+            "value": 502.8,
+            "samples": 8,
+            "p25": 436.6,
+            "p75": 573.7
+          },
+          {
+            "period": "2024Q3",
+            "value": 504.5,
+            "samples": 6,
+            "p25": 476.6,
+            "p75": 542.6
+          },
+          {
+            "period": "2024Q4",
+            "value": 513.3,
+            "samples": 5,
+            "p25": 497.6,
+            "p75": 519.6
+          },
+          {
+            "period": "2025Q1",
+            "value": null,
+            "samples": 2
+          },
+          {
+            "period": "2025Q2",
+            "value": 542.2,
+            "samples": 11,
+            "p25": 512.6,
+            "p75": 586.9
+          },
+          {
+            "period": "2025Q3",
+            "value": 595.7,
+            "samples": 7,
+            "p25": 538.9,
+            "p75": 624.8
+          },
+          {
+            "period": "2025Q4",
+            "value": 567.5,
+            "samples": 7,
+            "p25": 533.0,
+            "p75": 603.2
+          },
+          {
+            "period": "2026Q1",
+            "value": 571.9,
+            "samples": 15,
+            "p25": 526.0,
+            "p75": 668.8
+          },
+          {
+            "period": "2026Q2",
+            "value": 586.8,
+            "samples": 22,
+            "p25": 547.0,
+            "p75": 675.0
+          },
+          {
+            "period": "2026Q3",
+            "value": null,
+            "samples": 4
+          }
+        ],
+        "latest": 586.8,
+        "latest_period": "2026Q2",
+        "first_value": 467.5,
+        "first_period": "2021Q4",
+        "change_pct": 25.5,
+        "total_samples": 168
+      },
+      {
+        "id": "13113|used",
+        "ward_code": "13113",
+        "ward": "渋谷区",
+        "stage": "used",
+        "stage_label": "中古",
+        "label": "渋谷区・中古",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": 470.6,
+            "samples": 13,
+            "p25": 445.0,
+            "p75": 544.6
+          },
+          {
+            "period": "2021Q4",
+            "value": 467.4,
+            "samples": 18,
+            "p25": 418.7,
+            "p75": 512.2
+          },
+          {
+            "period": "2022Q1",
+            "value": 437.1,
+            "samples": 13,
+            "p25": 388.2,
+            "p75": 486.2
+          },
+          {
+            "period": "2022Q2",
+            "value": 416.4,
+            "samples": 15,
+            "p25": 399.2,
+            "p75": 453.3
+          },
+          {
+            "period": "2022Q3",
+            "value": 506.6,
+            "samples": 19,
+            "p25": 462.0,
+            "p75": 598.2
+          },
+          {
+            "period": "2022Q4",
+            "value": 523.5,
+            "samples": 13,
+            "p25": 467.5,
+            "p75": 540.3
+          },
+          {
+            "period": "2023Q1",
+            "value": 472.9,
+            "samples": 15,
+            "p25": 418.4,
+            "p75": 560.5
+          },
+          {
+            "period": "2023Q2",
+            "value": 532.9,
+            "samples": 12,
+            "p25": 477.8,
+            "p75": 584.6
+          },
+          {
+            "period": "2023Q3",
+            "value": 475.7,
+            "samples": 16,
+            "p25": 413.3,
+            "p75": 571.6
+          },
+          {
+            "period": "2023Q4",
+            "value": 540.0,
+            "samples": 18,
+            "p25": 486.5,
+            "p75": 555.9
+          },
+          {
+            "period": "2024Q1",
+            "value": 571.1,
+            "samples": 21,
+            "p25": 482.4,
+            "p75": 595.2
+          },
+          {
+            "period": "2024Q2",
+            "value": 623.4,
+            "samples": 10,
+            "p25": 508.4,
+            "p75": 666.9
+          },
+          {
+            "period": "2024Q3",
+            "value": 518.5,
+            "samples": 19,
+            "p25": 417.9,
+            "p75": 597.2
+          },
+          {
+            "period": "2024Q4",
+            "value": 588.5,
+            "samples": 19,
+            "p25": 512.2,
+            "p75": 635.0
+          },
+          {
+            "period": "2025Q1",
+            "value": 532.7,
+            "samples": 16,
+            "p25": 458.7,
+            "p75": 568.5
+          },
+          {
+            "period": "2025Q2",
+            "value": 546.2,
+            "samples": 15,
+            "p25": 508.9,
+            "p75": 578.8
+          },
+          {
+            "period": "2025Q3",
+            "value": 638.8,
+            "samples": 19,
+            "p25": 510.8,
+            "p75": 690.0
+          },
+          {
+            "period": "2025Q4",
+            "value": 477.2,
+            "samples": 14,
+            "p25": 430.0,
+            "p75": 569.8
+          },
+          {
+            "period": "2026Q1",
+            "value": 566.6,
+            "samples": 12,
+            "p25": 435.4,
+            "p75": 675.4
+          },
+          {
+            "period": "2026Q2",
+            "value": 536.1,
+            "samples": 18,
+            "p25": 449.1,
+            "p75": 573.0
+          },
+          {
+            "period": "2026Q3",
+            "value": 686.1,
+            "samples": 18,
+            "p25": 622.8,
+            "p75": 712.2
+          }
+        ],
+        "latest": 686.1,
+        "latest_period": "2026Q3",
+        "first_value": 470.6,
+        "first_period": "2021Q3",
+        "change_pct": 45.8,
+        "total_samples": 333
+      },
+      {
+        "id": "13113|new",
+        "ward_code": "13113",
+        "ward": "渋谷区",
+        "stage": "new",
+        "stage_label": "新築分譲",
+        "label": "渋谷区・新築分譲",
+        "points": [
+          {
+            "period": "2021Q3",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2021Q4",
+            "value": 677.1,
+            "samples": 9,
+            "p25": 644.7,
+            "p75": 719.7
+          },
+          {
+            "period": "2022Q1",
+            "value": null,
+            "samples": 3
+          },
+          {
+            "period": "2022Q2",
+            "value": 774.8,
+            "samples": 6,
+            "p25": 670.9,
+            "p75": 823.2
+          },
+          {
+            "period": "2022Q3",
+            "value": 826.9,
+            "samples": 7,
+            "p25": 760.9,
+            "p75": 901.6
+          },
+          {
+            "period": "2022Q4",
+            "value": 845.2,
+            "samples": 9,
+            "p25": 767.5,
+            "p75": 893.8
+          },
+          {
+            "period": "2023Q1",
+            "value": 757.5,
+            "samples": 6,
+            "p25": 716.0,
+            "p75": 894.7
+          },
+          {
+            "period": "2023Q2",
+            "value": 813.6,
+            "samples": 11,
+            "p25": 795.3,
+            "p75": 896.0
+          },
+          {
+            "period": "2023Q3",
+            "value": null,
+            "samples": 3
+          },
+          {
+            "period": "2023Q4",
+            "value": 831.1,
+            "samples": 7,
+            "p25": 779.5,
+            "p75": 899.5
+          },
+          {
+            "period": "2024Q1",
+            "value": 834.1,
+            "samples": 10,
+            "p25": 801.2,
+            "p75": 897.5
+          },
+          {
+            "period": "2024Q2",
+            "value": 891.3,
+            "samples": 6,
+            "p25": 831.5,
+            "p75": 985.5
+          },
+          {
+            "period": "2024Q3",
+            "value": null,
+            "samples": 4
+          },
+          {
+            "period": "2024Q4",
+            "value": 933.5,
+            "samples": 9,
+            "p25": 891.7,
+            "p75": 1020.3
+          },
+          {
+            "period": "2025Q1",
+            "value": 978.0,
+            "samples": 7,
+            "p25": 926.8,
+            "p75": 1033.0
+          },
+          {
+            "period": "2025Q2",
+            "value": 939.5,
+            "samples": 8,
+            "p25": 911.5,
+            "p75": 1006.4
+          },
+          {
+            "period": "2025Q3",
+            "value": 987.4,
+            "samples": 8,
+            "p25": 960.4,
+            "p75": 1023.2
+          },
+          {
+            "period": "2025Q4",
+            "value": 989.5,
+            "samples": 6,
+            "p25": 898.0,
+            "p75": 1031.3
+          },
+          {
+            "period": "2026Q1",
+            "value": null,
+            "samples": 1
+          },
+          {
+            "period": "2026Q2",
+            "value": 1004.8,
+            "samples": 19,
+            "p25": 865.8,
+            "p75": 1022.0
+          },
+          {
+            "period": "2026Q3",
+            "value": 1125.4,
+            "samples": 6,
+            "p25": 999.0,
+            "p75": 1132.5
+          }
+        ],
+        "latest": 1125.4,
+        "latest_period": "2026Q3",
+        "first_value": 677.1,
+        "first_period": "2021Q4",
+        "change_pct": 66.2,
+        "total_samples": 149
+      }
+    ],
+    "sources": [
+      "sample"
+    ],
+    "notes": {
+      "dropped_no_total_units": 0
+    }
+  },
+  "official_trends": null
+}

@@ -1,0 +1,71 @@
+{
+  "generated_at": "2026-08-09T21:13:49+00:00",
+  "status": [
+    {
+      "key": "suumo",
+      "name": "SUUMO",
+      "state": "skipped",
+      "reason": "SUUMO: 비활성 (access_mode=off)"
+    },
+    {
+      "key": "homes",
+      "name": "LIFULL HOME'S",
+      "state": "skipped",
+      "reason": "LIFULL HOME'S: 비활성 (access_mode=off)"
+    },
+    {
+      "key": "athome",
+      "name": "アットホーム (at home)",
+      "state": "skipped",
+      "reason": "アットホーム (at home): 비활성 (access_mode=off)"
+    },
+    {
+      "key": "fudousan_japan",
+      "name": "不動産ジャパン",
+      "state": "skipped",
+      "reason": "不動産ジャパン: 비활성 (access_mode=off)"
+    },
+    {
+      "key": "feed",
+      "name": "ライセンス済み物件フィード",
+      "state": "skipped",
+      "reason": "sources.feed.enabled = false"
+    },
+    {
+      "key": "sample",
+      "name": "サンプル（架空データ）",
+      "state": "ok",
+      "count": 498
+    }
+  ],
+  "portals": [
+    {
+      "key": "suumo",
+      "name": "SUUMO",
+      "operator": "株式会社リクルート",
+      "home_url": "https://suumo.jp/",
+      "access_note": "제3자용 공개 물건 API 없음. 利用規約이 자동수집을 금지한다. 실무 경로: 掲載企業(불동산회사)로서 리쿠르트와 계약하고 물건 데이터를 주고받거나, 제휴 API 계약을 별도로 맺는 것."
+    },
+    {
+      "key": "homes",
+      "name": "LIFULL HOME'S",
+      "operator": "株式会社LIFULL",
+      "home_url": "https://www.homes.co.jp/",
+      "access_note": "과거 공개 API(HOME'S API)는 종료. 현재는 加盟店/파트너 계약 경로. 연구 목적이라면 'LIFULL HOME'S データセット'(情報学研究データリポジトリ 경유) 신청이 별도로 존재한다 — 다만 연구 한정이고 실시간이 아니다."
+    },
+    {
+      "key": "athome",
+      "name": "アットホーム (at home)",
+      "operator": "アットホーム株式会社",
+      "home_url": "https://www.athome.co.jp/",
+      "access_note": "加盟店(부동산회사) 대상 물件データ 연携 서비스가 있다. 일반 이용자용 공개 API는 없음."
+    },
+    {
+      "key": "fudousan_japan",
+      "name": "不動産ジャパン",
+      "operator": "公益財団法人 不動産流通推進センター",
+      "home_url": "https://www.fudousan.or.jp/",
+      "access_note": "REINS 등록 물건 중 공개 가능분을 일반에 보여주는 사이트. 영리 목적 대량 취득은 별도 협의 대상이며, 공개 API는 제공하지 않는다."
+    }
+  ]
+}

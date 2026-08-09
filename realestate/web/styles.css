@@ -1,0 +1,528 @@
+/* 도쿄 7구 대규모 맨션 가격추이 — 스타일
+ *
+ * 색은 역할(role)로만 참조한다. 라이트/다크 값을 여기 한 곳에서 바꾸면
+ * 차트까지 같이 따라온다. 계열 색은 '구(区)'에 고정이며, 필터로 계열이
+ * 줄어도 남은 구의 색은 절대 바뀌지 않는다.
+ */
+
+:root {
+  color-scheme: light;
+
+  --page: #f9f9f7;
+  --surface-1: #fcfcfb;
+  --surface-2: #f2f1ed;
+
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+
+  --gridline: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.10);
+
+  --good: #0ca30c;
+  --good-text: #006300;
+  --critical: #d03b3b;
+  --warning: #fab219;
+
+  /* 계열 슬롯 — 고정 순서 (CVD 검증 통과) */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #4a3aa7;
+
+  --radius: 10px;
+  --font: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN",
+    "Noto Sans JP", "Apple SD Gothic Neo", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --page: #0d0d0d;
+    --surface-1: #1a1a19;
+    --surface-2: #222220;
+
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+
+    --gridline: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+
+    --good-text: #0ca30c;
+
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+    --series-7: #9085e9;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --page: #0d0d0d;
+  --surface-1: #1a1a19;
+  --surface-2: #222220;
+
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+
+  --gridline: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255, 255, 255, 0.10);
+
+  --good-text: #0ca30c;
+
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 20px 72px;
+}
+
+/* ---------------------------------------------------------- 헤더 */
+
+.masthead { margin-bottom: 20px; }
+
+.masthead h1 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.masthead p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.masthead .scope {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.scope-chip {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+/* --------------------------------------------------- 경고 배너 */
+
+.banner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--warning);
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 0 0 20px;
+}
+
+.banner[hidden] { display: none; }
+
+.banner .icon { font-size: 18px; line-height: 1.4; }
+.banner strong { display: block; font-size: 14px; }
+.banner p { margin: 4px 0 0; font-size: 13px; color: var(--text-secondary); }
+
+/* -------------------------------------------------------- 필터 */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 26px;
+  align-items: flex-end;
+  padding: 16px 18px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 22px;
+}
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+
+.field > .field-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 3px 11px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.chip:hover { border-color: var(--baseline); }
+
+.chip[aria-pressed="true"] {
+  color: var(--text-primary);
+  background: var(--surface-1);
+  border-color: var(--baseline);
+  font-weight: 550;
+}
+
+.chip .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.chip[aria-pressed="false"] .dot { opacity: 0.28; }
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.seg button {
+  font: inherit;
+  font-size: 13px;
+  min-height: 32px;
+  padding: 4px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.seg button + button { border-left: 1px solid var(--border); }
+
+.seg button[aria-pressed="true"] {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font-weight: 550;
+}
+
+/* ---------------------------------------------------- 스탯 타일 */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.tile {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 15px 17px;
+}
+
+.tile .label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.tile .value {
+  font-size: 27px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.tile .value .unit {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-left: 3px;
+}
+
+.tile .delta { font-size: 12.5px; margin-top: 5px; color: var(--text-secondary); }
+.tile .delta .up { color: var(--good-text); font-weight: 600; }
+.tile .delta .down { color: var(--critical); font-weight: 600; }
+
+.tile.hero .value { font-size: 48px; }
+
+/* -------------------------------------------------------- 카드 */
+
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px 20px;
+  margin-bottom: 22px;
+}
+
+.card-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.card-head h2 { margin: 0; font-size: 16px; font-weight: 620; }
+.card-head .sub { margin: 0; font-size: 12.5px; color: var(--text-secondary); }
+
+.linkish {
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--baseline);
+  padding: 0 0 1px;
+  cursor: pointer;
+}
+
+.linkish:hover { color: var(--text-primary); }
+
+/* -------------------------------------------------------- 차트 */
+
+.chart-host { position: relative; margin-top: 10px; }
+.chart-host svg { display: block; width: 100%; overflow: visible; }
+.chart-host svg:focus-visible { outline: 2px solid var(--series-1); outline-offset: 3px; }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--gridline);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  background: none;
+  border: 0;
+  padding: 3px 2px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.legend-item .key { width: 14px; height: 3px; border-radius: 2px; background: currentColor; flex: none; }
+.legend-item[aria-pressed="false"] { opacity: 0.38; }
+.legend-item:hover { color: var(--text-primary); }
+
+.legend-note {
+  width: 100%;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  min-width: 168px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.14);
+  padding: 9px 11px;
+  font-size: 12.5px;
+  opacity: 0;
+  transition: opacity 90ms linear;
+}
+
+.tooltip.on { opacity: 1; }
+.tooltip .tt-period { font-weight: 620; margin-bottom: 6px; font-size: 12px; }
+
+.tooltip .tt-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  padding: 1.5px 0;
+}
+
+.tooltip .tt-name { display: inline-flex; align-items: center; gap: 6px; }
+.tooltip .tt-swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+.tooltip .tt-val { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+/* 소규모 다중 차트 */
+
+.facets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.facet { border: 1px solid var(--gridline); border-radius: 8px; padding: 11px 12px 8px; }
+.facet h3 { margin: 0; font-size: 13.5px; font-weight: 620; }
+
+.facet .facet-meta {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  margin: 2px 0 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* -------------------------------------------------------- 표 */
+
+.table-wrap { overflow-x: auto; margin-top: 14px; }
+
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+
+th, td {
+  text-align: right;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--gridline);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+th:first-child, td:first-child { text-align: left; font-variant-numeric: normal; }
+thead th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+tbody tr:hover { background: var(--surface-2); }
+
+/* ------------------------------------------------- 신규 매물 */
+
+.listing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: 13px;
+  margin-top: 14px;
+}
+
+.listing {
+  border: 1px solid var(--gridline);
+  border-radius: 9px;
+  padding: 13px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.listing .row1 { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.badge.new { color: var(--good-text); border-color: currentColor; }
+.badge.shinchiku { color: var(--series-2); border-color: currentColor; }
+
+.listing .name { font-weight: 600; font-size: 14px; }
+.listing .price { font-size: 19px; font-weight: 620; letter-spacing: -0.01em; }
+.listing .meta { font-size: 12.5px; color: var(--text-secondary); }
+.listing .ward { display: inline-flex; align-items: center; gap: 6px; }
+.listing .ward .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+/* -------------------------------------------------------- 출처 */
+
+.sources { display: grid; gap: 10px; margin-top: 12px; }
+
+.source-row {
+  display: grid;
+  grid-template-columns: 150px 88px 1fr;
+  gap: 12px;
+  align-items: start;
+  font-size: 13px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--gridline);
+}
+
+.source-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.source-row .nm { font-weight: 600; }
+.source-row .rs { color: var(--text-secondary); font-size: 12.5px; }
+
+.state {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  justify-self: start;
+  white-space: nowrap;
+}
+
+.state.ok { color: var(--good-text); }
+.state.skipped { color: var(--text-muted); }
+.state.error { color: var(--critical); }
+
+.empty {
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  padding: 22px 0;
+  text-align: center;
+}
+
+footer {
+  margin-top: 36px;
+  padding-top: 18px;
+  border-top: 1px solid var(--gridline);
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+footer a { color: inherit; }
+
+@media (max-width: 620px) {
+  .source-row { grid-template-columns: 1fr; gap: 4px; }
+  .tile.hero .value { font-size: 38px; }
+}

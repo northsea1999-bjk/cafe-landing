@@ -1,0 +1,79 @@
+{
+  "data_dir": "web/data",
+
+  "trends": {
+    "min_total_units": 200,
+    "min_samples": 5,
+    "granularity": "quarter",
+    "wards": ["13101", "13102", "13103", "13104", "13105", "13108", "13113"]
+  },
+
+  "official_market": {
+    "enabled": true,
+    "quarters": 20,
+    "min_samples": 5,
+    "wards": ["13101", "13102", "13103", "13104", "13105", "13108", "13113"],
+    "_note": "국토교통성 不動産情報ライブラリ. 환경변수 REINFOLIB_API_KEY 필요. 성약가에는 총세대수가 없어 200세대 필터가 적용되지 않는다."
+  },
+
+  "sources": {
+    "suumo": {
+      "enabled": false,
+      "access_mode": "off",
+      "basis": "",
+      "_note": "掲載企業 계약 또는 제휴 API 계약 확보 후 access_mode 를 api/feed 로."
+    },
+    "homes": {
+      "enabled": false,
+      "access_mode": "off",
+      "basis": ""
+    },
+    "athome": {
+      "enabled": false,
+      "access_mode": "off",
+      "basis": ""
+    },
+    "fudousan_japan": {
+      "enabled": false,
+      "access_mode": "off",
+      "basis": ""
+    },
+
+    "feed": {
+      "enabled": false,
+      "basis": "",
+      "location": "data/incoming/listings.csv",
+      "format": "csv",
+      "encoding": "cp932",
+      "field_map": {
+        "source_id": "物件番号",
+        "title": "物件名",
+        "stage": "区分",
+        "price": "価格",
+        "prefecture": "都道府県",
+        "city": "市区町村",
+        "address": "所在地",
+        "line": "沿線",
+        "station": "最寄駅",
+        "walk": "徒歩",
+        "area_m2": "専有面積",
+        "layout": "間取り",
+        "built": "築年月",
+        "floor": "所在階",
+        "total_floors": "総階数",
+        "total_units": "総戸数",
+        "management_fee": "管理費",
+        "repair_reserve": "修繕積立金",
+        "url": "詳細URL",
+        "listed_on": "情報公開日"
+      }
+    },
+
+    "sample": {
+      "enabled": true,
+      "seed_history": true,
+      "seed_history_days": 1825,
+      "_note": "架空データ. 실제 소스가 붙으면 enabled 를 false 로."
+    }
+  }
+}
