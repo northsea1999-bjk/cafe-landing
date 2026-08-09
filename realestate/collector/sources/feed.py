@@ -130,11 +130,16 @@ class FeedSource(Source):
         index: int,
     ) -> Listing | None:
         def get(field: str) -> str:
+            # 칸 이름은 하나여도 되고 여러 후보를 줘도 된다.
+            # (한국어 표·일본어 표를 같은 설정으로 받기 위해)
             column = field_map.get(field)
             if not column:
                 return ""
-            value = row.get(column, "")
-            return "" if value is None else str(value).strip()
+            for name in ([column] if isinstance(column, str) else column):
+                value = row.get(name)
+                if value not in (None, ""):
+                    return str(value).strip()
+            return ""
 
         price = parse_price_to_yen(get("price"))
         address = get("address")

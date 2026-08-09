@@ -174,19 +174,22 @@ class Listing:
 
 
 def parse_price_to_yen(text: str) -> int | None:
-    """「4,980万円」「1億2000万円」→ 엔 정수."""
+    """「4,980万円」「1億2000万円」「12800만엔」→ 엔 정수.
+
+    한국어로 적은 표(만엔·억엔)도 그대로 읽는다.
+    """
     if not text:
         return None
     s = text.replace(",", "").replace(" ", "")
     total = 0
     matched = False
 
-    oku = re.search(r"([\d.]+)億", s)
+    oku = re.search(r"([\d.]+)\s*[億억]", s)
     if oku:
         total += int(float(oku.group(1)) * 100_000_000)
         matched = True
 
-    man = re.search(r"([\d.]+)万", s)
+    man = re.search(r"([\d.]+)\s*(?:万|만)", s)
     if man:
         total += int(float(man.group(1)) * _MAN_YEN)
         matched = True
@@ -196,6 +199,10 @@ def parse_price_to_yen(text: str) -> int | None:
         if not bare:
             return None
         total = int(bare.group(1))
+        # 단위 없이 「9800」처럼 적는 경우, 업계 관행상 万円을 뜻한다.
+        # 그대로 엔으로 읽으면 1만 배 틀린 값이 조용히 들어간다.
+        if total < 1_000_000:
+            total *= _MAN_YEN
 
     return total or None
 
@@ -211,23 +218,30 @@ def parse_area_m2(text: str) -> float | None:
 
 
 def parse_built(text: str) -> tuple[int | None, int | None]:
-    """「1998年3月」「築1998年」→ (연, 월)."""
+    """「1998年3月」「1998년 3월」「1998-03」→ (연, 월)."""
     if not text:
         return None, None
-    year = re.search(r"(\d{4})\s*年", text)
-    month = re.search(r"年\s*(\d{1,2})\s*月", text)
-    return (
-        int(year.group(1)) if year else None,
-        int(month.group(1)) if month else None,
-    )
+    year = re.search(r"(\d{4})\s*[年년]", text)
+    month = re.search(r"[年년]\s*(\d{1,2})\s*[月월]", text)
+    if not year:
+        # 「1998-03」「1998/3」 같은 표기도 받아준다
+        plain = re.match(r"\s*(\d{4})[-/.](\d{1,2})", text)
+        if plain:
+            return int(plain.group(1)), int(plain.group(2))
+        bare = re.search(r"(\d{4})", text)
+        return (int(bare.group(1)) if bare else None), None
+    return int(year.group(1)), int(month.group(1)) if month else None
 
 
 def parse_walk_minutes(text: str) -> int | None:
-    """「徒歩8分」→ 8."""
+    """「徒歩8分」「도보 8분」「8」→ 8."""
     if not text:
         return None
-    m = re.search(r"徒歩\s*(\d+)\s*分", text)
-    return int(m.group(1)) if m else None
+    m = re.search(r"(?:徒歩|도보)\s*(\d+)\s*[分분]?", text)
+    if m:
+        return int(m.group(1))
+    stripped = text.strip()
+    return int(stripped) if stripped.isdigit() else None
 
 
 _PREF_RE = re.compile(r"^\s*(東京都|北海道|京都府|大阪府|.{2,3}県)")
@@ -236,13 +250,16 @@ _CITY_RE = re.compile(r"(.+?郡.+?[町村]|.+?市.+?区|.+?[市区町村])")
 
 
 def parse_stage(text: str, default: str = STAGE_USED) -> str:
-    """「新築」「中古」「新築分譲」 등의 표기를 stage 값으로."""
+    """「新築」「中古」「신축」「중고」 등의 표기를 stage 값으로.
+
+    한국어·일본어·영어 어느 쪽으로 적어도 같게 읽는다.
+    """
     if not text:
         return default
     lowered = text.strip().lower()
-    if lowered in ("new", "shinchiku") or "新築" in text or "分譲" in text:
+    if lowered in ("new", "shinchiku") or any(k in text for k in ("新築", "分譲", "신축", "분양")):
         return STAGE_NEW
-    if lowered in ("used", "chuko") or "中古" in text:
+    if lowered in ("used", "chuko") or any(k in text for k in ("中古", "중고")):
         return STAGE_USED
     return default
 

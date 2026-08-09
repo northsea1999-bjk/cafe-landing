@@ -59,30 +59,86 @@
     "feed": {
       "enabled": false,
       "basis": "",
-      "location": "data/incoming/listings.csv",
+      "location": "data/incoming/입력표.csv",
       "format": "csv",
-      "encoding": "cp932",
+      "encoding": "utf-8-sig",
       "field_map": {
-        "source_id": "物件番号",
-        "title": "物件名",
-        "stage": "区分",
-        "price": "価格",
-        "prefecture": "都道府県",
-        "city": "市区町村",
-        "address": "所在地",
-        "line": "沿線",
-        "station": "最寄駅",
-        "walk": "徒歩",
-        "area_m2": "専有面積",
-        "layout": "間取り",
-        "built": "築年月",
-        "floor": "所在階",
-        "total_floors": "総階数",
-        "total_units": "総戸数",
-        "management_fee": "管理費",
-        "repair_reserve": "修繕積立金",
-        "url": "詳細URL",
-        "listed_on": "情報公開日"
+        "source_id": [
+          "번호",
+          "物件番号"
+        ],
+        "title": [
+          "맨션이름",
+          "物件名"
+        ],
+        "stage": [
+          "구분",
+          "区分"
+        ],
+        "price": [
+          "가격",
+          "価格"
+        ],
+        "address": [
+          "주소",
+          "所在地"
+        ],
+        "line": [
+          "노선",
+          "沿線"
+        ],
+        "station": [
+          "가까운역",
+          "最寄駅"
+        ],
+        "walk": [
+          "도보분",
+          "徒歩"
+        ],
+        "sub_area": [
+          "역세권",
+          "駅エリア"
+        ],
+        "area_m2": [
+          "전용면적",
+          "専有面積"
+        ],
+        "layout": [
+          "방구조",
+          "間取り"
+        ],
+        "built": [
+          "준공년월",
+          "築年月"
+        ],
+        "floor": [
+          "층",
+          "所在階"
+        ],
+        "total_floors": [
+          "총층수",
+          "総階数"
+        ],
+        "total_units": [
+          "총세대수",
+          "総戸数"
+        ],
+        "management_fee": [
+          "관리비",
+          "管理費"
+        ],
+        "repair_reserve": [
+          "수선적립금",
+          "修繕積立金"
+        ],
+        "url": [
+          "주소링크",
+          "詳細URL"
+        ],
+        "listed_on": [
+          "등록일",
+          "情報公開日"
+        ]
       }
     },
     "sample": {
