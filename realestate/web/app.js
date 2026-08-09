@@ -57,6 +57,7 @@ const I18N = {
     groupCount: '{n}건', stageUsedHead: '중고', stageNewHead: '신축 분양',
     wardNoItems: '해당 없음',
     changeFromTo: '{from} → {to}',
+    partialNote: '마지막 {period} 는 아직 진행 중이라 표본이 덜 모였습니다 — 대표 숫자와 변동률에서는 뺐습니다',
     stageUsed: '중고', stageNew: '신축 분양', stageBoth: '둘 다 비교',
     r3y: '3년', r5y: '5년', rAll: '전체',
     scaleAbs: '실제 금액', scaleIdx: '지수 =100',
@@ -125,6 +126,7 @@ const I18N = {
     groupCount: '{n}件', stageUsedHead: '中古', stageNewHead: '新築分譲',
     wardNoItems: '該当なし',
     changeFromTo: '{from} → {to}',
+    partialNote: '마지막 {period} 는 아직 진행 중이라 표본이 덜 모였습니다 — 대표 숫자와 변동률에서는 뺐습니다',
     stageUsed: '中古', stageNew: '新築分譲', stageBoth: '両方を比較',
     r3y: '3年', r5y: '5年', rAll: '全期間',
     scaleAbs: '実額', scaleIdx: '指数 =100',
@@ -271,6 +273,16 @@ function scaleSeries(points) {
   return points.map((p) => (p.value === null ? p : { ...p, value: (p.value / base) * 100, raw: p.value }));
 }
 
+/** 아직 안 끝난 구간인지. 표본이 덜 모여 늘 낮게 나오므로 요약에서 뺀다. */
+function isPartial(period) {
+  const trends = trendsData();
+  for (const series of trends?.series ?? []) {
+    const point = series.points.find((p) => p.period === period);
+    if (point) return Boolean(point.partial);
+  }
+  return false;
+}
+
 function clipPoints(points, periods) {
   const keep = new Set(periods);
   return points.filter((p) => keep.has(p.period));
@@ -409,12 +421,25 @@ function renderLineChart(host, opts) {
         root.appendChild(svg('circle', { cx: x(run[0].i), cy: y(run[0].value), r: 2.5, fill: s.color }));
         continue;
       }
-      const d = run.map((p, k) => `${k ? 'L' : 'M'}${x(p.i).toFixed(1)},${y(p.value).toFixed(1)}`).join(' ');
-      root.appendChild(svg('path', {
-        d, fill: 'none', stroke: s.color, 'stroke-width': 2,
-        'stroke-linejoin': 'round', 'stroke-linecap': 'round',
-        'stroke-dasharray': s.dashed ? '6 4' : null,
-      }));
+      // 마지막 점이 '진행 중'이면 그 구간만 점선으로 — 확정된 값과 구분한다
+      const tail = run[run.length - 1];
+      const solid = tail.partial ? run.slice(0, -1) : run;
+      if (solid.length > 1) {
+        const d = solid.map((p, k) => `${k ? 'L' : 'M'}${x(p.i).toFixed(1)},${y(p.value).toFixed(1)}`).join(' ');
+        root.appendChild(svg('path', {
+          d, fill: 'none', stroke: s.color, 'stroke-width': 2,
+          'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+          'stroke-dasharray': s.dashed ? '6 4' : null,
+        }));
+      }
+      if (tail.partial && run.length > 1) {
+        const prev = run[run.length - 2];
+        root.appendChild(svg('path', {
+          d: `M${x(prev.i).toFixed(1)},${y(prev.value).toFixed(1)}L${x(tail.i).toFixed(1)},${y(tail.value).toFixed(1)}`,
+          fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linecap': 'round',
+          'stroke-dasharray': '2 3', opacity: 0.75,
+        }));
+      }
     }
   }
 
@@ -423,7 +448,7 @@ function renderLineChart(host, opts) {
     .map((s) => {
       const last = [...s.points].reverse().find((p) => p.value !== null);
       if (!last) return null;
-      return { s, i: s.points.indexOf(last), value: last.value };
+      return { s, i: s.points.indexOf(last), value: last.value, partial: Boolean(last.partial) };
     })
     .filter(Boolean)
     .sort((a, b) => b.value - a.value);
@@ -433,7 +458,9 @@ function renderLineChart(host, opts) {
     const cx = x(end.i);
     const cy = y(end.value);
     root.appendChild(svg('circle', { cx, cy, r: 6, fill: 'var(--surface-1)' }));  // 2px 서피스 링
-    root.appendChild(svg('circle', { cx, cy, r: 4, fill: end.s.color }));
+    root.appendChild(end.partial
+      ? svg('circle', { cx, cy, r: 4, fill: 'var(--surface-1)', stroke: end.s.color, 'stroke-width': 2 })
+      : svg('circle', { cx, cy, r: 4, fill: end.s.color }));
 
     if (!endLabels || placed.length >= 4) continue;
     if (placed.some((p) => Math.abs(p - cy) < 15)) continue;   // 겹치면 스택하지 않고 생략
@@ -501,7 +528,9 @@ function attachCrosshair(host, root, ctx) {
       name.append(sw, document.createTextNode(s.label));
       const val = document.createElement('span');
       val.className = 'tt-val';
-      val.textContent = `${fmt1(p.value)}${valueSuffix}` + (p.samples ? ` (n=${p.samples})` : '');
+      val.textContent = `${fmt1(p.value)}${valueSuffix}`
+        + (p.samples ? ` (n=${p.samples})` : '')
+        + (p.partial ? ' *' : '');
       row.append(name, val);
       tip.appendChild(row);
     }
@@ -1113,9 +1142,12 @@ function renderTiles() {
   // 그때 빈칸을 보여주는 대신, 값이 있는 가장 최근 분기까지 물러난다.
   const findPeriod = (stage, fromEnd) => {
     const order = fromEnd ? [...periods].reverse() : periods;
-    for (const period of order) {
-      const value = pick(stage, period);
-      if (value !== null) return { period, value };
+    for (const skipPartial of [true, false]) {   // 완료된 구간을 먼저 찾고, 없으면 그때 진행 중도 허용
+      for (const period of order) {
+        if (skipPartial && isPartial(period)) continue;
+        const value = pick(stage, period);
+        if (value !== null) return { period, value };
+      }
     }
     return { period: null, value: null };
   };
@@ -1207,6 +1239,10 @@ function renderMain() {
     (state.scale === 'idx' ? t('mainSubIdx', { base: periods[0] ?? '' }) : t('mainSubAbs'))
     + ' · ' + t('mainSubUnits', { units: trendsData()?.min_total_units ?? 500 })
     + (state.stage === 'both' ? ' · ' + t('mainSubBoth') : '');
+
+  const ongoing = periods.filter(isPartial);
+  const note = document.getElementById('partial-note');
+  if (note) note.textContent = ongoing.length ? t('partialNote', { period: ongoing[0] }) : '';
 
   renderLineChart(document.getElementById('main-chart'), {
     series, periods, height: 330, valueSuffix: suffix,
@@ -1340,7 +1376,8 @@ function renderChange() {
     .map((code) => {
       const row = trends.series.find((s) => s.ward_code === code && s.stage === stage);
       if (!row) return null;
-      const pts = clipPoints(row.points, periods).filter((p) => p.value !== null);
+      const all = clipPoints(row.points, periods).filter((p) => p.value !== null);
+      const pts = all.filter((p) => !p.partial).length >= 2 ? all.filter((p) => !p.partial) : all;
       if (pts.length < 2) return null;
       const from = pts[0].value, to = pts[pts.length - 1].value;
       return { label: wardLabel(code), value: (to / from - 1) * 100, from, to, color: wardColor(code) };
@@ -1348,8 +1385,9 @@ function renderChange() {
     .filter(Boolean)
     .sort((a, b) => b.value - a.value);
 
+  const lastSettled = [...periods].reverse().find((x) => !isPartial(x)) ?? periods[periods.length - 1];
   document.getElementById('change-sub').textContent = t('changeSub', {
-    from: periods[0] ?? '', to: periods[periods.length - 1] ?? '', stage: stageLabel(stage),
+    from: periods[0] ?? '', to: lastSettled, stage: stageLabel(stage),
   });
   renderChangeChart(host, rows);
 }

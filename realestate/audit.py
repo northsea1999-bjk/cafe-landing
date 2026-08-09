@@ -133,14 +133,25 @@ def main() -> int:
 
         # 변동률 = 마지막/처음 - 1
         pct_bad = 0
+        partial_leak = 0
         for series in trends["series"]:
             seen = [p for p in series["points"] if p["value"] is not None]
             if len(seen) < 2 or series.get("change_pct") is None:
                 continue
-            expected = (seen[-1]["value"] / seen[0]["value"] - 1) * 100
+            # 요약은 진행 중 구간을 빼고 계산해야 한다
+            settled = [p for p in seen if not p.get("partial")]
+            base = settled if len(settled) >= 2 else seen
+            expected = (base[-1]["value"] / base[0]["value"] - 1) * 100
             if abs(expected - series["change_pct"]) > 0.15:
                 pct_bad += 1
+            if series.get("latest") != base[-1]["value"]:
+                partial_leak += 1
         check(pct_bad == 0, f"[{units}세대] 변동률이 어긋난 계열 {pct_bad}개")
+        check(partial_leak == 0, f"[{units}세대] 최신값에 진행 중 구간이 섞인 계열 {partial_leak}개")
+
+        # 진행 중 구간이 실제로 표시돼 있는지 (표시가 없으면 요약이 조용히 왜곡된다)
+        marked = {p["period"] for s2 in trends["series"] for p in s2["points"] if p.get("partial")}
+        check(len(marked) <= 1, f"[{units}세대] 진행 중으로 표시된 구간이 여러 개: {marked}")
 
     # ---------------------------------------------------------------
     # 3. 지도: 최근 N분기 합산 중앙값

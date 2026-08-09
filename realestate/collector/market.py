@@ -123,6 +123,7 @@ def build_listing_trends(
                 {p: buckets.get((name, stage, p), []) for p in periods},
                 periods,
                 min_samples,
+                granularity,
             )
             built = _summarize(points)
             if built is None:
@@ -198,7 +199,7 @@ def build_official_trends(config: dict[str, Any]) -> dict[str, Any]:
     periods = [f"{y}Q{q}" for y, q in reversed(quarters)]
     series: list[dict[str, Any]] = []
     for ward in wards:
-        points = _points({p: buckets.get((ward, p), []) for p in periods}, periods, min_samples)
+        points = _points({p: buckets.get((ward, p), []) for p in periods}, periods, min_samples, "quarter")
         built = _summarize(points)
         if built is None:
             continue
@@ -269,14 +270,21 @@ def _unit_price(record: dict[str, Any]) -> float | None:
 
 
 def _points(
-    by_period: dict[str, list[float]], periods: list[str], min_samples: int
+    by_period: dict[str, list[float]],
+    periods: list[str],
+    min_samples: int,
+    granularity: str = "quarter",
 ) -> list[dict[str, Any]]:
+    ongoing = current_period(granularity)
     out: list[dict[str, Any]] = []
     for period in periods:
         values = by_period.get(period, [])
+        # 아직 안 끝난 구간은 표본이 덜 모여 늘 낮게 나온다. 값은 보여주되
+        # '진행 중'이라고 표시해서, 대표 숫자와 변동률에서는 빼도록 한다.
+        partial = period == ongoing
         if len(values) < min_samples:
-            # 표본이 부족한 분기는 0으로 눕히지 않고 결측(None)으로 둔다.
-            out.append({"period": period, "value": None, "samples": len(values)})
+            # 표본이 부족한 구간은 0으로 눕히지 않고 결측(None)으로 둔다.
+            out.append({"period": period, "value": None, "samples": len(values), "partial": partial})
             continue
         out.append(
             {
@@ -285,6 +293,7 @@ def _points(
                 "samples": len(values),
                 "p25": round(_quantile(values, 0.25), 1),
                 "p75": round(_quantile(values, 0.75), 1),
+                "partial": partial,
             }
         )
     return out
@@ -294,7 +303,11 @@ def _summarize(points: list[dict[str, Any]]) -> dict[str, Any] | None:
     observed = [p for p in points if p["value"] is not None]
     if len(observed) < 2:
         return None
-    first, last = observed[0], observed[-1]
+    # 진행 중 구간은 제외하고 요약한다 — 넣으면 늘 '최근 하락'처럼 보인다
+    settled = [p for p in observed if not p.get("partial")]
+    if len(settled) < 2:
+        settled = observed
+    first, last = settled[0], settled[-1]
     return {
         "latest": last["value"],
         "latest_period": last["period"],
@@ -304,7 +317,20 @@ def _summarize(points: list[dict[str, Any]]) -> dict[str, Any] | None:
         if first["value"]
         else None,
         "total_samples": sum(p.get("samples", 0) for p in points),
+        "has_partial": any(p.get("partial") and p["value"] is not None for p in points),
     }
+
+
+def current_period(granularity: str) -> str:
+    """오늘이 속한 구간. 이 구간은 아직 안 끝났으므로 값이 낮게 잡힌다."""
+    today = date.today()
+    if granularity == "month":
+        return f"{today.year}-{today.month:02d}"
+    if granularity == "half":
+        return f"{today.year}H{1 if today.month <= 6 else 2}"
+    if granularity == "year":
+        return str(today.year)
+    return f"{today.year}Q{(today.month - 1) // 3 + 1}"
 
 
 def _period_of(value: str, granularity: str) -> str | None:
@@ -563,7 +589,7 @@ def build_station_trends(
             continue
         for stage in (STAGE_USED, STAGE_NEW):
             points = _points(
-                {p: buckets.get((station, stage, p), []) for p in periods}, periods, min_samples
+                {p: buckets.get((station, stage, p), []) for p in periods}, periods, min_samples, granularity
             )
             built = _summarize(points)
             if built is None:
