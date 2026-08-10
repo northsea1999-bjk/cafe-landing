@@ -464,6 +464,8 @@ STATION_AREAS: dict[str, tuple[str, float, float, str]] = {
     "勝どき":     ("13102", 35.6588, 139.7770, "가치도키역"),
     "八丁堀":     ("13102", 35.6752, 139.7776, "핫초보리역"),
     "人形町":     ("13102", 35.6862, 139.7827, "닌교초역"),
+    "水天宮前":   ("13102", 35.6829, 139.7869, "스이텐구마에역"),
+    "馬喰町":     ("13102", 35.6947, 139.7823, "바쿠로초역"),
     # 港区
     "六本木":     ("13103", 35.6628, 139.7315, "롯폰기역"),
     "麻布十番":   ("13103", 35.6556, 139.7360, "아자부주반역"),
@@ -503,9 +505,24 @@ STATION_AREAS: dict[str, tuple[str, float, float, str]] = {
     "広尾":       ("13113", 35.6520, 139.7220, "히로오역"),
 }
 
+#: 한국어 역 이름 → 일본어. 크롬 번역본을 붙여넣어도 역을 알아보게 한다.
+STATION_KO_TO_JA: dict[str, str] = {}
+
 STATIONS_BY_WARD: dict[str, list[str]] = defaultdict(list)
 for _station, (_ward_code, _lat, _lon, _ko) in STATION_AREAS.items():
     STATIONS_BY_WARD[_ward_code].append(_station)
+    STATION_KO_TO_JA[_ko] = _station                 # 「롯폰기역」
+    STATION_KO_TO_JA[_ko.removesuffix("역")] = _station  # 「롯폰기」
+
+
+def normalize_station(name: str) -> str:
+    """「스이텐구마에」「水天宮前」「水天宮前駅」 → 「水天宮前」."""
+    if not name:
+        return ""
+    cleaned = name.strip().removesuffix("駅").removesuffix("역").strip()
+    if cleaned in STATION_AREAS:
+        return cleaned
+    return STATION_KO_TO_JA.get(cleaned, cleaned)
 
 
 def build_area_map(

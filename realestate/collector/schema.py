@@ -211,7 +211,7 @@ def parse_area_m2(text: str) -> float | None:
     """「72.45m2」「72.45㎡」→ float."""
     if not text:
         return None
-    m = re.search(r"([\d.]+)\s*(?:m2|㎡|m²)", text.replace(",", ""))
+    m = re.search(r"([\d.]+)\s*(?:m\s*2|㎡|m²|평방미터)", text.replace(",", ""))
     if not m:
         m = re.search(r"([\d.]+)", text.replace(",", ""))
     return float(m.group(1)) if m else None
@@ -244,7 +244,15 @@ def parse_walk_minutes(text: str) -> int | None:
     return int(stripped) if stripped.isdigit() else None
 
 
-_PREF_RE = re.compile(r"^\s*(東京都|北海道|京都府|大阪府|.{2,3}県)")
+#: 한국어로 번역된 페이지도 그대로 읽는다 (크롬 자동번역 결과를 붙여넣는 경우)
+WARD_KO_TO_JA = {
+    "지요다구": "千代田区", "주오구": "中央区", "미나토구": "港区",
+    "신주쿠구": "新宿区", "분쿄구": "文京区", "고토구": "江東区",
+    "시부야구": "渋谷区", "시나가와구": "品川区", "메구로구": "目黒区",
+    "도시마구": "豊島区", "다이토구": "台東区", "스미다구": "墨田区",
+}
+
+_PREF_RE = re.compile(r"^\s*(東京都|도쿄도|北海道|京都府|大阪府|.{2,3}県)")
 # 政令指定都市의 「○○市△△区」를 먼저 잡아야 한다. 그러지 않으면 "横浜市"에서 끊긴다.
 _CITY_RE = re.compile(r"(.+?郡.+?[町村]|.+?市.+?区|.+?[市区町村])")
 
@@ -277,19 +285,27 @@ def split_address(address: str) -> tuple[str, str]:
     pref = ""
     match = _PREF_RE.match(text)
     if match:
-        pref = match.group(1)
-        text = text[match.end():]
+        pref = "東京都" if match.group(1) == "도쿄도" else match.group(1)
+        text = text[match.end():].lstrip()
+
+    # 한국어 표기를 먼저 본다 — 「주오구」는 아래 한자 규칙에 안 걸린다
+    for ko, ja in WARD_KO_TO_JA.items():
+        if text.startswith(ko):
+            return pref or "東京都", ja
 
     city_match = _CITY_RE.match(text)
     return pref, city_match.group(1) if city_match else ""
 
 
 def dedupe(listings: Iterable[Listing]) -> list[Listing]:
-    """같은 물건이 여러 포털에 중복 게재되는 경우를 하나로 접는다.
+    """같은 물건이 여러 중개사·포털에 중복 게재된 것을 하나로 접는다.
 
-    포털 간 ID는 공유되지 않으므로 (주소 + 면적 + 간취り + 층) 조합으로 본다.
-    이 조합이 같으면 같은 방으로 간주하고, 먼저 온 쪽(= 수집 순서상 우선
-    소스)을 남긴 뒤 나머지는 also_on 에 출처만 기록한다.
+    주소 문자열만으로는 못 접는다. 실제로 같은 방인데 한쪽은
+    「日本橋箱崎町29-1」, 다른 쪽은 「日本橋箱崎町」로 적는 일이 흔하다.
+    그래서 (구 + 전용면적 + 간취り + 축년 + 가격) 이 모두 같으면 같은 방으로 본다.
+    가격까지 같아야 접으므로, 같은 건물의 다른 호실이 잘못 합쳐지지는 않는다.
+
+    먼저 온 쪽을 남기고, 접힌 쪽의 출처는 also:소스 태그로 남긴다.
     """
     out: list[Listing] = []
     seen: dict[tuple, Listing] = {}
@@ -297,13 +313,15 @@ def dedupe(listings: Iterable[Listing]) -> list[Listing]:
     for item in listings:
         area = item.area_m2 or item.building_area_m2 or item.land_area_m2
         sig = (
-            item.address.strip(),
+            item.city.strip(),
             round(area, 1) if area else None,
             item.layout.strip(),
+            item.built_year,
+            item.price_yen,
             item.floor,
         )
-        # 주소가 비면 신뢰할 수 없으므로 접지 않는다.
-        if not sig[0]:
+        # 구·면적·간취り 가 다 있어야 판단할 수 있다. 하나라도 비면 접지 않는다.
+        if not (sig[0] and sig[1] and sig[2]):
             out.append(item)
             continue
 
@@ -315,5 +333,8 @@ def dedupe(listings: Iterable[Listing]) -> list[Listing]:
             tag = f"also:{item.source}"
             if tag not in prior.features:
                 prior.features.append(tag)
+            # 원문 링크가 없던 쪽이면 채워 준다
+            if not prior.url and item.url:
+                prior.url = item.url
 
     return out
