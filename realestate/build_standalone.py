@@ -9,7 +9,10 @@ fetch 가 막힌 환경(로컬 file://, 정적 호스팅 없이 파일만 전달
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
+
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # 윈도우 콘솔 대응
 
 ROOT = Path(__file__).resolve().parent
 WEB = ROOT / "web"
@@ -118,8 +121,6 @@ def build() -> Path:
 
 
 if __name__ == "__main__":
-    import sys
-
     if "--input" in sys.argv:
         path = build_input_tool()
     elif "--artifact" in sys.argv:

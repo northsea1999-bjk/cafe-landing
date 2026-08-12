@@ -13,6 +13,8 @@ import json
 import statistics
 import sys
 from collections import defaultdict
+
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # 윈도우 콘솔 대응
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent

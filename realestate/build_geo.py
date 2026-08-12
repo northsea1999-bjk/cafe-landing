@@ -19,6 +19,8 @@ import sys
 import urllib.request
 from pathlib import Path
 
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # 윈도우 콘솔 대응
+
 ROOT = Path(__file__).resolve().parent
 SOURCE_URL = "https://raw.githubusercontent.com/dataofjapan/land/master/tokyo.geojson"
 CACHE = ROOT / "data" / "tokyo.geojson"

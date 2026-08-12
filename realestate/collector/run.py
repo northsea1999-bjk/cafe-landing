@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from . import market
+from ._console import setup as _setup_console
 from .schema import dedupe
 from .sources import REGISTRY, SOURCE_ORDER, SourceError
 from .sources.portals import PORTALS
@@ -32,6 +33,7 @@ DEFAULT_CONFIG = REPO_ROOT / "realestate" / "config.json"
 
 
 def main(argv: list[str] | None = None) -> int:
+    _setup_console()
     parser = argparse.ArgumentParser(description="도쿄 7구 맨션 가격추이 수집기")
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--data-dir", type=Path, default=None, help="기본값은 config.data_dir")

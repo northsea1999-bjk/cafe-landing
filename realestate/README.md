@@ -26,6 +26,27 @@ python3 -m realestate.collector.run --config realestate/config.json
 cd realestate/web && python3 -m http.server 8000     # http://localhost:8000
 ```
 
+### 윈도우에서
+
+명령만 `python3` → `python` 으로 바꾸면 됩니다. 그 외에 설치할 것은 없습니다
+(파이썬 3.11 표준 라이브러리만 씁니다).
+
+```powershell
+python -m realestate.collector.run --config realestate/config.json
+cd realestate\web
+python -m http.server 8000
+```
+
+**윈도우 콘솔 인코딩** — 이 프로그램은 일본어 지명(`中央区`·`アットホーム`)을
+화면에 찍는데, 윈도우 기본 콘솔은 한국어판이 cp949, 일본어판이 cp932라
+그대로 두면 `UnicodeEncodeError` 로 **프로그램이 죽습니다**.
+그래서 진입점마다 `collector/_console.py` 로 표준 출력을 UTF-8 로 바꾸고,
+못 찍는 글자는 죽는 대신 대체 문자로 흘려보냅니다.
+글자가 깨져 보이면 `chcp 65001` 을 한 번 실행하면 됩니다.
+
+파일은 전부 `encoding="utf-8"` 을 명시해 읽고 씁니다. 엑셀이 저장한 CSV는
+앞에 BOM이 붙으므로 `config.json` 의 피드 인코딩은 `utf-8-sig` 입니다.
+
 매일 09:10 JST에 `.github/workflows/realestate-daily.yml` 이 같은 명령을 돌리고
 결과 JSON을 커밋합니다.
 
